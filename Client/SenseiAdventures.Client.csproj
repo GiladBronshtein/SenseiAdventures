@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Shared\template.Shared.csproj" />
+    <ProjectReference Include="..\Shared\SenseiAdventures.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

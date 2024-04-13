@@ -3,7 +3,7 @@ using System.Data;
 using Dapper;
 using Microsoft.Data.Sqlite;
 
-namespace template.Server.Data
+namespace SenseiAdventures.Server.Data
 {
 	public class DbRepository
 	{

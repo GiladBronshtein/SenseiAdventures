@@ -3,7 +3,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 
 
-namespace template.Server.Data
+namespace SenseiAdventures.Server.Data
 {
     public class FilesManage
     {

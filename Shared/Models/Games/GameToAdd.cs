@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace template.Shared.Models.Games
+namespace SenseiAdventures.Shared.Models.Games
 {
     public class GameToAdd
     {

@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Client\template.Client.csproj" />
-    <ProjectReference Include="..\Shared\template.Shared.csproj" />
+    <ProjectReference Include="..\Client\SenseiAdventures.Client.csproj" />
+    <ProjectReference Include="..\Shared\SenseiAdventures.Shared.csproj" />
   </ItemGroup>
 
 

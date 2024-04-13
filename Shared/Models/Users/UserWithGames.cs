@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using template.Shared.Models.Games;
-namespace template.Shared.Models.Users
+using SenseiAdventures.Shared.Models.Games;
+namespace SenseiAdventures.Shared.Models.Users
 {
     public class UserWithGames
     {

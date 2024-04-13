@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace template.Server.Helpers
+namespace SenseiAdventures.Server.Helpers
 {
 	public class AuthCheck : IAsyncActionFilter
     {

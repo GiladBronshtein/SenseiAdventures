@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using template.Server.Data;
-using template.Shared.Models.Games; 
-using template.Shared.Models.Users;
+using SenseiAdventures.Server.Data;
+using SenseiAdventures.Shared.Models.Games; 
+using SenseiAdventures.Shared.Models.Users;
 
-namespace template.Server.Controllers
+namespace SenseiAdventures.Server.Controllers
 {
     [Route("api/[controller]/{userId}")]
     [ApiController]

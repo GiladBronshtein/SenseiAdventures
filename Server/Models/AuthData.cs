@@ -1,5 +1,5 @@
 ﻿using System;
-namespace template.Server.Models
+namespace SenseiAdventures.Server.Models
 {
 	public class AuthData
 	{
