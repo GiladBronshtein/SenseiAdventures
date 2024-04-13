@@ -1,0 +1,6 @@
+.vscode
+.vs
+bin
+obj
+*.db-shm
+*.db-wal

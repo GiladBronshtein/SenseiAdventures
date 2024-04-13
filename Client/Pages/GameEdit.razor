@@ -1,0 +1,19 @@
+﻿@page "/GameEdit/{gameCode}"
+@inject HttpClient Http
+@inject NavigationManager Nav
+@using template.Shared.Models.Games;
+@using template.Shared.Models.Users;
+
+<h3>GameEdit</h3>
+
+@code {
+
+    [CascadingParameter]
+    public int UserId { get; set; } // Inject UserId
+
+    [Parameter]
+    public string gameCode { get; set; } // Inject gameCode
+
+    GameDetails gameData; // Object to hold the game data
+    UserWithGames user; // Object to hold the user data
+}

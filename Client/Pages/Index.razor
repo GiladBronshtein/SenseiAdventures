@@ -1,0 +1,11 @@
+﻿@page "/"
+<h6>המשתמש שמחובר כעת: @UserId</h6>
+<span>עמוד נחיתה - סרטון וכניסה לעורך</span>
+
+
+
+@code {
+    [CascadingParameter]
+    public int UserId { get; set; }
+}
+

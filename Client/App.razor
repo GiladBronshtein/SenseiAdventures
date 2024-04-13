@@ -1,0 +1,57 @@
+﻿@inject HttpClient _http
+@inject NavigationManager _nav
+
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        @if (UserId > 0 || _nav.Uri + "/" == _nav.ToAbsoluteUri("./").ToString() || _nav.Uri == _nav.ToAbsoluteUri("./").ToString())
+        {
+            <CascadingValue Value="UserId">
+                <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </CascadingValue>
+
+        }
+        else
+        {
+            <p>loading portelem</p>
+        }
+
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+
+@code {
+    int UserId = 0;
+    protected override async Task OnInitializedAsync()
+    {
+        var res = await _http.GetAsync("api/users");
+        if (res.IsSuccessStatusCode)
+        {
+            UserId = res.Content.ReadFromJsonAsync<int>().Result;
+        }
+    }
+
+    public void Dispose()
+    {
+        _nav.LocationChanged -= OnLocationChanged;
+    }
+
+    async void OnLocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        if (_nav.Uri + "/" != _nav.ToAbsoluteUri("./").ToString() && _nav.Uri != _nav.ToAbsoluteUri("./").ToString() && _nav.Uri != _nav.ToAbsoluteUri("../Game").ToString())
+        {
+            var res = await _http.GetAsync("api/users");
+            if (res.IsSuccessStatusCode)
+            {
+                UserId = res.Content.ReadFromJsonAsync<int>().Result;
+            }
+        }
+        StateHasChanged();
+    }
+}
+
