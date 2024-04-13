@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34714.143
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SenseiAdventures.Server", "Server\SenseiAdventures.Server.csproj", "{BF13691D-27E4-42BD-850F-5B017284EAD6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "template.Server", "Server\template.Server.csproj", "{BF13691D-27E4-42BD-850F-5B017284EAD6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SenseiAdventures.Client", "Client\SenseiAdventures.Client.csproj", "{240FC635-4CAB-4D72-95C8-18E4D42FBACE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "template.Client", "Client\template.Client.csproj", "{240FC635-4CAB-4D72-95C8-18E4D42FBACE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SenseiAdventures.Shared", "Shared\SenseiAdventures.Shared.csproj", "{0375A7B5-8E6F-4620-8079-C014BBED67E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "template.Shared", "Shared\template.Shared.csproj", "{0375A7B5-8E6F-4620-8079-C014BBED67E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

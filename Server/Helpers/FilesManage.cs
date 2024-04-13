@@ -1,7 +1,7 @@
 ﻿using System;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
-namespace SenseiAdventures.Server.Helpers
+namespace template.Server.Helpers
 {
 	public class FilesManage
 	{

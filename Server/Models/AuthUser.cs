@@ -1,5 +1,5 @@
 ﻿using System;
-namespace SenseiAdventures.Server.Models
+namespace template.Server.Models
 {
 	public class AuthUser
 	{

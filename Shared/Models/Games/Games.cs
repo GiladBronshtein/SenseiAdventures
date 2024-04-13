@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SenseiAdventures.Shared.Models.Games
+namespace template.Shared.Models.Games
 {
     public class Games
     {

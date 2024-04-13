@@ -2,10 +2,10 @@
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
-using SenseiAdventures.Server.Data;
-using SenseiAdventures.Server.Models;
+using template.Server.Data;
+using template.Server.Models;
 
-namespace SenseiAdventures.Server.Helpers
+namespace template.Server.Helpers
 {
 	public class AuthRepository
 	{

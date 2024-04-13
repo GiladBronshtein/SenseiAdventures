@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.IdentityModel.Tokens;
-using SenseiAdventures.Server.Data;
-using SenseiAdventures.Server.Helpers;
+using template.Server.Data;
+using template.Server.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<DbRepository>();
-builder.Services.AddScoped<SenseiAdventures.Server.Data.FilesManage>();
+builder.Services.AddScoped<template.Server.Data.FilesManage>();
 
 builder.Services.AddScoped<AuthRepository>();
 builder.Services.AddScoped<AuthCheck>();

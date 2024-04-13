@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace SenseiAdventures.Server.Helpers
+namespace template.Server.Helpers
 {
 	public class TokenService
 	{

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SenseiAdventures.Server.Data;
+using template.Server.Data;
 
-namespace SenseiAdventures.Server.Controllers
+namespace template.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
