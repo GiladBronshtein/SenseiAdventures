@@ -1,2 +1,2 @@
-# SenseiAdventures
- SenseiAdventures
+# Sensei Adventures
+ Sensei Adventures
