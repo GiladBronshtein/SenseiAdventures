@@ -1,0 +1,95 @@
+﻿@using template.Shared.Models.Games;
+@using template.Shared.Models.Users;
+
+<div class="container">
+
+    <!-- ROW 1 - TITLE -->
+    <div class="row  mb-5">
+        <div class="col col-8">
+            <h3>דוכן - שבירת בקבוקים</h3>
+            <span>שוברים את הבקבוק עם התשובה הנכונה</span>
+        </div>
+        <div class="col  col-4 text-end">
+            <button type="button" class="btn btn-secondary">כיבוי דוכן</button>
+        </div>
+    </div>
+
+    <EditForm Model="gameDetails" OnValidSubmit="formSubmit" OnInvalidSubmit="failedSubmit">
+     <DataAnnotationsValidator />
+
+
+    <!-- ROW 2 - Question and Image Inputs -->
+        <div class="row mb-3">
+            <div class="col col-12">
+                <label for="question" class="form-label">שאלה</label>
+                <span>(2-30 טווח תווים)</span>
+                <input type="text" class="form-control" id="question" placeholder="שאלה">
+            </div>
+        </div>
+
+    <!-- ROW 3 - Right Answer TITLE -->
+        <div class="row mb-3">
+            <div class="col col-12">
+                <span>תשובות לשאלה</span>
+                <span>(2-30 טווח תווים)</span>
+
+            </div>
+        </div>
+
+    <!-- ROW 4 - Right Answer -->
+        <div class="row mb-3">
+            <div class="col col-6">
+                <label for="correctAnswer" class="form-label">תשובה נכונה:</label>
+                <input type="text" class="form-control" id="correctAnswer" placeholder="תשובה נכונה">
+            </div>
+        </div>
+
+
+        <!-- ROW 5 - WRONG Answers TITLE -->
+        <div class="row mb-3">
+            <div class="col col-12">
+                <span>תשובות נוספות:</span>
+            </div>
+        </div>
+
+
+    <!-- ROW 6 - Wrong Answers -->
+    <div class="row mb-3">
+        <div class="col col-6">
+            <input type="text" class="form-control" placeholder="תשובה שגויה">
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col col-6">
+            <input type="text" class="form-control" placeholder="תשובה שגויה">
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col col-6">
+            <input type="text" class="form-control" placeholder="תשובה שגויה">
+        </div>
+    </div>
+
+    <!-- Submit Form -->
+    <div class="row mb-3">
+        <div class="col col-12">
+            <button type="submit" class="btn btn-primary">שמירת שאלה</button>
+        </div>
+        </div>
+
+    </EditForm>
+
+</div>
+@code {
+    GameDetails gameDetails = new GameDetails();
+
+    void formSubmit()
+    {
+        //
+    }
+
+    void failedSubmit()
+    {
+        //
+    }
+}

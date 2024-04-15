@@ -3,8 +3,98 @@
 @inject NavigationManager Nav
 @using template.Shared.Models.Games;
 @using template.Shared.Models.Users;
+@using template.Client.Components;
 
-<h3>GameEdit</h3>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Right column (widest) -->
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-12 p-2  bg-light">
+                    @switch (currentStage)
+                    {
+                        case Stage.StageA:
+                            <StageBottleBreak />
+                            break;
+                        case Stage.StageB:
+                            <StageTargetHit />
+                            break;
+                        case Stage.StageC:
+                            <StageBazzerHit />
+                            break;
+                        case Stage.StageD:
+                            <StageSlashing />
+                            break;
+                        default:
+                            <h1>בחרו דוכן</h1>
+                            break;
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle column (medium) -->
+        <div class="col-md-4">
+            <div class="row">
+                <div class="col-12 p-2  bg-light">Middle Column</div>
+            </div>
+        </div>
+
+        <!-- Left column (narrow with rows) -->
+        <div class="col-md-2">
+            <div class="row">
+                <div class="col-12 p-2  bg-light text-center">
+                    <span>
+                        חזרה למשחקים שלי
+                        <i class="fa fa-arrow-left"></i>
+                    </span>
+                </div>
+                <div class="col-12 p-2  bg-light">
+                    <div class="border rounded" style="background-color: #F7eeeD;">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-center p-2">יציאה</div>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-light w-100" @onclick="() => SetStage(Stage.StageD)">לחתוך תשובות</button>
+                            </div>
+                            <div class="col-6">
+                                <!-- Empty column -->
+                            </div>
+                            <div class="col-6">
+                                <!-- Empty column -->
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-light w-100" @onclick="() => SetStage(Stage.StageC)">פגיעה תשובה</button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-light w-100" @onclick="() => SetStage(Stage.StageB)">פגיעה במטרה</button>
+                            </div>
+                            <div class="col-6">
+                                <!-- Empty column -->
+                            </div>
+                            <div class="col-6">
+                                <!-- Empty column -->
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-light w-100" @onclick="() => SetStage(Stage.StageA)">שבירת בקבוקים</button>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex justify-content-center p-2">כניסה</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 p-2  bg-light">Row 3</div>
+                <div class="col-12 p-2  bg-light">
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-primary" value="publish">פרסום</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
 
@@ -16,4 +106,36 @@
 
     GameDetails gameData; // Object to hold the game data
     UserWithGames user; // Object to hold the user data
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the game data
+        //gameData = await Http.GetFromJsonAsync<GameDetails>($"api/Game/{gameCode}");
+
+        // Get the user data
+        //user = await Http.GetFromJsonAsync<UserWithGames>($"api/User/{UserId}");
+    }
+    private Task BazzerHit(MouseEventArgs e)
+    {
+        //show to component of stagebazzerhit
+        return Task.CompletedTask;
+        
+
+    }
+
+    private Stage currentStage = Stage.None;
+
+    private void SetStage(Stage stage)
+    {
+        currentStage = stage;
+    }
+
+    private enum Stage
+    {
+        None,
+        StageA = 1, //BottleBreak
+        StageB = 2, //TargetHit
+        StageC = 3, //BazzerHit
+        StageD = 4 //SlashingAnswers
+    }
 }

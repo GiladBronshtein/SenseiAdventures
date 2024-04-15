@@ -11,11 +11,11 @@
     <div class="row">
         <div class="col col-sm-8">
             <div>
-                <!-- Create New Game Button -->
-                <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                <!-- Button - Create New Game -->
+                <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="height: 86px;">
                     <span style="vertical-align: middle;">יצירת משחק חדש</span>
                     <span style="vertical-align: middle;">
-                        <i class="fa fa-plus-square" style="font-size: 36px; vertical-align: middle;"></i>
+                        <i class="fa fa-plus-square" style="font-size: 36px;  vertical-align: middle;"></i>
                     </span>
                 </button>
 
@@ -30,7 +30,7 @@
                             </div>
                             <div class="modal-body">
 
-                                <!-- modal form for new game creation -->
+                                <!-- Form for new game creation -->
                                 <EditForm Model="gameToAdd" OnValidSubmit="formSubmit" OnInvalidSubmit="failedSubmit">
                                     <DataAnnotationsValidator />
 
@@ -263,58 +263,7 @@
         }
 
 
-        // var parameters = new ModalParameters().Add(nameof(PopUpComponent.Message), "האם ברצונכם למחוק את המשחק?"); // Pass parameter(s) to modal component
-        // var messageForm = Modal.Show<PopUpComponent>("מחיקת משחק", parameters); // Show modal
-        // var result = await messageForm.Result; // Get result from modal
 
-        // if (result.Confirmed)
-        // {
-        //     if (filesToDeleteList.Count > 0)
-        //     {
-        //         //delete image files
-        //         var saveResponse = await Http.PostAsJsonAsync("api/Media/deleteImages", filesToDeleteList);
-        //         if (saveResponse.IsSuccessStatusCode == true)
-        //         {
-        //             Console.WriteLine("Images deleted Successfully");
-        //         }
-        //         else
-        //         {
-        //             msg = "IMAGES DELETE ERROR";
-        //         }
-        //     }
-
-        //     //שליחת המשתנה לקונטרולר
-        //     var res = await Http.DeleteAsync("api/game/" + UserId + "/deleteGame/" + game.GameCode);
-        //     if (res.IsSuccessStatusCode == true)
-        //     {
-        //         //הסרת המשחק מרשימת המשחקים
-        //         GamesList.Remove(game);
-        //     }
-        //     else
-        //     {
-        //         string error = res.Content.ReadAsStringAsync().Result;
-        //         switch (error)
-        //         {
-        //             case "No Session":
-        //                 msg = "Session error, please reload page";
-        //                 break;
-        //             case "User Not Logged In":
-        //                 msg = "You are not logged in, please reload page to try again";
-        //                 break;
-        //             case "User Not Found":
-        //                 msg = "the user details not found, please reload page to try again";
-        //                 break;
-        //         }
-        //     }
-
-        // }
-        // else
-        // {
-        //     Console.WriteLine("Not confirmed");
-        // }
-        // var currentUrl = Nav.Uri;
-        // // Navigate to the current URL to reload the page
-        // Nav.NavigateTo(currentUrl);
     }
 
     void formSubmit()

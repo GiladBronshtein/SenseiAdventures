@@ -1,11 +1,16 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-@*    <div class="sidebar">
+@* <div class="page">
+ *@
+    <div class="page d-flex flex-column" style="min-height: 100vh;">
+
+@* <div class="sidebar">
         <NavMenu />
     </div>  *@
+    @* <main> *@
 
-    <main>
+        <main class="flex-shrink-0">
+
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
@@ -44,5 +49,12 @@
             @Body
         </article>
     </main>
+
+    <!--NAV ITEMS-->
+    <footer class="mt-auto bg-dark text-white py-2">
+        <div class="container">
+            <span>Sensei Adventures</span>
+        </div>
+    </footer>
 </div>
 
