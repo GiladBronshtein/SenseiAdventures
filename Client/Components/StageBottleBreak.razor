@@ -1,95 +1,216 @@
-﻿@using template.Shared.Models.Games;
+﻿@inject HttpClient Http
+@inject NavigationManager Nav
+@using template.Shared.Models.Games;
 @using template.Shared.Models.Users;
 
-<div class="container">
 
+
+<style>
+    .scrollable-table-body {
+        display: block;
+        max-height: 450px; /* Adjust based on the height needed to show 10 rows */
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    table {
+        width: 100%;
+    }
+</style>
+
+
+
+<div class="container-fluid">
     <!-- ROW 1 - TITLE -->
-    <div class="row  mb-5">
-        <div class="col col-8">
+    <div class="row mb-5">
+        <div class="col-md-8">
             <h3>דוכן - שבירת בקבוקים</h3>
             <span>שוברים את הבקבוק עם התשובה הנכונה</span>
         </div>
-        <div class="col  col-4 text-end">
+        <div class="col-md-4 text-end">
             <button type="button" class="btn btn-secondary">כיבוי דוכן</button>
         </div>
     </div>
 
-    <EditForm Model="gameDetails" OnValidSubmit="formSubmit" OnInvalidSubmit="failedSubmit">
-     <DataAnnotationsValidator />
+    <!-- ROW 2 - FORM AND QUESTION LIST -->
+    <div class="row">
+        <!-- Edit Form Column -->
+        <div class="col-md-7">
+            <h5>הוספת שאלה</h5>
 
+            <EditForm Model="questionToAdd" OnValidSubmit="HandleSubmit" OnInvalidSubmit="failedSubmit">
+                <DataAnnotationsValidator />
 
-    <!-- ROW 2 - Question and Image Inputs -->
-        <div class="row mb-3">
-            <div class="col col-12">
-                <label for="question" class="form-label">שאלה</label>
-                <span>(2-30 טווח תווים)</span>
-                <input type="text" class="form-control" id="question" placeholder="שאלה">
-            </div>
+                <!-- Form Input Fields -->
+                <div class="mb-3">
+                    <div class="col col-8">
+                        <label for="question" class="form-label">שאלה</label>
+                        <span>(2-30 טווח תווים)</span>
+                        <InputText class="form-control" id="question" @bind-Value="QuestionDescription" placeholder="שאלה" />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col col-12">
+                        <span>תשובות לשאלה</span>
+                        <span>(2-30 טווח תווים)</span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col col-6">
+
+                        <label for="correctAnswer" class="form-label">תשובה נכונה:</label>
+                        <InputText class="form-control" id="correctAnswer" @bind-Value="CorrectAnswer" placeholder="תשובה נכונה" />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col col-6">
+                        <span>תשובות נוספות:</span>
+                        <InputText class="form-control mt-3" @bind-Value="WrongAnswer1" placeholder="תשובה שגויה" />
+                        <InputText class="form-control mt-3" @bind-Value="WrongAnswer2" placeholder="תשובה שגויה" />
+                        <InputText class="form-control mt-3" @bind-Value="WrongAnswer3" placeholder="תשובה שגויה" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">שמירת שאלה</button>
+                </div>
+            </EditForm>
         </div>
 
-    <!-- ROW 3 - Right Answer TITLE -->
-        <div class="row mb-3">
-            <div class="col col-12">
-                <span>תשובות לשאלה</span>
-                <span>(2-30 טווח תווים)</span>
-
+        <!-- Question List Column -->
+        <div class="col-md-5">
+            <h5>רשימת שאלות</h5>
+            <div class="scrollable-table-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>דוכן</th>
+                            <th>שאלה</th>
+                            <th>עריכה</th>
+                            <th>מחיקה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var question in questions)
+                        {
+                            <tr>
+                                <td>@question.StageID</td>
+                                <td>@question.QuestionDescription</td>
+                                <td><i class="fa fa-pencil icon" @onclick="()=>EditQuestion(question)"></i></td>
+                                <td><i class="fa fa-trash-o icon" @onclick="() => DeleteQuestion(question)"></i></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
-        </div>
-
-    <!-- ROW 4 - Right Answer -->
-        <div class="row mb-3">
-            <div class="col col-6">
-                <label for="correctAnswer" class="form-label">תשובה נכונה:</label>
-                <input type="text" class="form-control" id="correctAnswer" placeholder="תשובה נכונה">
-            </div>
-        </div>
-
-
-        <!-- ROW 5 - WRONG Answers TITLE -->
-        <div class="row mb-3">
-            <div class="col col-12">
-                <span>תשובות נוספות:</span>
-            </div>
-        </div>
-
-
-    <!-- ROW 6 - Wrong Answers -->
-    <div class="row mb-3">
-        <div class="col col-6">
-            <input type="text" class="form-control" placeholder="תשובה שגויה">
         </div>
     </div>
-    <div class="row mb-3">
-        <div class="col col-6">
-            <input type="text" class="form-control" placeholder="תשובה שגויה">
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col col-6">
-            <input type="text" class="form-control" placeholder="תשובה שגויה">
-        </div>
-    </div>
-
-    <!-- Submit Form -->
-    <div class="row mb-3">
-        <div class="col col-12">
-            <button type="submit" class="btn btn-primary">שמירת שאלה</button>
-        </div>
-        </div>
-
-    </EditForm>
-
 </div>
-@code {
-    GameDetails gameDetails = new GameDetails();
 
-    void formSubmit()
+
+
+
+
+@code {
+    [CascadingParameter] public int UserId { get; set; } // Inject UserId
+
+    [Parameter] public string gameCode { get; set; } // Inject gameCode
+    [Parameter] public GameDetails game { get; set; }
+    [Parameter] public int stage { get; set; }
+
+    private GameDetails gameDetails = new GameDetails();
+    private QuestionToAdd questionToAdd = new QuestionToAdd();
+    private GameAnswers answersToAdd = new GameAnswers();
+    List<GameQuestions> questions = new List<GameQuestions>();
+
+
+
+
+    private int newQuestionCreated;
+    string QuestionDescription = "";
+    string CorrectAnswer = "";
+    string WrongAnswer1 = "";
+    string WrongAnswer2 = "";
+    string WrongAnswer3 = "";
+
+
+    protected override async Task OnInitializedAsync()
     {
-        //
+        questions = game.Questions;
+    }
+
+    private async Task HandleSubmit()
+    {
+        await AddQuestion();
+        if (newQuestionCreated > 0)
+        {
+            await AddAnswers();
+        }
     }
 
     void failedSubmit()
     {
-        //
+        Console.WriteLine("Form submission failed");
+    }
+
+    private async Task AddQuestion()
+    {
+        QuestionToAdd questionToAdd = new QuestionToAdd()
+            {
+                GameID = game.ID,
+                HasImage = false,
+                QuestionDescription = QuestionDescription,
+                QuestionImage = "empty",
+                StageID = 1,
+            };
+
+        var url = $"api/game/{UserId}/addQuestion/{gameCode}";
+        var response = await Http.PostAsJsonAsync(url, questionToAdd);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadAsStringAsync();
+            newQuestionCreated = int.Parse(result);
+            Console.WriteLine("Successful Question Creation - ID: " + result); // Handle success
+        }
+        else
+        {
+            Console.WriteLine("Error: " + response.StatusCode); // Handle error
+        }
+    }
+
+    private async Task AddAnswers()
+    {
+        List<GameAnswers> answers = new List<GameAnswers>()
+    {
+        new GameAnswers { AnswerDescription = CorrectAnswer, IsCorrect = true, QuestionID = newQuestionCreated },
+        new GameAnswers { AnswerDescription = WrongAnswer1, IsCorrect = false, QuestionID = newQuestionCreated },
+        new GameAnswers { AnswerDescription = WrongAnswer2, IsCorrect = false, QuestionID = newQuestionCreated },
+        new GameAnswers { AnswerDescription = WrongAnswer3, IsCorrect = false, QuestionID = newQuestionCreated }
+    };
+
+        var response = await Http.PostAsJsonAsync($"api/game/{UserId}/addAnswers/{newQuestionCreated}", answers);
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Successful Answers Creation");
+        }
+        else
+        {
+            Console.WriteLine("Failed to add answers: " + await response.Content.ReadAsStringAsync());
+        }
+    }
+
+    private void EditQuestion(GameQuestions question)
+    {
+        // Implementation for editing a question
+        Nav.NavigateTo($"/edit-question/{question.ID}");
+    }
+
+    private async Task DeleteQuestion(GameQuestions question)
+    {
+        var response = await Http.DeleteAsync($"api/game/{UserId}/deleteQuestion/{question.ID}");
+        if (response.IsSuccessStatusCode)
+        {
+            questions.Remove(question); // Update UI upon successful deletion
+        }
     }
 }

@@ -8,13 +8,13 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Right column (widest) -->
-        <div class="col-md-6">
+        <div class="col-md-10">
             <div class="row">
-                <div class="col-12 p-2  bg-light">
+                <div class="col-12 p-2">
                     @switch (currentStage)
                     {
                         case Stage.StageA:
-                            <StageBottleBreak />
+                            <StageBottleBreak gameCode="@gameCode" game="@gameData" />
                             break;
                         case Stage.StageB:
                             <StageTargetHit />
@@ -33,24 +33,17 @@
             </div>
         </div>
 
-        <!-- Middle column (medium) -->
-        <div class="col-md-4">
-            <div class="row">
-                <div class="col-12 p-2  bg-light">Middle Column</div>
-            </div>
-        </div>
-
-        <!-- Left column (narrow with rows) -->
+        <!-- Left column (narrow) -->
         <div class="col-md-2">
             <div class="row">
-                <div class="col-12 p-2  bg-light text-center">
+                <div class="col-12 p-2 text-center">
                     <span>
                         חזרה למשחקים שלי
                         <i class="fa fa-arrow-left"></i>
                     </span>
                 </div>
-                <div class="col-12 p-2  bg-light">
-                    <div class="border rounded" style="background-color: #F7eeeD;">
+                <div class="col-12 p-2">
+                    <div class="border rounded" style="background-color: #FFF4F2;">
                         <div class="row">
                             <div class="col-12">
                                 <div class="d-flex justify-content-center p-2">יציאה</div>
@@ -85,9 +78,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-12 p-2  bg-light">Row 3</div>
-                <div class="col-12 p-2  bg-light">
-                    <div class="col-auto">
+                <div class="col-12 p-2"></div>
+                <div class="col-12 p-2">
+                    <div class="col-auto d-flex justify-content-center">
                         <button type="button" class="btn btn-primary" value="publish">פרסום</button>
                     </div>
                 </div>
@@ -97,30 +90,18 @@
 </div>
 
 @code {
-
     [CascadingParameter]
-    public int UserId { get; set; } // Inject UserId
+    public int UserId { get; set; }
 
     [Parameter]
-    public string gameCode { get; set; } // Inject gameCode
+    public string gameCode { get; set; }
 
-    GameDetails gameData; // Object to hold the game data
-    UserWithGames user; // Object to hold the user data
+    GameDetails gameData;
+    UserWithGames user;
 
     protected override async Task OnInitializedAsync()
     {
-        // Get the game data
-        //gameData = await Http.GetFromJsonAsync<GameDetails>($"api/Game/{gameCode}");
-
-        // Get the user data
-        //user = await Http.GetFromJsonAsync<UserWithGames>($"api/User/{UserId}");
-    }
-    private Task BazzerHit(MouseEventArgs e)
-    {
-        //show to component of stagebazzerhit
-        return Task.CompletedTask;
-        
-
+        gameData = await Http.GetFromJsonAsync<GameDetails>($"api/Game/{UserId}/getGame/{gameCode}");
     }
 
     private Stage currentStage = Stage.None;

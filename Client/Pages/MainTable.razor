@@ -20,8 +20,8 @@
                 </button>
 
                 <!-- Modal -->
-                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" 
-                aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal fade @(isModalOpen ? "show" : "")" style="display: @(isModalOpen ? "block" : "none");" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    aria-labelledby="staticBackdropLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -60,7 +60,7 @@
                                     <!-- Submit / Cancel Buttons -->
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">חזרה</button>
-                                        <button type="submit" value="send" class="btn btn-primary" @onclick="CreateGame">שמירה</button>
+                                        <button type="submit" value="send" class="btn btn-primary" data-bs-dismiss="modal">שמירה</button>
                                     </div>
                                 </EditForm>
                             </div>
@@ -210,6 +210,7 @@
                 break;
         }
     }
+    bool isModalOpen = false;
 
     //New game creation
     async Task CreateGame()
@@ -224,6 +225,7 @@
             gameToAdd.GameName = "";
             
             //call to edit game with the new gamecode created
+
             Nav.NavigateTo("./GameEdit/" + newGame.GameCode);
         }
         else
@@ -237,6 +239,7 @@
     //edit game method to navigate to edit game page
     private void EditGame(Games game)
     {
+
         Nav.NavigateTo("./GameEdit/" + game.GameCode);
     }
 
@@ -268,6 +271,8 @@
 
     void formSubmit()
     {
+
+
         CreateGame();
     }
 

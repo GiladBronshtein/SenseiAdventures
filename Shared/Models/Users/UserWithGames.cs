@@ -8,6 +8,7 @@ namespace template.Shared.Models.Users
 {
     public class UserWithGames
     {
+        public int ID { get; set; }
         public string FirstName { get; set; }
         public List<Games.Games> Games { get; set; }
     }
