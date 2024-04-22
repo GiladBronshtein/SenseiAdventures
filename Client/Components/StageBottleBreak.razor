@@ -4,23 +4,8 @@
 @using template.Shared.Models.Users;
 
 
-
-<style>
-    .scrollable-table-body {
-        display: block;
-        max-height: 450px; /* Adjust based on the height needed to show 10 rows */
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-
-    table {
-        width: 100%;
-    }
-</style>
-
-
-
 <div class="container-fluid">
+
     <!-- ROW 1 - TITLE -->
     <div class="row mb-5">
         <div class="col-md-8">
@@ -36,44 +21,133 @@
     <div class="row">
         <!-- Edit Form Column -->
         <div class="col-md-7">
-            <h5>הוספת שאלה</h5>
+            <h5>שאלה</h5>
 
-            <EditForm Model="questionToAdd" OnValidSubmit="HandleSubmit" OnInvalidSubmit="failedSubmit">
+            <EditForm Model="questionsAndAnswers" OnValidSubmit="HandleSubmit" OnInvalidSubmit="failedSubmit">
                 <DataAnnotationsValidator />
 
-                <!-- Form Input Fields -->
-                <div class="mb-3">
-                    <div class="col col-8">
-                        <label for="question" class="form-label">שאלה</label>
-                        <span>(2-30 טווח תווים)</span>
-                        <InputText class="form-control" id="question" @bind-Value="QuestionDescription" placeholder="שאלה" />
+                <!-- ROW - Form Input Fields -->
+                <div class="mb-3 d-flex align-items-center">
+                    <div class="col-7 p-0">
+                        <InputText pattern=".{2,30}" class="form-control" id="question"
+                                   @bind-Value="QuestionDescription"
+                                   @oninput="@(e => HandleInputChange(e, nameof(QuestionDescription)))"
+                                   placeholder="שאלה"
+                                   aria-describedby="questionDescription" required title="(טווח תווים 2-30)" />
+                        <ValidationMessage For="@(() =>  questionsAndAnswers.Questions.QuestionDescription)" style="color:Red;" />
+
+
                     </div>
+                    <div class="col-1 p-0">
+                        <small id="questionDescription" class="col-2 p-0 d-flex justify-content-start text-muted">@QuestionDescription.Length/30</small>
+                    </div>
+                    <div class="col-2 p-0">
+                        <button class="btn btn-outline-secondary">
+                            <i class="fa fa-picture-o"></i>
+                        </button>
+                        <InputFile class="d-none" />
+                    </div>
+                    @if (questionImageFile != null)
+                    {
+                        <div class="mb-3 d-flex justify-content-end">
+                            <button class="btn btn-danger">הסר תמונה</button>
+                        </div>
+                        <div class="mb-3">
+                            <img src="@imagePreview" class="img-thumbnail" style="max-height: 200px;" alt="Preview" />
+                        </div>
+                    }
                 </div>
+
+                <div class="mb-3 mt-3 col-9"> </div>
+
+                <!-- Row -->
                 <div class="row mb-3">
                     <div class="col col-12">
                         <span>תשובות לשאלה</span>
                         <span>(2-30 טווח תווים)</span>
                     </div>
                 </div>
-                <div class="row mb-3">
-                    <div class="col col-6">
 
-                        <label for="correctAnswer" class="form-label">תשובה נכונה:</label>
-                        <InputText class="form-control" id="correctAnswer" @bind-Value="CorrectAnswer" placeholder="תשובה נכונה" />
+
+
+                <!-- Correct Answer -->
+                <label for="correctAnswer" class="form-label">תשובה נכונה:</label>
+                <div class="mb-3 align-items-center">
+
+                    <div class="col-7">
+                        <InputText class="form-control" id="correctAnswer"
+                                   @bind-Value="CorrectAnswer"
+                                   @oninput="@(e => HandleInputChange(e, nameof(CorrectAnswer)))"
+                                   placeholder="תשובה נכונה"
+                                   aria-describedby="correctAnswer" required />
+                        <ValidationMessage For="@(() =>  questionsAndAnswers.Answers.AnswerDescription)" style="color:Red;" />
+
+                    </div>
+                    
+                    <div class="col-3 p-0">
+
+                        <small id="correctAnswer" class="col-2 p-0 d-flex justify-content-start text-muted">@CorrectAnswer.Length/30</small>
                     </div>
                 </div>
-                <div class="row mb-3">
-                    <div class="col col-6">
-                        <span>תשובות נוספות:</span>
-                        <InputText class="form-control mt-3" @bind-Value="WrongAnswer1" placeholder="תשובה שגויה" />
-                        <InputText class="form-control mt-3" @bind-Value="WrongAnswer2" placeholder="תשובה שגויה" />
-                        <InputText class="form-control mt-3" @bind-Value="WrongAnswer3" placeholder="תשובה שגויה" />
+
+
+                <span>תשובות נוספות:</span>
+
+                <!-- Wrong Answer 1 -->
+                <div class="d-flex align-items-center mb-3">
+                    <div class="col-7 p-0">
+                        <InputText class="form-control"
+                                   @bind-Value="WrongAnswer1"
+                                   @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer1)))"
+                                   placeholder="תשובה שגויה" 
+                                   aria-describedby="wrongAnswer1" required />
+                        <ValidationMessage For="@(() =>  questionsAndAnswers.Answers.AnswerDescription)" style="color:Red;" />
+
+                    </div>
+
+                    <div class="col-3 p-0">
+                        <small id="wrongAnswer1" class="col-2 p-0 d-flex justify-content-start text-muted">@WrongAnswer1.Length/30</small>
                     </div>
                 </div>
 
-                <div class="mb-3">
+                <!-- Wrong Answer 2 -->
+                <div class="d-flex align-items-center mb-3">
+                    <div class="col-7 p-0">
+                        <InputText class="form-control"
+                                   @bind-Value="WrongAnswer2"
+                                   @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer2)))"
+                                   placeholder="תשובה שגויה"
+                                   aria-describedby="wrongAnswer2" required />
+                        <ValidationMessage For="@(() =>  questionsAndAnswers.Answers.AnswerDescription)" style="color:Red;" />
+
+                    </div>
+                    <div class="col-3 p-0">
+                        <small id="wrongAnswer2" class="col-2 p-0 d-flex justify-content-start text-muted">@WrongAnswer2.Length/30</small>
+                    </div>
+                </div>
+
+                <!-- Wrong Answer 3 -->
+                <div class="d-flex align-items-center mb-3">
+                    <div class="col-7 p-0">
+                        <InputText class="form-control"
+                                   @bind-Value="WrongAnswer3"
+                                   @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer3)))"
+                                   placeholder="תשובה שגויה"
+                                   aria-describedby="wrongAnswer3" required />
+                        <ValidationMessage For="@(() =>  questionsAndAnswers.Answers.AnswerDescription)" style="color:Red;" />
+
+                    </div>
+                    <div class="col-3 p-0">
+                        <small id="wrongAnswer3" class="col-2 p-0 d-flex justify-content-start text-muted">@WrongAnswer3.Length/30</small>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mt-3 mb-3">
                     <button type="submit" class="btn btn-primary">שמירת שאלה</button>
+
                 </div>
+
             </EditForm>
         </div>
 
@@ -81,23 +155,21 @@
         <div class="col-md-5">
             <h5>רשימת שאלות</h5>
             <div class="scrollable-table-body">
-                <table class="table">
+                <table class="table table-striped table-hover table-responsive border border-1">
                     <thead>
                         <tr>
-                            <th>דוכן</th>
                             <th>שאלה</th>
-                            <th>עריכה</th>
-                            <th>מחיקה</th>
+                            <th class="text-center">עריכה</th>
+                            <th class="text-center">מחיקה</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var question in questions)
                         {
                             <tr>
-                                <td>@question.StageID</td>
                                 <td>@question.QuestionDescription</td>
-                                <td><i class="fa fa-pencil icon" @onclick="()=>EditQuestion(question)"></i></td>
-                                <td><i class="fa fa-trash-o icon" @onclick="() => DeleteQuestion(question)"></i></td>
+                                <td class="text-center"><button class="btn btn-outline-primary btn-sm" @onclick="()=>EditQuestion(question)"><i class="fa fa-pencil fa-fw" style="width: 14px;"></i></button></td>
+                                <td class="text-center"><button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteQuestion(question)"><i class="fa fa-trash-o fa-fw" style="width: 14px;"></i></button></td>
                             </tr>
                         }
                     </tbody>
@@ -106,9 +178,6 @@
         </div>
     </div>
 </div>
-
-
-
 
 
 @code {
@@ -123,21 +192,57 @@
     private GameAnswers answersToAdd = new GameAnswers();
     List<GameQuestions> questions = new List<GameQuestions>();
 
-
-
-
+    private QuestionsAndAnswers questionsAndAnswers = new QuestionsAndAnswers();
     private int newQuestionCreated;
-    string QuestionDescription = "";
-    string CorrectAnswer = "";
-    string WrongAnswer1 = "";
-    string WrongAnswer2 = "";
-    string WrongAnswer3 = "";
 
+    string QuestionDescription = string.Empty;
+    string CorrectAnswer = string.Empty;
+    string WrongAnswer1 = string.Empty;
+    string WrongAnswer2 = string.Empty;
+    string WrongAnswer3 = string.Empty;
+
+    int QuestionDescriptionCount => QuestionDescription.Length;
+    int CorrectAnswerCount => CorrectAnswer.Length;
+    int WrongAnswer1Count => WrongAnswer1.Length;
+    int WrongAnswer2Count => WrongAnswer2.Length;
+    int WrongAnswer3Count => WrongAnswer3.Length;
+
+
+
+    private IBrowserFile questionImageFile;
+    private string imagePreview;
 
     protected override async Task OnInitializedAsync()
     {
         questions = game.Questions;
     }
+
+    private void HandleInputChange(ChangeEventArgs e, string inputType)
+    {
+        var newValue = e.Value.ToString();
+        switch (inputType)
+        {
+            case "QuestionDescription":
+                QuestionDescription = newValue;
+                break;
+            case "CorrectAnswer":
+                CorrectAnswer = newValue;
+                break;
+            case "WrongAnswer1":
+                WrongAnswer1 = newValue;
+                break;
+            case "WrongAnswer2":
+                WrongAnswer2 = newValue;
+                break;
+            case "WrongAnswer3":
+                WrongAnswer3 = newValue;
+                break;
+            default:
+                break;
+        }
+
+    }
+    
 
     private async Task HandleSubmit()
     {
@@ -213,4 +318,9 @@
             questions.Remove(question); // Update UI upon successful deletion
         }
     }
+
+
+
+
+
 }

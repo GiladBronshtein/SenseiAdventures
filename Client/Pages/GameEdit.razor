@@ -7,10 +7,10 @@
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Right column (widest) -->
-        <div class="col-md-10">
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
             <div class="row">
-                <div class="col-12 p-2">
+                <div class="col-12 p-3">
                     @switch (currentStage)
                     {
                         case Stage.StageA:
@@ -26,68 +26,55 @@
                             <StageSlashing />
                             break;
                         default:
-                            <h1>בחרו דוכן</h1>
+                            <StageDefault/>
+                        
+
                             break;
                     }
                 </div>
             </div>
         </div>
 
-        <!-- Left column (narrow) -->
-        <div class="col-md-2">
-            <div class="row">
-                <div class="col-12 p-2 text-center">
+        <!-- Sidebar -->
+        <div class="col-md-2 d-flex flex-column bg-dark text-white p-3 sidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-heading d-flex justify-content-center align-items-center text-center">
+                <a href="/" class="text-white text-decoration-none">
                     <span>
-                        חזרה למשחקים שלי
+                        חזרה למשחקים 
                         <i class="fa fa-arrow-left"></i>
                     </span>
+                </a>
+            </div>
+            <hr class="bg-white">
+            <!-- Stages -->
+            <div class="sidebar-panel nav nav-pills flex-column">
+                <span style="color:black;" class="enterExitText text-center">סיום הפסטיבל</span>
+                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(Stage.StageD)">לחתוך תשובות</button>
+                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(Stage.StageC)">פגיעה תשובה</button>
+                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(Stage.StageB)">פגיעה במטרה</button>
+                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(Stage.StageA)">שבירת בקבוקים</button>
+                <span style="color:black;" class="enterExitText text-center">כניסה לפסטיבל</span>
+            </div>
+            <div class="d-flex flex-column align-items-center justify-content-center">
+                <div class="text-center">
+                    <i class="fa fa-gamepad" aria-hidden="true"></i>
+                    <!-- Example text or other content -->
+                    <p>Sensei Adventures</p>
                 </div>
-                <div class="col-12 p-2">
-                    <div class="border rounded" style="background-color: #FFF4F2;">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="d-flex justify-content-center p-2">יציאה</div>
-                            </div>
-                            <div class="col-6">
-                                <button type="button" class="btn btn-light w-100" @onclick="() => SetStage(Stage.StageD)">לחתוך תשובות</button>
-                            </div>
-                            <div class="col-6">
-                                <!-- Empty column -->
-                            </div>
-                            <div class="col-6">
-                                <!-- Empty column -->
-                            </div>
-                            <div class="col-6">
-                                <button type="button" class="btn btn-light w-100" @onclick="() => SetStage(Stage.StageC)">פגיעה תשובה</button>
-                            </div>
-                            <div class="col-6">
-                                <button type="button" class="btn btn-light w-100" @onclick="() => SetStage(Stage.StageB)">פגיעה במטרה</button>
-                            </div>
-                            <div class="col-6">
-                                <!-- Empty column -->
-                            </div>
-                            <div class="col-6">
-                                <!-- Empty column -->
-                            </div>
-                            <div class="col-6">
-                                <button type="button" class="btn btn-light w-100" @onclick="() => SetStage(Stage.StageA)">שבירת בקבוקים</button>
-                            </div>
-                            <div class="col-12">
-                                <div class="d-flex justify-content-center p-2">כניסה</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 p-2"></div>
-                <div class="col-12 p-2">
-                    <div class="col-auto d-flex justify-content-center">
-                        <button type="button" class="btn btn-primary" value="publish">פרסום</button>
-                    </div>
+            </div>
+            <div class="mt-auto">
+                <hr class="bg-white">
+                <!-- Sidebar Footer -->
+                <div class="sidebar-footer text-center p-2">
+                    <button type="button" class="btn btn-success w-100" value="publish">פרסום</button>
                 </div>
             </div>
         </div>
     </div>
+
 </div>
+
 
 @code {
     [CascadingParameter]

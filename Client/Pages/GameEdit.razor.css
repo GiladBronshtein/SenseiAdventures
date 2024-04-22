@@ -1,0 +1,79 @@
+﻿.container-fluid {
+    border-radius: 5px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); /* Soft shadow for depth */
+    margin-bottom: 10px;
+}
+
+
+.main-content {
+    border-radius: 5px;
+    background-color: #fff; /* Optional: depends on your design preference */
+    padding: 10px; /* Provide some spacing inside the content area */
+}
+
+.sidebar-panel {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.sidebar-button {
+    margin: 5px;
+}
+
+
+.enterExitText {
+    padding: 10px;
+    color: #ccc;
+    text-shadow: 0 0 8px #ffffff; /* White glow for emphasis on text */
+}
+
+/* Sidebar Styles */
+.sidebar {
+    border-radius: 5px;
+    background: linear-gradient(to bottom right, #3A4148 , #212529); /* Dark gradient background */
+}
+
+.sidebar-heading {
+    padding: 25px;
+    /*background: rgba(255, 255, 255, 0.1); /* Slight transparency */
+}
+
+/* Improved Button Styles */
+.sidebar-button {
+    margin: 5px;
+    background-color: #6c757d;
+    border: none;
+    color: white;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2); /* Soft shadow for neumorphism */
+    transition: transform 0.2s, box-shadow 0.2s; /* Smooth transition for interaction */
+}
+
+.sidebar-button:hover, .sidebar-button:focus {
+     transform: translateY(-2px);
+     box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.3); /* Elevated shadow on hover */
+}
+
+/* Glowing effects for icons and key texts */
+.fa-gamepad {
+    color: #17a2b8; /* Bright color for icons */
+    text-shadow: 0 0 7px #00c4ff; /* Blue glow around icon */
+    font-size: 90px;
+    padding: 20px;
+}
+
+.btn-success {
+    background-image: linear-gradient(to right, #23913B, #218838); /* Gradient for success button */
+    border: 1px solid #27A141;
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.9); /* Elevated shadow on hover rgba(0, 0, 0, 0.2) */
+}
+
+/* Overall text and link enhancements for better readability and effect */
+a.text-white {
+    text-decoration: none;
+    opacity: 0.9; /* Slightly dim links for focus on interaction */
+}
+
+a.text-white:hover {
+    opacity: 1; /* Brighten on hover for interactivity */
+}
+

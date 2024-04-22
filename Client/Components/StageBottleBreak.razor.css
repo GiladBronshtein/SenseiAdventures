@@ -1,0 +1,41 @@
+﻿.scrollable-table-body {
+    display: block;
+    max-height: 450px; /* Adjust based on the height needed to show 10 rows */
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+table {
+    width: 100%;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+}
+
+.input-group-append {
+    margin-left: 0.5rem; /* Adjust as needed for spacing */
+}
+
+.input-group-text {
+    background-color: transparent; /* or any color that fits your design */
+    border: none; /* Adjust or remove as per your design */
+    color: #495057; /* Match the color with your design */
+    padding-left: 0.5rem; /* Spacing inside the span */
+    padding-right: 0.5rem; /* Spacing inside the span */
+}
+
+.mb-3 {
+    display: flex; /* This will put the input and counter side by side */
+    align-items: center; /* This will vertically center them */
+    gap: 0.5rem; /* This provides some space between the input and the counter */
+}
+
+    .mb-3 .form-control {
+        flex-grow: 1; /* This will make the input take up the available space */
+    }
+
+    .mb-3 span {
+        white-space: nowrap; /* This prevents the counter from wrapping */
+    }

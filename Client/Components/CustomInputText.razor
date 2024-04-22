@@ -1,0 +1,87 @@
+﻿@inherits InputText
+
+<div class="parent" style="--component-width: @inputWidth;">
+    <div class="new-wrapper">
+        @if (!string.IsNullOrEmpty(alert) && alertIsSet)
+        {
+            <span>
+                <Tooltip Text="@alert">
+                    <i class="fa fa-info-circle">  </i>
+                </Tooltip>
+            </span>
+        }
+        <div class="wrapper">
+            <input @attributes="AdditionalAttributes" class="@CssClass @inputClass" value="@CurrentValueAsString" @oninput="HandleInternalInputChange" @onkeyup="countChars" required />
+@*             <input @attributes="AdditionalAttributes" class="@CssClass @inputClass"  @bind="CurrentValueAsString" @bind:event="oninput" @onkeyup="countChars"   @onchange="OnInputChanged" required />
+ *@            <span class="counter">@(CurrentValueAsString?.Length ?? 0)/@maxChars </span>
+        </div>
+    </div>
+</div>
+
+@code {
+    string inputClass = "";
+    private string internalValue;
+
+    [Parameter] public EventCallback<string> CustomValueChanged { get; set; }
+
+    [Parameter] public string alert { get; set; }
+
+    [Parameter] public string inputWidth { get; set; }
+
+    [Parameter] public string maxChars { get; set; }
+
+    bool alertIsSet = false; // Indicates whether the alert has been set at least once
+
+    protected override void OnParametersSet()
+    {
+        internalValue = Value; // Ensure the internal value is always in sync with the external one.
+        base.OnParametersSet();
+    }
+
+    private void HandleInternalInputChange(ChangeEventArgs e)
+    {
+        internalValue = e.Value.ToString();
+        Value = internalValue; // Update the actual value of the component
+        ValueChanged.InvokeAsync(internalValue); // Notify the parent component of the change
+        CustomValueChanged.InvokeAsync(internalValue); // Custom event for the parent component
+        countChars();
+    }
+
+    void countChars()
+    {
+        int length = internalValue.Length;
+        string minChars = AdditionalAttributes.ContainsKey("minChars") ? AdditionalAttributes["minChars"].ToString() : "2";
+        int minCharsInt = Convert.ToInt32(minChars);
+        int maxCharsInt = Convert.ToInt32(maxChars);
+
+        if (length >= minCharsInt && length <= (maxCharsInt - 3))
+        {
+            inputClass = "good-input";
+            alert = $"יש בין {minCharsInt} ל10 תווים";
+        }
+        else if (length > (maxCharsInt - 3) && length <= (maxCharsInt - 1))
+        {
+            inputClass = "warnning-input";
+            alert = "יש יותר מ15 תווים";
+        }
+        else if (length >= maxCharsInt)
+        {
+            inputClass = "danger-input";
+            alert = "הגעת למקסימום התווים";
+        }
+        else
+        {
+            inputClass = "";
+            alert = "אין מספיק תווים";
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (!string.IsNullOrEmpty(alert))
+        {
+            alertIsSet = true; // Initial alert value is set
+        }
+    }
+}

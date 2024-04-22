@@ -1,0 +1,87 @@
+﻿.default-input {
+    border: none !important;
+    border-radius: 2px !important;
+    outline-width: 2px !important;
+    outline-color: lightgray !important;
+    outline-style: solid !important;
+}
+
+.good-input {
+    outline-color: yellowgreen !important;
+    color: seagreen;
+}
+
+.warnning-input {
+    outline-color: orange !important;
+    color: saddlebrown;
+}
+
+.danger-input {
+    outline-color: red !important;
+    color: darkred;
+}
+
+i {
+    margin-left: 5px;
+}
+
+.wrapper {
+    background: #fff;
+    padding: 1px;
+    width: var(--component-width, 300px);
+    border-radius: 5px;
+    height: 30px;
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.new-wrapper {
+    display: flex;
+    align-items: center; /* To align items vertically in the center */
+}
+
+    .new-wrapper > span {
+        margin-right: 10px; /* Adjust as needed */
+    }
+
+
+ input {
+    height: 100%;
+    width: 100%;
+    padding: 0 4px 0 45px;
+    transition: all 0.1s ease;
+}
+
+ input::selection {
+    color: #fff;
+    background: #58cff1;
+}
+
+ input:focus,
+ input:valid {
+/*    border-color: #58cff1;
+*/}
+
+ input::placeholder {
+    /*color: #c4c4c4;*/
+}
+
+ .counter {
+    position: absolute;
+    left: 2px;
+    width: 42px;
+    font-size: 11px;
+    color: #c4c4c4;
+    text-align: center;
+    padding-right: 0px;
+    border-right: 1px solid #d8d8d8;
+    pointer-events: none;
+}
+
+ input:valid ~ .counter {
+    color: black;
+    border-color: gray;
+}
