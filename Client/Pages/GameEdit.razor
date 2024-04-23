@@ -41,7 +41,7 @@
         <div class="col-md-2 d-flex flex-column bg-dark text-white p-3 sidebar">
             <!-- Sidebar Header -->
             <div class="sidebar-heading d-flex justify-content-center align-items-center text-center">
-                <a href="/" class="text-white text-decoration-none">
+                <a href="./maintable" class="text-white text-decoration-none">
                     <span>
                         חזרה למשחקים 
                         <i class="fa fa-arrow-left"></i>
@@ -52,7 +52,7 @@
             <!-- Stages -->
             <div class="sidebar-panel nav nav-pills flex-column">
                 <span style="color:black;" class="enterExitText text-center">סיום הפסטיבל</span>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageD)">לחתוך תשובות</button>
+                <button type="button" class="btn btn-secondary shadow sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageD)">לחתוך תשובות</button>
                 <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageC)">פגיעה תשובה</button>
                 <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageB)">פגיעה במטרה</button>
                 <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageA)">שבירת בקבוקים</button>
@@ -69,7 +69,7 @@
                 <hr class="bg-white">
                 <!-- Sidebar Footer -->
                 <div class="sidebar-footer text-center p-2">
-                    <button type="button" class="btn btn-success w-100" value="publish">פרסום</button>
+                    <button type="button" class="btn btn-secondary w-100" value="publish">פרסום</button>
                 </div>
             </div>
         </div>

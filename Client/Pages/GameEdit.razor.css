@@ -18,6 +18,7 @@
 
 .sidebar-button {
     margin: 5px;
+    background: linear-gradient(to bottom right, #3A4148, #212529); /* Dark gradient background */
 }
 
 
@@ -35,8 +36,17 @@
 
 .sidebar-heading {
     padding: 25px;
-    /*background: rgba(255, 255, 255, 0.1); /* Slight transparency */
+    /*text shadow*/
+    text-shadow: 0 0 12px black; /* White glow for emphasis on text */
 }
+
+    .sidebar-heading:hover {
+        /*text effect*/
+        text-shadow: 0 0 12px black; /* White glow for emphasis on text */
+        /*expanding text a bit*/
+        transform: scale(1.04);
+        transition: transform 0.4s; /* Smooth transition for interaction */
+    }
 
 /* Improved Button Styles */
 .sidebar-button {

@@ -6,8 +6,9 @@
         @if (UserId > 0 || _nav.Uri + "/" == _nav.ToAbsoluteUri("./").ToString() || _nav.Uri == _nav.ToAbsoluteUri("./").ToString())
         {
             <CascadingValue Value="UserId">
-                <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+                 <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" /> 
+                
             </CascadingValue>
 
         }
