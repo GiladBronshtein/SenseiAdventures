@@ -288,11 +288,7 @@ namespace template.Server.Controllers
         public async Task<IActionResult> DeleteGame(int userId, int deleteGameCode)
         {
             Console.WriteLine("deleteGameCode");
-            int? sessionId = HttpContext.Session.GetInt32("userId");
-            if (sessionId != null)
-            {
-                if (userId == sessionId)
-                {
+           
                     object param = new
                     {
                         UserId = userId
@@ -328,11 +324,13 @@ namespace template.Server.Controllers
                         return BadRequest("Game Not Found");
                     }
                     return BadRequest("User Not Found");
-                }
-                return BadRequest("User Not Logged In");
-            }
-            return BadRequest("No Session");
         }
+
+
+
+
+
+
 
         [HttpPut("updateGame/{updateGameCode}")]
         public async Task<IActionResult> UpdateGame(int userId, int updateGameCode, GameToUpdate gameToUpdate)

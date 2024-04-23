@@ -1,6 +1,6 @@
 ﻿.container-fluid {
     border-radius: 5px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); /* Soft shadow for depth */
+    box-shadow: 5px 5px 6px rgba(0, 0, 0, 0.3); /* Soft shadow for depth */
     margin-bottom: 10px;
 }
 
@@ -77,3 +77,9 @@ a.text-white:hover {
     opacity: 1; /* Brighten on hover for interactivity */
 }
 
+/*on narrow sized screens no box shadow to conatiner-fluid*/
+@media (max-width: 768px) {
+    .container-fluid {
+        box-shadow: none;
+    }
+}

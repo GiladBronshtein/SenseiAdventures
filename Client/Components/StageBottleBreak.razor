@@ -1,4 +1,5 @@
-﻿@inject HttpClient Http
+﻿
+@inject HttpClient Http
 @inject NavigationManager Nav
 @using template.Shared.Models.Games;
 @using template.Shared.Models.Users;
@@ -28,18 +29,24 @@
 
                 <!-- ROW - Form Input Fields -->
                 <div class="mb-3 d-flex align-items-center">
-                    <div class="col-7 p-0">
-                        <InputText pattern=".{2,30}" class="form-control" id="question"
+                    <div class="col-8 p-0">
+                        <InputText maxlength="@QuestionDescriptionMaxChars"
+                                   pattern="@($"{{2,{QuestionDescriptionMaxChars}}}")"
+                                   class="form-control"
+                                   id="question"
                                    @bind-Value="QuestionDescription"
                                    @oninput="@(e => HandleInputChange(e, nameof(QuestionDescription)))"
                                    placeholder="שאלה"
-                                   aria-describedby="questionDescription" required title="(טווח תווים 2-30)" />
-                        <ValidationMessage For="@(() =>  questionsAndAnswers.Questions.QuestionDescription)" style="color:Red;" />
+                                   aria-describedby="questionDescription" required
+                                   title="@($"(טווח תווים 2-{QuestionDescriptionMaxChars})")" />
+                        <ValidationMessage For="@(() => questionsAndAnswers.Questions.QuestionDescription)" style="color:Red;" />
+
 
 
                     </div>
                     <div class="col-1 p-0">
-                        <small id="questionDescription" class="col-2 p-0 d-flex justify-content-start text-muted">@QuestionDescription.Length/30</small>
+                        <small id="questionDescription" class="@GetInputClass(QuestionDescription.Length, 2, @QuestionDescriptionMaxChars) 
+                            col-2 p-0 d-flex justify-content-start">@QuestionDescription.Length/@QuestionDescriptionMaxChars</small>
                     </div>
                     <div class="col-2 p-0">
                         <button class="btn btn-outline-secondary">
@@ -75,19 +82,20 @@
                 <div class="mb-3 align-items-center">
 
                     <div class="col-7">
-                        <InputText class="form-control" id="correctAnswer"
+                        <InputText maxlength="@AnswersDescriptionMaxChars"
+                                   class="form-control"
+                                   id="correctAnswer"
                                    @bind-Value="CorrectAnswer"
                                    @oninput="@(e => HandleInputChange(e, nameof(CorrectAnswer)))"
                                    placeholder="תשובה נכונה"
                                    aria-describedby="correctAnswer" required />
-                        <ValidationMessage For="@(() =>  questionsAndAnswers.Answers.AnswerDescription)" style="color:Red;" />
-
+                        <ValidationMessage For="@(() => questionsAndAnswers.Answers.AnswerDescription)" style="color:Red;" />
                     </div>
-                    
                     <div class="col-3 p-0">
-
-                        <small id="correctAnswer" class="col-2 p-0 d-flex justify-content-start text-muted">@CorrectAnswer.Length/30</small>
+                        <small id="correctAnswer" class="@GetInputClass(CorrectAnswer.Length, 2, @AnswersDescriptionMaxChars)
+                            col-2 p-0 d-flex justify-content-start">@CorrectAnswer.Length/@AnswersDescriptionMaxChars</small>
                     </div>
+
                 </div>
 
 
@@ -96,55 +104,57 @@
                 <!-- Wrong Answer 1 -->
                 <div class="d-flex align-items-center mb-3">
                     <div class="col-7 p-0">
-                        <InputText class="form-control"
+                        <InputText maxlength="@AnswersDescriptionMaxChars"
+                                   class="form-control"
                                    @bind-Value="WrongAnswer1"
                                    @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer1)))"
                                    placeholder="תשובה שגויה" 
                                    aria-describedby="wrongAnswer1" required />
                         <ValidationMessage For="@(() =>  questionsAndAnswers.Answers.AnswerDescription)" style="color:Red;" />
-
                     </div>
-
                     <div class="col-3 p-0">
-                        <small id="wrongAnswer1" class="col-2 p-0 d-flex justify-content-start text-muted">@WrongAnswer1.Length/30</small>
+                        <small id="wrongAnswer1" class="@GetInputClass(WrongAnswer1.Length, 2, @AnswersDescriptionMaxChars)
+                            col-2 p-0 d-flex justify-content-start">@WrongAnswer1.Length/30</small>
                     </div>
                 </div>
 
                 <!-- Wrong Answer 2 -->
                 <div class="d-flex align-items-center mb-3">
                     <div class="col-7 p-0">
-                        <InputText class="form-control"
+                        <InputText maxlength="@AnswersDescriptionMaxChars"
+                                   class="form-control"
                                    @bind-Value="WrongAnswer2"
                                    @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer2)))"
                                    placeholder="תשובה שגויה"
                                    aria-describedby="wrongAnswer2" required />
                         <ValidationMessage For="@(() =>  questionsAndAnswers.Answers.AnswerDescription)" style="color:Red;" />
-
                     </div>
                     <div class="col-3 p-0">
-                        <small id="wrongAnswer2" class="col-2 p-0 d-flex justify-content-start text-muted">@WrongAnswer2.Length/30</small>
+                        <small id="wrongAnswer2" class="@GetInputClass(WrongAnswer2.Length, 2, @AnswersDescriptionMaxChars)
+                            col-2 p-0 d-flex justify-content-start">@WrongAnswer2.Length/30</small>
                     </div>
                 </div>
 
                 <!-- Wrong Answer 3 -->
                 <div class="d-flex align-items-center mb-3">
                     <div class="col-7 p-0">
-                        <InputText class="form-control"
+                        <InputText maxlength="@AnswersDescriptionMaxChars"
+                                   class="form-control"
                                    @bind-Value="WrongAnswer3"
                                    @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer3)))"
                                    placeholder="תשובה שגויה"
                                    aria-describedby="wrongAnswer3" required />
                         <ValidationMessage For="@(() =>  questionsAndAnswers.Answers.AnswerDescription)" style="color:Red;" />
-
                     </div>
                     <div class="col-3 p-0">
-                        <small id="wrongAnswer3" class="col-2 p-0 d-flex justify-content-start text-muted">@WrongAnswer3.Length/30</small>
+                        <small id="wrongAnswer3" class="@GetInputClass(WrongAnswer3.Length, 2, @AnswersDescriptionMaxChars)
+                            col-2 p-0 d-flex justify-content-start">@WrongAnswer3.Length/30</small>
                     </div>
                 </div>
 
                 <!-- Submit Button -->
                 <div class="mt-3 mb-3">
-                    <button type="submit" class="btn btn-primary">שמירת שאלה</button>
+                    <button type="submit" class="btn btn-primary shadow">שמירת שאלה</button>
 
                 </div>
 
@@ -152,10 +162,10 @@
         </div>
 
         <!-- Question List Column -->
-        <div class="col-md-5">
+        <div class="col-md-5 ">
             <h5>רשימת שאלות</h5>
-            <div class="scrollable-table-body">
-                <table class="table table-striped table-hover table-responsive border border-1">
+            <div class="scrollable-table-body ">
+                <table class="table shadow-sm table-striped table-hover table-responsive border border-1">
                     <thead>
                         <tr>
                             <th>שאלה</th>
@@ -178,6 +188,8 @@
         </div>
     </div>
 </div>
+
+
 
 
 @code {
@@ -206,6 +218,9 @@
     int WrongAnswer1Count => WrongAnswer1.Length;
     int WrongAnswer2Count => WrongAnswer2.Length;
     int WrongAnswer3Count => WrongAnswer3.Length;
+
+    int QuestionDescriptionMaxChars = 50;
+    int AnswersDescriptionMaxChars = 30;
 
 
 
@@ -319,8 +334,16 @@
         }
     }
 
-
-
-
-
+    private string GetInputClass(int length, int minChars, int maxChars)
+    {
+        if (length == 0)
+            return "text-muted"; // Neutral for zero characters
+        else if (length < minChars)
+            return "text-danger";  // Red for less than minimum characters
+        else if (length >= minChars && length <= maxChars - 3)
+            return "text-good";   // Green for within the normal range
+        else if (length > maxChars - 3 && length <= maxChars)
+            return "text-warning";  // Orange for nearing maximum length
+        return "text-muted";  // Fallback, might not be necessary
+    }
 }

@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\javascript\" />
+    <Folder Include="wwwroot\assets-images\" />
   </ItemGroup>
 
 </Project>

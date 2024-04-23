@@ -39,3 +39,19 @@ table {
     .mb-3 span {
         white-space: nowrap; /* This prevents the counter from wrapping */
     }
+
+.text-good {
+    color: green;
+}
+
+.text-warning {
+    color: orange;
+}
+
+.text-danger {
+    color: red;
+}
+
+.text-muted {
+    color: #6c757d; /* Default color, change as needed */
+}

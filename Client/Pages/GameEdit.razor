@@ -11,26 +11,28 @@
         <div class="col-md-10 main-content">
             <div class="row">
                 <div class="col-12 p-3">
+                    <CascadingValue Value="currentStage">
+
                     @switch (currentStage)
                     {
-                        case Stage.StageA:
+                        case StageEnum.Stage.StageA:
                             <StageBottleBreak gameCode="@gameCode" game="@gameData" />
                             break;
-                        case Stage.StageB:
+                        case StageEnum.Stage.StageB:
                             <StageTargetHit />
                             break;
-                        case Stage.StageC:
+                        case StageEnum.Stage.StageC:
                             <StageBazzerHit />
                             break;
-                        case Stage.StageD:
+                        case StageEnum.Stage.StageD:
                             <StageSlashing />
                             break;
                         default:
                             <StageDefault/>
-                        
-
                             break;
                     }
+                    </CascadingValue>
+
                 </div>
             </div>
         </div>
@@ -50,10 +52,10 @@
             <!-- Stages -->
             <div class="sidebar-panel nav nav-pills flex-column">
                 <span style="color:black;" class="enterExitText text-center">סיום הפסטיבל</span>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(Stage.StageD)">לחתוך תשובות</button>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(Stage.StageC)">פגיעה תשובה</button>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(Stage.StageB)">פגיעה במטרה</button>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(Stage.StageA)">שבירת בקבוקים</button>
+                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageD)">לחתוך תשובות</button>
+                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageC)">פגיעה תשובה</button>
+                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageB)">פגיעה במטרה</button>
+                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageA)">שבירת בקבוקים</button>
                 <span style="color:black;" class="enterExitText text-center">כניסה לפסטיבל</span>
             </div>
             <div class="d-flex flex-column align-items-center justify-content-center">
@@ -82,28 +84,18 @@
 
     [Parameter]
     public string gameCode { get; set; }
-
+    
     GameDetails gameData;
     UserWithGames user;
+    private StageEnum.Stage currentStage = StageEnum.Stage.None;
 
     protected override async Task OnInitializedAsync()
     {
         gameData = await Http.GetFromJsonAsync<GameDetails>($"api/Game/{UserId}/getGame/{gameCode}");
     }
 
-    private Stage currentStage = Stage.None;
-
-    private void SetStage(Stage stage)
+    private void SetStage(StageEnum.Stage stage)
     {
         currentStage = stage;
-    }
-
-    private enum Stage
-    {
-        None,
-        StageA = 1, //BottleBreak
-        StageB = 2, //TargetHit
-        StageC = 3, //BazzerHit
-        StageD = 4 //SlashingAnswers
     }
 }
