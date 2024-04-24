@@ -1,10 +1,9 @@
 ﻿@page "/maintable"
 @inject HttpClient Http
 @inject NavigationManager Nav
-@* @inject IStringLocalizer<SharedResources> Localizer *@
 @using template.Shared.Models.Games
 @using template.Shared.Models.Users
-
+@using template.Client.Components
 
 <div class="container-fluid">
     <!-- Page Header -->
@@ -38,17 +37,33 @@
                                     <div class="mb-3">
                                         <label for="gameName" class="form-label">שם המשחק</label>
                                         <span>(2-30 תווים)</span>
-                                        <input type="text" class="form-control" id="gameName" @bind="gameToAdd.GameName" />
+                                        <InputText maxlength="30"
+                                                   @oninput="@(e => { HandleInputChange(e, nameof(gameToAdd.GameName)); gameToAdd.GameName = e.Value.ToString(); StateHasChanged(); })"
+                                                   id="gameName"
+                                                   class="form-control"
+                                                   @bind-Value="gameToAdd.GameName"
+                                                   aria-describedby="gameNameHelp" required />
+
+                                        <small id="gameName" class="@GetInputClass(gameToAdd?.GameName?.Length ?? 0, 2, 30)">@((gameToAdd?.GameName?.Length ?? 0).ToString())/30</small>
                                         <ValidationMessage For="@(() => gameToAdd.GameName)" style="color:Red;" />
                                     </div>
 
+
                                     <!-- Ending Message -->
                                     <div class="mb-3">
-                                        <label for="endingMessage" class="form-label">הודעת סיום</label>
+                                        <label for="endingMessage" class="form-label">הודעת הסיום</label>
                                         <span>(2-30 תווים)</span>
-                                        <input type="text" class="form-control" id="endingMessage" @bind="gameToAdd.EndingMessage" />
+                                        <InputText maxlength="30"
+                                                   @oninput="@(e => { HandleInputChange(e, nameof(gameToAdd.EndingMessage)); gameToAdd.EndingMessage = e.Value.ToString(); StateHasChanged(); })"
+                                                   id="endingMessage"
+                                                   class="form-control"
+                                                   @bind-Value="gameToAdd.EndingMessage"
+                                                   aria-describedby="endingMessageHelp" required />
+
+                                        <small id="endingMessage" class="@GetInputClass(gameToAdd?.EndingMessage?.Length ?? 0, 2, 30)">@((gameToAdd?.EndingMessage?.Length ?? 0).ToString())/30</small>
                                         <ValidationMessage For="@(() => gameToAdd.EndingMessage)" style="color:Red;" />
                                     </div>
+
                                     
                                     <!-- Image upload input -->
                                     <div class="mb-3">
@@ -69,6 +84,7 @@
                 </div>
             </div>
         </div>
+
         <!-- Publish Instructions -->
         <div class="col col-sm-4">
             <div class="alert alert-success" role="alert">
@@ -84,8 +100,79 @@
         </div>        
     </div>
 
-
     <!--Main Games Table-->
+    <div class="row">
+        <h5>טבלת המשחקים</h5>
+
+        <div class="col-12 table-responsive">
+            <table class="table table-hover">
+                <!--Table HEADER-->
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">קוד</th>
+                        <th scope="col">שם המשחק
+                            <Tooltip Text="הזינו מספר שאלות ועברו לדוכן הבא"><i class="fa fa-info-circle"> </i> </Tooltip>
+                        </th>
+
+                        <th scope="col" class="col-auto text-center">עריכה
+                            <Tooltip Text="הזינו מספר שאלות ועברו לדוכן הבא"><i class="fa fa-info-circle"> </i> </Tooltip>
+                        </th>
+                        <th scope="col" class="col-auto text-center">פרסום
+                            <Tooltip Text="הזינו מספר שאלות ועברו לדוכן הבא"><i class="fa fa-info-circle"> </i> </Tooltip>
+                        </th>
+                        <th scope="col" class="col-auto text-center">מחיקה
+                            <Tooltip Text="הזינו מספר שאלות ועברו לדוכן הבא"><i class="fa fa-info-circle"> </i> </Tooltip>
+                        </th>
+                    </tr>
+                </thead>
+
+                <!--Table TBODY-->
+                <tbody>
+                    @if (GamesList != null && GamesList.Count > 0)
+                    {
+                        @foreach (var game in GamesList)
+                        {
+                            <tr>
+                                <td><b>@game.GameCode</b></td>
+                                <td>@game.GameName</td>
+                                <td class="col-auto text-center"><i class="fa fa-pencil icon link-success" @onclick="()=>EditGame(game)"></i></td>
+                                <td class="col-auto text-center">
+                                    @if (game.CanPublish == false)
+                                    {
+                                        <div>
+                                            <input type="checkbox" id="@game.ID" disabled>
+                                            <label for="@game.ID" />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            <input type="checkbox" id="@game.ID" checked="@game.IsPublished" @onchange="()=>changePublish(game)" />
+                                            <label for="@game.ID"></label>
+                                        </div>
+                                    }
+                                </td>
+                                <td class="col-auto text-center">
+                                    <i class="fa fa-trash-o icon link-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" @onclick="() => PromptDelete(game)"></i>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center" style="font-weight:bold;">
+                                בטבלה זו יופיעו כלל המשחקים, טרם הוזנו משחקים - לחצו על "משחק חדש"
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    @* <!--Main Games Table-->
     <div class="row">
         <h5>טבלת המשחקים</h5>
 
@@ -111,7 +198,7 @@
                             <tr>
                                 <td><b>@game.GameCode</b></td>
                                 <td>@game.GameName</td>
-                                <td><i class="fa fa-pencil icon"  @onclick="()=>EditGame(game)"></i> </td>
+                                <td><i class="fa fa-pencil icon link-success" @onclick="()=>EditGame(game)"></i> </td>
                                 <td>
                                     @if (game.CanPublish == false)
                                     {
@@ -129,7 +216,7 @@
                                     }
                                 </td>
                                 <td>
-                                    <i class="fa fa-trash-o icon" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" @onclick="() => PromptDelete(game)"></i>
+                                    <i class="fa fa-trash-o icon link-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" @onclick="() => PromptDelete(game)"></i>
 
                                 </td>
                             </tr>
@@ -146,7 +233,7 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </div> *@
 
 
     @if (msg != "")
@@ -159,15 +246,15 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <h5 class="modal-title" id="deleteModalLabel">מחיקת משחק</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this game?
+                    מחיקת המשחק תתבצע לצמיתות וללא יכולת שחזור, בטוחים?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="ConfirmDelete">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="ConfirmDelete">מחיקה</button>
                 </div>
             </div>
         </div>
@@ -186,16 +273,16 @@
 
     [Parameter]
     public EventCallback<Games> OnDeleteClicked { get; set; }
-    
-    UserWithGames user;
-    string msg = "";
 
+    UserWithGames user;
     GameToAdd gameToAdd = new GameToAdd();
 
     bool isModalOpen = false;
     bool isDeleteModalOpen = false;
 
     private Games gameToDelete;
+    private int characterCount = 0;
+    string msg = "";
 
 
     protected override async Task OnInitializedAsync()
@@ -240,33 +327,40 @@
         }
     }
 
-   
+    private void UpdateCharacterCount(ChangeEventArgs e)
+    {
+        characterCount = e.Value.ToString().Length;
+    }
 
-
+  
 
     //New game creation
     async Task CreateGame()
     {
-        //שליחת המשחק החדש לקונטרולר
-        var userRes = await Http.PostAsJsonAsync("api/game/" + UserId + "/addGame/", gameToAdd);
-        if (userRes.IsSuccessStatusCode == true)
-        {
-            //החזרת המשחק והוספתו לרשימת המשחקים כדי שיתווסף לטבלה
-            Games newGame = userRes.Content.ReadFromJsonAsync<Games>().Result;
-            user.Games.Add(newGame);
-            gameToAdd.GameName = "";
-            
-            //call to edit game with the new gamecode created
 
+
+        // Sending the new game to the controller
+        var userRes = await Http.PostAsJsonAsync("api/game/" + UserId + "/addGame/", gameToAdd);
+        if (userRes.IsSuccessStatusCode)
+        {
+            Console.WriteLine(gameToAdd.GameName);
+            Console.WriteLine(gameToAdd.EndingMessage);
+            // Retrieving the game and adding it to the list of games to update the table
+            Games newGame = await userRes.Content.ReadFromJsonAsync<Games>();
+            user.Games.Add(newGame);
+
+
+            // Redirect to edit game page with the new game code created
             Nav.NavigateTo("./GameEdit/" + newGame.GameCode);
         }
         else
         {
-            string error = userRes.Content.ReadAsStringAsync().Result;
-            // ShowError(error);
+            string error = await userRes.Content.ReadAsStringAsync();
+            Console.WriteLine($"Error creating game: {error}");
+            // Optionally handle the error in UI
         }
-
     }
+
 
     //edit game method to navigate to edit game page
     private void EditGame(Games game)
@@ -279,9 +373,6 @@
     protected async Task changePublish(Games game)
     {
     }
-
-
-   
 
     void PromptDelete(Games game)
     {
@@ -305,8 +396,6 @@
         StateHasChanged(); // Request Blazor to re-render the component
     }
 
-
-
     private async Task DeleteGame(Games game)
     {
         var response = await Http.DeleteAsync($"api/game/{UserId}/deleteGame/{game.GameCode}");
@@ -323,14 +412,39 @@
         }
     }
 
+    private string GetInputClass(int length, int minChars, int maxChars)
+    {
+        if (length == 0)
+            return "text-muted"; // Neutral for zero characters
+        else if (length < minChars)
+            return "text-danger";  // Red for less than minimum characters
+        else if (length >= minChars && length <= maxChars - 3)
+            return "text-success";   // Green for within the normal range
+        else if (length > maxChars - 3 && length <= maxChars)
+            return "text-warning";  // Orange for nearing maximum length
+        return "text-muted";  // Fallback, might not be necessary
+    }
 
+    private void HandleInputChange(ChangeEventArgs e, string inputType)
+    {
+        var newValue = e.Value.ToString();
+        switch (inputType)
+        {
+            case "gameName":
+                gameToAdd.GameName = newValue;
+                break;
+            case "endingMessage":
+                gameToAdd.EndingMessage = newValue;
+                break;
+            default:
+                break;
+        }
 
-
-
-
+    }
 
     void formSubmit()
     {
+        Console.WriteLine("Success form submit");
         CreateGame();
     }
 

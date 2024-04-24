@@ -223,10 +223,11 @@
     int QuestionDescriptionMaxChars = 50;
     int AnswersDescriptionMaxChars = 30;
 
-
-
     private IBrowserFile questionImageFile;
     private string imagePreview;
+
+
+    /*METHODS*/
 
     protected override async Task OnInitializedAsync()
     {
@@ -259,7 +260,6 @@
 
     }
     
-
     private async Task HandleSubmit()
     {
         await AddQuestion();
