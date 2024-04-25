@@ -271,19 +271,6 @@ namespace template.Server.Controllers
             return Ok("Answers added successfully");
         }
 
-
-
-
-
-
-        //NOTE: Didn't work on that yet 
-
-
-
-
-
-
-
         [HttpDelete("deleteGame/{deleteGameCode}")]
         public async Task<IActionResult> DeleteGame(int userId, int deleteGameCode)
         {
@@ -327,6 +314,46 @@ namespace template.Server.Controllers
         }
 
 
+        //delete question using question id
+        [HttpDelete("deleteQuestion/{questionId}")]
+        public async Task<IActionResult> DeleteQuestion(int userId, int questionId)
+        {
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    QuestionId = questionId
+                };
+                string questionQuery = "SELECT QuestionDescription FROM Questions WHERE ID = @QuestionId";
+                var questionRecords = await _db.GetRecordsAsync<UserWithGames>(questionQuery, param2);
+                UserWithGames question = questionRecords.FirstOrDefault();
+                if (question != null)
+                {
+                    object param3 = new
+                    {
+                        QuestionId = questionId
+                    };
+                    string deleteQuestionQuery = "DELETE FROM Questions WHERE ID = @QuestionId";
+                    int isDelete = await _db.SaveDataAsync(deleteQuestionQuery, param3);
+                    if (isDelete > 0)
+                    {
+                        return Ok("Question deleted");
+                    }
+                    return BadRequest("Question not deleted");
+                }
+                return BadRequest("Question Not Found");
+            }
+            return BadRequest("User Not Found");
+        }
+
+        //NOTE: Didn't work on that yet 
 
 
 

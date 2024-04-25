@@ -103,13 +103,16 @@
     <!--Main Games Table-->
     <div class="row">
         <h5>טבלת המשחקים</h5>
+        
 
-        <div class="col-12 table-responsive">
+
+        <div class="col-10 table-responsive">
             <table class="table table-hover">
                 <!--Table HEADER-->
                 <thead class="table-light">
                     <tr>
                         <th scope="col">קוד</th>
+                        
                         <th scope="col">שם המשחק
                             <Tooltip Text="הזינו מספר שאלות ועברו לדוכן הבא"><i class="fa fa-info-circle"> </i> </Tooltip>
                         </th>
@@ -170,71 +173,6 @@
             </table>
         </div>
     </div>
-
-
-    @* <!--Main Games Table-->
-    <div class="row">
-        <h5>טבלת המשחקים</h5>
-
-        <div class="col-12 table-responsive">
-            <table class="table table-hover">
-                <!--Table HEADER-->
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">קוד</th>
-                        <th scope="col">שם המשחק</th>
-                        <th scope="col">עריכה</th>
-                        <th scope="col">פרסום</th>
-                        <th scope="col">מחיקה</th>
-                    </tr>
-                </thead>
-
-                    <!--Table TBODY-->
-                    <tbody>
-                    @if (GamesList != null && GamesList.Count > 0)
-                    {
-                        @foreach (var game in GamesList)
-                        {
-                            <tr>
-                                <td><b>@game.GameCode</b></td>
-                                <td>@game.GameName</td>
-                                <td><i class="fa fa-pencil icon link-success" @onclick="()=>EditGame(game)"></i> </td>
-                                <td>
-                                    @if (game.CanPublish == false)
-                                    {
-                                        <div>
-                                            <input type="checkbox" id="@game.ID" disabled>
-                                            <label for="@game.ID"/>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <div>
-                                            <input type="checkbox" id="@game.ID" checked="@game.IsPublished" @onchange="()=>changePublish(game)" />
-                                            <label for="@game.ID"></label>
-                                        </div>
-                                    }
-                                </td>
-                                <td>
-                                    <i class="fa fa-trash-o icon link-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" @onclick="() => PromptDelete(game)"></i>
-
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="5" class="text-center" style="font-weight:bold;">
-                                בטבלה זו יופיעו כלל המשחקים, טרם הוזנו משחקים - לחצו על "משחק חדש"
-                                </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div> *@
-
 
     @if (msg != "")
     {

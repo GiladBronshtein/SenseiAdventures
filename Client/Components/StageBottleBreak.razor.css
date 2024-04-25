@@ -55,3 +55,7 @@ table {
 .text-muted {
     color: #6c757d; /* Default color, change as needed */
 }
+input#question::placeholder {
+    color: #ced4da !important; /* Use !important to override other styles if necessary */
+    font-size: 0.875rem !important; /* Use !important to override other styles if necessary */
+}

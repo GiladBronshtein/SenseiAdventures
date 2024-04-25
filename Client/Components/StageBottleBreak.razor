@@ -11,7 +11,8 @@
     <div class="row mb-5">
         <div class="col-md-8">
             <h3>דוכן - שבירת בקבוקים</h3>
-            <Tooltip Text="הזינו מספר שאלות ועברו לדוכן הבא"><i class="fa fa-info-circle"> </i> </Tooltip>
+            <Tooltip Text=
+                "בדוכן זה ניתן להוסיף שאלות חד-ברירה. לכל תיאור שאלה ניתן להוסיף גם תמונה. עבור מסיחים ניתן להוסיף טקסט או תמונה."><i class="fa fa-info-circle"> </i> </Tooltip>
             <span>משחק חד-ברירה בו שוברים את הבקבוק עם התשובה הנכונה</span>
         </div>
         <div class="col-md-4 text-end">
@@ -22,7 +23,7 @@
     <!-- ROW 2 - FORM AND QUESTION LIST -->
     <div class="row">
         <!-- Edit Form Column -->
-        <div class="col-md-7">
+        <div class="col-md-7 ">
             <h5>שאלה</h5>
 
             <EditForm Model="questionsAndAnswers" OnValidSubmit="HandleSubmit" OnInvalidSubmit="failedSubmit">
@@ -32,38 +33,37 @@
                 <div class="mb-3 d-flex align-items-center">
                     <div class="col-8 p-0">
                         <InputText maxlength="@QuestionDescriptionMaxChars"
-                                   pattern="@($"{{2,{QuestionDescriptionMaxChars}}}")"
                                    class="form-control"
                                    id="question"
-                                   @bind-Value="QuestionDescription"
-                                   @oninput="@(e => HandleInputChange(e, nameof(QuestionDescription)))"
+                                   @bind-Value="questionsAndAnswers.Questions.QuestionDescription"
+                                   @oninput="@(e => HandleInputChange(e, nameof(questionsAndAnswers.Questions.QuestionDescription)))"
                                    placeholder="שאלה"
-                                   aria-describedby="questionDescription" required
-                                   title="@($"(טווח תווים 2-{QuestionDescriptionMaxChars})")" />
+                                   aria-describedby="questionDescription" required/>
+
                         <ValidationMessage For="@(() => questionsAndAnswers.Questions.QuestionDescription)" style="color:Red;" />
-
-
-
                     </div>
-                    <div class="col-1 p-0">
-                        <small id="questionDescription" class="@GetInputClass(QuestionDescription.Length, 2, @QuestionDescriptionMaxChars) 
-                            col-2 p-0 d-flex justify-content-start">@QuestionDescription.Length/@QuestionDescriptionMaxChars</small>
+
+                    <div class="col-1">
+                        <small id="questionDescription" class="@GetInputClass(QuestionDescription.Length, 2, @QuestionDescriptionMaxChars)">
+                            @QuestionDescription.Length/@QuestionDescriptionMaxChars</small>
                     </div>
-                    <div class="col-2 p-0">
-                        <button class="btn btn-outline-secondary">
-                            <i class="fa fa-picture-o"></i>
-                        </button>
-                        <InputFile class="d-none" />
+                    
+                    <div class="col-1 d-flex justify-content-end pe-0">
+                        <label class="btn btn-outline-secondary " for="FileInputID">
+                            <i class="fa fa-picture-o "></i>
+                        </label>
+                        <InputFile id="FileInputID" OnChange="UploadFile" hidden />
                     </div>
-                    @if (questionImageFile != null)
-                    {
-                        <div class="mb-3 d-flex justify-content-end">
-                            <button class="btn btn-danger">הסר תמונה</button>
-                        </div>
-                        <div class="mb-3">
-                            <img src="@imagePreview" class="img-thumbnail" style="max-height: 200px;" alt="Preview" />
-                        </div>
-                    }
+                    <div class="col-2 ps-1">
+
+                        @if (myFileImage != "")
+                        {
+                            <div class="img-wrapper">
+                                <img src="@myFileImage" width="34" />
+                                <i class="fa fa-trash-o delete-image-btn" @onclick="MakeDeleteList"></i>
+                            </div>
+                        }
+                    </div>
                 </div>
 
                 <div class="mb-3 mt-3 col-9"> </div>
@@ -163,6 +163,8 @@
         </div>
 
         <!-- Question List Column -->
+        @if (questions.Count > 0)
+        {
         <div class="col-md-5 ">
             <h5>רשימת שאלות</h5>
             <div class="scrollable-table-body ">
@@ -187,10 +189,14 @@
                 </table>
             </div>
         </div>
+        }
     </div>
 </div>
 
-
+@if (msg != "")
+{
+    <p>@msg</p>
+}
 
 
 @code {
@@ -223,10 +229,16 @@
     int QuestionDescriptionMaxChars = 50;
     int AnswersDescriptionMaxChars = 30;
 
+    bool hasimage = false;
     private IBrowserFile questionImageFile;
     private string imagePreview;
+    string myFileImage = "";
+    long maxFileSize = 4194304; //4MB
 
+    string msg = "";
 
+    List<string> DeleteImages = new List<string>();
+    
     /*METHODS*/
 
     protected override async Task OnInitializedAsync()
@@ -276,12 +288,21 @@
 
     private async Task AddQuestion()
     {
+        if (myFileImage != "")
+        {
+            hasimage = true;
+        }
+        else
+        {
+            hasimage = false;
+        }
+
         QuestionToAdd questionToAdd = new QuestionToAdd()
             {
                 GameID = game.ID,
-                HasImage = false,
+                HasImage = hasimage,
                 QuestionDescription = QuestionDescription,
-                QuestionImage = "empty",
+                QuestionImage = myFileImage,
                 StageID = 1,
             };
 
@@ -346,5 +367,46 @@
         else if (length > maxChars - 3 && length <= maxChars)
             return "text-warning";  // Orange for nearing maximum length
         return "text-muted";  // Fallback, might not be necessary
+    }
+
+    private async Task UploadFile(InputFileChangeEventArgs e)
+    {
+        var imageFiles = e.GetMultipleFiles();
+        foreach (var file in imageFiles)
+        {
+            if (file.Size <= maxFileSize)
+            {
+                var buffer = new byte[file.Size];
+                await file.OpenReadStream(maxFileSize).ReadAsync(buffer);
+                var imageBase64 = Convert.ToBase64String(buffer);
+                var saveResponse = await Http.PostAsJsonAsync("api/media/upload", imageBase64);
+
+                if (saveResponse.IsSuccessStatusCode == true)
+                {
+                    string resizeUrl = saveResponse.Content.ReadAsStringAsync().Result;
+                    myFileImage = "uploadedFiles/" + resizeUrl;
+                }
+            }
+        }
+    }
+
+    private void MakeDeleteList()
+    {
+        DeleteImages.Add(myFileImage);
+        myFileImage = "";
+    }
+
+    private async Task DeleteImage()
+    {
+        var saveResponse = await Http.PostAsJsonAsync("api/Media/deleteImages", DeleteImages);
+        if (saveResponse.IsSuccessStatusCode == true)
+        {
+            msg = "deleted Successfully";
+            DeleteImages.Clear();
+        }
+        else
+        {
+            msg = "DELETE ERROR";
+        }
     }
 }
