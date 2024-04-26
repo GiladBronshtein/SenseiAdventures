@@ -4,7 +4,6 @@
     margin-bottom: 10px;
 }
 
-
 .main-content {
     border-radius: 5px;
     background-color: #fff; /* Optional: depends on your design preference */
@@ -40,14 +39,6 @@
     text-shadow: 0 0 12px black; /* White glow for emphasis on text */
 }
 
-    .sidebar-heading:hover {
-        /*text effect*/
-        text-shadow: 0 0 12px black; /* White glow for emphasis on text */
-        /*expanding text a bit*/
-        transform: scale(1.04);
-        transition: transform 0.4s; /* Smooth transition for interaction */
-    }
-
 /* Improved Button Styles */
 .sidebar-button {
     margin: 5px;
@@ -67,7 +58,7 @@
 .fa-gamepad {
     color: #17a2b8; /* Bright color for icons */
     text-shadow: 0 0 7px #00c4ff; /* Blue glow around icon */
-    font-size: 90px;
+    font-size: 30px;
     padding: 20px;
 }
 

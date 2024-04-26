@@ -16,7 +16,7 @@
                     @switch (currentStage)
                     {
                         case StageEnum.Stage.StageA:
-                            <StageBottleBreak gameCode="@gameCode" game="@gameData" />
+                                <StageBottleBreak gameCode="@gameCode" game="@gameData" OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" />
                             break;
                         case StageEnum.Stage.StageB:
                             <StageTargetHit />
@@ -41,12 +41,21 @@
         <div class="col-md-2 d-flex flex-column bg-dark text-white p-3 sidebar">
             <!-- Sidebar Header -->
             <div class="sidebar-heading d-flex justify-content-center align-items-center text-center">
-                <a href="./maintable" class="text-white text-decoration-none">
+                
+                <a class="icon-link icon-link-hover text-white text-decoration-none" href="./maintable" >
+                    חזרה למשחקים
+                    <svg class="bi" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 1-.5-.5H2.707l5.147-5.146a.5.5 0 1 0-.708-.708l-6 6a.5.5 0 0 0 0 .708l6 6a.5.5 0 1 0 .708-.708L2.707 8.5H14.5a.5.5 0 0 1 .5-.5z" />
+                    </svg>
+                </a>
+
+                
+               @*  <a href="./maintable" class="text-white text-decoration-none">
                     <span>
                         חזרה למשחקים 
                         <i class="fa fa-arrow-left"></i>
                     </span>
-                </a>
+                </a> *@
             </div>
             <hr class="bg-white">
             <!-- Stages -->
@@ -62,7 +71,18 @@
                 <div class="text-center">
                     <i class="fa fa-gamepad" aria-hidden="true"></i>
                     <!-- Example text or other content -->
-                    <p>Sensei Adventures</p>
+                    @if (gameData != null && gameData.Questions != null && gameData.Questions.Count > 0)
+                    {
+                        <p>
+                            כמות שאלות במשחק:
+                            @gameData.Questions.Count
+                        </p>
+                        <p>
+                            כמות דוכנים במשחק:
+                            @gameData.Questions.Count
+                        </p>
+                    }
+                        
                 </div>
             </div>
             <div class="mt-auto">
@@ -97,5 +117,21 @@
     private void SetStage(StageEnum.Stage stage)
     {
         currentStage = stage;
+    }
+
+    private async Task HandleQuestionAdded(GameQuestions question)
+    {
+        if (gameData.Questions == null)
+        {
+            gameData.Questions = new List<GameQuestions>();
+        }
+        gameData.Questions.Add(question);
+        StateHasChanged(); // Force a re-render of the component
+    }
+    private void HandleQuestionDeleted(GameQuestions question)
+    {
+        gameData.Questions.Remove(question);
+        gameData.Questions = new List<GameQuestions>(gameData.Questions); // Re-assign to force UI update
+        StateHasChanged(); // Optionally force re-render
     }
 }

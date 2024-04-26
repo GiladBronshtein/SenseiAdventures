@@ -50,7 +50,7 @@
                     
                     <div class="col-1 d-flex justify-content-end pe-0">
                         <label class="btn btn-outline-secondary " for="FileInputID">
-                            <i class="fa fa-picture-o "></i>
+                            <i class="fa-solid fa-image "></i>
                         </label>
                         <InputFile id="FileInputID" OnChange="UploadFile" hidden />
                     </div>
@@ -60,7 +60,7 @@
                         {
                             <div class="img-wrapper">
                                 <img src="@myFileImage" width="34" />
-                                <i class="fa fa-trash-o delete-image-btn" @onclick="MakeDeleteList"></i>
+                                <i class="fa-solid fa-trash  delete-image-btn" @onclick="MakeDeleteList"></i>
                             </div>
                         }
                     </div>
@@ -181,8 +181,8 @@
                         {
                             <tr>
                                 <td>@question.QuestionDescription</td>
-                                <td class="text-center"><button class="btn btn-outline-primary btn-sm" @onclick="()=>EditQuestion(question)"><i class="fa fa-pencil fa-fw" style="width: 14px;"></i></button></td>
-                                <td class="text-center"><button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteQuestion(question)"><i class="fa fa-trash-o fa-fw" style="width: 14px;"></i></button></td>
+                                    <td class="text-center"><button class="btn btn-outline-primary btn-sm" @onclick="()=>EditQuestion(question)"><i class="fa-solid fa-file-pen fa-fw" style="width: 14px;"></i></button></td>
+                                    <td class="text-center"><button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteQuestion(question)"><i class="fa-solid fa-trash  fa-fw" style="width: 14px;"></i></button></td>
                             </tr>
                         }
                     </tbody>
@@ -200,11 +200,14 @@
 
 
 @code {
+    #region Variables
     [CascadingParameter] public int UserId { get; set; } // Inject UserId
 
     [Parameter] public string gameCode { get; set; } // Inject gameCode
     [Parameter] public GameDetails game { get; set; }
     [Parameter] public int stage { get; set; }
+    [Parameter] public EventCallback<GameQuestions> OnQuestionAdded { get; set; }
+    [Parameter] public EventCallback<GameQuestions> OnQuestionDeleted { get; set; }
 
     private GameDetails gameDetails = new GameDetails();
     private QuestionToAdd questionToAdd = new QuestionToAdd();
@@ -238,6 +241,7 @@
     string msg = "";
 
     List<string> DeleteImages = new List<string>();
+    #endregion
     
     /*METHODS*/
 
@@ -274,10 +278,23 @@
     
     private async Task HandleSubmit()
     {
-        await AddQuestion();
-        if (newQuestionCreated > 0)
+        // var newQuestion = await AddQuestion();
+        // if (newQuestion != null)
+        // {
+        //     questions.Add(newQuestion);
+        //     await AddAnswers(newQuestion.ID);
+        // }
+        var newQuestion = await AddQuestion();
+        if (newQuestion != null)
         {
-            await AddAnswers();
+            // Check if the new question is already in the list to avoid duplication
+            if (!questions.Any(q => q.ID == newQuestion.ID))
+            {
+                questions.Add(newQuestion);
+                questions = new List<GameQuestions>(questions); // Re-assign to force UI update
+                StateHasChanged(); // This may not be necessary depending on your Blazor version
+            }
+            await AddAnswers(newQuestion.ID);
         }
     }
 
@@ -286,21 +303,14 @@
         Console.WriteLine("Form submission failed");
     }
 
-    private async Task AddQuestion()
+    private async Task<GameQuestions> AddQuestion()
     {
-        if (myFileImage != "")
-        {
-            hasimage = true;
-        }
-        else
-        {
-            hasimage = false;
-        }
+        bool hasImage = !string.IsNullOrEmpty(myFileImage);
 
         QuestionToAdd questionToAdd = new QuestionToAdd()
             {
                 GameID = game.ID,
-                HasImage = hasimage,
+                HasImage = hasImage,
                 QuestionDescription = QuestionDescription,
                 QuestionImage = myFileImage,
                 StageID = 1,
@@ -311,26 +321,34 @@
         if (response.IsSuccessStatusCode)
         {
             var result = await response.Content.ReadAsStringAsync();
-            newQuestionCreated = int.Parse(result);
-            Console.WriteLine("Successful Question Creation - ID: " + result); // Handle success
+            int questionId = int.Parse(result);
+            Console.WriteLine("Successful Question Creation - ID: " + result);
+            GameQuestions newQuestion = new GameQuestions
+                {
+                    ID = questionId,
+                    QuestionDescription = QuestionDescription
+                };
+            await OnQuestionAdded.InvokeAsync(newQuestion);
+            return newQuestion;
         }
         else
         {
-            Console.WriteLine("Error: " + response.StatusCode); // Handle error
+            Console.WriteLine("Error: " + response.StatusCode);
+            return null;
         }
     }
 
-    private async Task AddAnswers()
+    private async Task AddAnswers(int questionId)
     {
         List<GameAnswers> answers = new List<GameAnswers>()
     {
-        new GameAnswers { AnswerDescription = CorrectAnswer, IsCorrect = true, QuestionID = newQuestionCreated },
-        new GameAnswers { AnswerDescription = WrongAnswer1, IsCorrect = false, QuestionID = newQuestionCreated },
-        new GameAnswers { AnswerDescription = WrongAnswer2, IsCorrect = false, QuestionID = newQuestionCreated },
-        new GameAnswers { AnswerDescription = WrongAnswer3, IsCorrect = false, QuestionID = newQuestionCreated }
+        new GameAnswers { AnswerDescription = CorrectAnswer, IsCorrect = true, QuestionID = questionId },
+        new GameAnswers { AnswerDescription = WrongAnswer1, IsCorrect = false, QuestionID = questionId },
+        new GameAnswers { AnswerDescription = WrongAnswer2, IsCorrect = false, QuestionID = questionId },
+        new GameAnswers { AnswerDescription = WrongAnswer3, IsCorrect = false, QuestionID = questionId }
     };
 
-        var response = await Http.PostAsJsonAsync($"api/game/{UserId}/addAnswers/{newQuestionCreated}", answers);
+        var response = await Http.PostAsJsonAsync($"api/game/{UserId}/addAnswers/{questionId}", answers);
         if (response.IsSuccessStatusCode)
         {
             Console.WriteLine("Successful Answers Creation");
@@ -352,7 +370,11 @@
         var response = await Http.DeleteAsync($"api/game/{UserId}/deleteQuestion/{question.ID}");
         if (response.IsSuccessStatusCode)
         {
-            questions.Remove(question); // Update UI upon successful deletion
+            await OnQuestionDeleted.InvokeAsync(question);
+        }
+        else
+        {
+            Console.WriteLine("Failed to delete question: " + await response.Content.ReadAsStringAsync());
         }
     }
 
