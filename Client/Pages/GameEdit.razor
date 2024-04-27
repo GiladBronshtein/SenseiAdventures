@@ -12,7 +12,6 @@
             <div class="row">
                 <div class="col-12 p-3">
                     <CascadingValue Value="currentStage">
-
                     @switch (currentStage)
                     {
                         case StageEnum.Stage.StageA:
@@ -32,30 +31,19 @@
                             break;
                     }
                     </CascadingValue>
-
                 </div>
             </div>
         </div>
-
         <!-- Sidebar -->
         <div class="col-md-2 d-flex flex-column bg-dark text-white p-3 sidebar">
             <!-- Sidebar Header -->
-            <div class="sidebar-heading d-flex justify-content-center align-items-center text-center">
-                
+            <div class="sidebar-heading d-flex justify-content-center align-items-center text-center mt-2 mb-2">
                 <a class="icon-link icon-link-hover text-white text-decoration-none" href="./maintable" >
                     חזרה למשחקים
                     <svg class="bi" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M15 8a.5.5 0 0 1-.5-.5H2.707l5.147-5.146a.5.5 0 1 0-.708-.708l-6 6a.5.5 0 0 0 0 .708l6 6a.5.5 0 1 0 .708-.708L2.707 8.5H14.5a.5.5 0 0 1 .5-.5z" />
                     </svg>
                 </a>
-
-                
-               @*  <a href="./maintable" class="text-white text-decoration-none">
-                    <span>
-                        חזרה למשחקים 
-                        <i class="fa fa-arrow-left"></i>
-                    </span>
-                </a> *@
             </div>
             <hr class="bg-white">
             <!-- Stages -->
@@ -74,15 +62,17 @@
                     @if (gameData != null && gameData.Questions != null && gameData.Questions.Count > 0)
                     {
                         <p>
-                            כמות שאלות במשחק:
+                        <span>
+                             שאלות :
                             @gameData.Questions.Count
-                        </p>
-                        <p>
-                            כמות דוכנים במשחק:
-                            @gameData.Questions.Count
+                        </span>
+                        <br/>
+                        <span>
+                             דוכנים :
+                            @activeStages
+                        </span>
                         </p>
                     }
-                        
                 </div>
             </div>
             <div class="mt-auto">
@@ -94,7 +84,6 @@
             </div>
         </div>
     </div>
-
 </div>
 
 
@@ -104,16 +93,27 @@
 
     [Parameter]
     public string gameCode { get; set; }
-    
+
     GameDetails gameData;
     UserWithGames user;
+
+    private int activeStages;
+
     private StageEnum.Stage currentStage = StageEnum.Stage.None;
 
     protected override async Task OnInitializedAsync()
     {
         gameData = await Http.GetFromJsonAsync<GameDetails>($"api/Game/{UserId}/getGame/{gameCode}");
+        //activeStages call to controller getactivestages
+        activeStages = await Http.GetFromJsonAsync<int>($"api/Game/{UserId}/getActiveStages/{gameCode}");
     }
-
+    
+    private async Task UpdateActiveStages()
+    {
+        activeStages = await Http.GetFromJsonAsync<int>($"api/Game/{UserId}/getActiveStages/{gameCode}");
+        StateHasChanged(); // Force update the UI
+    }
+   
     private void SetStage(StageEnum.Stage stage)
     {
         currentStage = stage;
@@ -126,12 +126,16 @@
             gameData.Questions = new List<GameQuestions>();
         }
         gameData.Questions.Add(question);
+        UpdateActiveStages();
         StateHasChanged(); // Force a re-render of the component
     }
+    
     private void HandleQuestionDeleted(GameQuestions question)
     {
         gameData.Questions.Remove(question);
         gameData.Questions = new List<GameQuestions>(gameData.Questions); // Re-assign to force UI update
+        UpdateActiveStages();
+
         StateHasChanged(); // Optionally force re-render
     }
 }

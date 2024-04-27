@@ -1,4 +1,4 @@
-﻿
+﻿@inject IJSRuntime JS
 @inject HttpClient Http
 @inject NavigationManager Nav
 @using template.Shared.Models.Games;
@@ -7,15 +7,18 @@
 
 <div class="container-fluid">
 
+
+
     <!-- ROW 1 - TITLE -->
-    <div class="row mb-5">
-        <div class="col-md-8">
-            <h3>דוכן - שבירת בקבוקים</h3>
-            <Tooltip Text=
-                "בדוכן זה ניתן להוסיף שאלות חד-ברירה. לכל תיאור שאלה ניתן להוסיף גם תמונה. עבור מסיחים ניתן להוסיף טקסט או תמונה."><i class="fa fa-info-circle"> </i> </Tooltip>
-            <span>משחק חד-ברירה בו שוברים את הבקבוק עם התשובה הנכונה</span>
+    <div class="row mb-4">
+        <div class="col-md-7">
+            <h3>
+                דוכן - שבירת בקבוקים
+                <Tooltip Text="בדוכן זה ניתן להוסיף שאלות חד-ברירה. לכל תיאור שאלה ניתן להוסיף גם תמונה. עבור מסיחים ניתן להוסיף טקסט או תמונה."><i class="fa fa-info-circle" style="font-size:18px;"> </i> </Tooltip>
+            </h3>
+
         </div>
-        <div class="col-md-4 text-end">
+        <div class="col-md-5 text-end">
             <button type="button" class="btn btn-secondary">כיבוי דוכן</button>
         </div>
     </div>
@@ -24,7 +27,12 @@
     <div class="row">
         <!-- Edit Form Column -->
         <div class="col-md-7 ">
-            <h5>שאלה</h5>
+            <div class="row mb-3">
+                <div class="col col-12">
+                    <span> שאלה</span>
+                    <span>(2-30 טווח תווים)</span>
+                </div>
+            </div>
 
             <EditForm Model="questionsAndAnswers" OnValidSubmit="HandleSubmit" OnInvalidSubmit="failedSubmit">
                 <DataAnnotationsValidator />
@@ -35,19 +43,20 @@
                         <InputText maxlength="@QuestionDescriptionMaxChars"
                                    class="form-control"
                                    id="question"
-                                   @bind-Value="questionsAndAnswers.Questions.QuestionDescription"
+                                   @bind-Value="QuestionDescription"
                                    @oninput="@(e => HandleInputChange(e, nameof(questionsAndAnswers.Questions.QuestionDescription)))"
                                    placeholder="שאלה"
-                                   aria-describedby="questionDescription" required/>
+                                   aria-describedby="questionDescription" required />
 
-                        <ValidationMessage For="@(() => questionsAndAnswers.Questions.QuestionDescription)" style="color:Red;" />
+
                     </div>
 
                     <div class="col-1">
                         <small id="questionDescription" class="@GetInputClass(QuestionDescription.Length, 2, @QuestionDescriptionMaxChars)">
-                            @QuestionDescription.Length/@QuestionDescriptionMaxChars</small>
+                            @QuestionDescription.Length/@QuestionDescriptionMaxChars
+                        </small>
                     </div>
-                    
+
                     <div class="col-1 d-flex justify-content-end pe-0">
                         <label class="btn btn-outline-secondary " for="FileInputID">
                             <i class="fa-solid fa-image "></i>
@@ -76,8 +85,6 @@
                     </div>
                 </div>
 
-
-
                 <!-- Correct Answer -->
                 <label for="correctAnswer" class="form-label">תשובה נכונה:</label>
                 <div class="mb-3 align-items-center">
@@ -90,7 +97,6 @@
                                    @oninput="@(e => HandleInputChange(e, nameof(CorrectAnswer)))"
                                    placeholder="תשובה נכונה"
                                    aria-describedby="correctAnswer" required />
-                        <ValidationMessage For="@(() => questionsAndAnswers.Answers.AnswerDescription)" style="color:Red;" />
                     </div>
                     <div class="col-3 p-0">
                         <small id="correctAnswer" class="@GetInputClass(CorrectAnswer.Length, 2, @AnswersDescriptionMaxChars)
@@ -109,9 +115,8 @@
                                    class="form-control"
                                    @bind-Value="WrongAnswer1"
                                    @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer1)))"
-                                   placeholder="תשובה שגויה" 
+                                   placeholder="תשובה שגויה"
                                    aria-describedby="wrongAnswer1" required />
-                        <ValidationMessage For="@(() =>  questionsAndAnswers.Answers.AnswerDescription)" style="color:Red;" />
                     </div>
                     <div class="col-3 p-0">
                         <small id="wrongAnswer1" class="@GetInputClass(WrongAnswer1.Length, 2, @AnswersDescriptionMaxChars)
@@ -128,7 +133,6 @@
                                    @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer2)))"
                                    placeholder="תשובה שגויה"
                                    aria-describedby="wrongAnswer2" required />
-                        <ValidationMessage For="@(() =>  questionsAndAnswers.Answers.AnswerDescription)" style="color:Red;" />
                     </div>
                     <div class="col-3 p-0">
                         <small id="wrongAnswer2" class="@GetInputClass(WrongAnswer2.Length, 2, @AnswersDescriptionMaxChars)
@@ -145,7 +149,6 @@
                                    @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer3)))"
                                    placeholder="תשובה שגויה"
                                    aria-describedby="wrongAnswer3" required />
-                        <ValidationMessage For="@(() =>  questionsAndAnswers.Answers.AnswerDescription)" style="color:Red;" />
                     </div>
                     <div class="col-3 p-0">
                         <small id="wrongAnswer3" class="@GetInputClass(WrongAnswer3.Length, 2, @AnswersDescriptionMaxChars)
@@ -154,9 +157,8 @@
                 </div>
 
                 <!-- Submit Button -->
-                <div class="mt-3 mb-3">
-                    <button type="submit" class="btn btn-primary shadow">שמירת שאלה</button>
-
+                <div class="mt-3 mb-2">
+                    <button type="submit" id="liveToastBtn" class="btn btn-primary shadow-sm">שמירת שאלה</button>
                 </div>
 
             </EditForm>
@@ -165,32 +167,70 @@
         <!-- Question List Column -->
         @if (questions.Count > 0)
         {
-        <div class="col-md-5 ">
-            <h5>רשימת שאלות</h5>
-            <div class="scrollable-table-body ">
-                <table class="table shadow-sm table-striped table-hover table-responsive border border-1">
-                    <thead>
-                        <tr>
-                            <th>שאלה</th>
-                            <th class="text-center">עריכה</th>
-                            <th class="text-center">מחיקה</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var question in questions)
-                        {
+            <div class="col-md-5 mt-4">
+                <h5>רשימת שאלות</h5>
+                <div class="scrollable-table-body ">
+                    <table class="table shadow-sm table-striped table-hover table-responsive border border-1">
+                        <thead>
                             <tr>
-                                <td>@question.QuestionDescription</td>
-                                    <td class="text-center"><button class="btn btn-outline-primary btn-sm" @onclick="()=>EditQuestion(question)"><i class="fa-solid fa-file-pen fa-fw" style="width: 14px;"></i></button></td>
-                                    <td class="text-center"><button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteQuestion(question)"><i class="fa-solid fa-trash  fa-fw" style="width: 14px;"></i></button></td>
+                                <th>שאלה</th>
+                                <th class="text-center">עריכה</th>
+                                <th class="text-center">מחיקה</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var question in questions)
+                            {
+                                <tr>
+                                    <td>@question.QuestionDescription</td>
+                                    <td class="text-center"><button class="btn btn-outline-primary btn-sm" @onclick="()=>EditQuestion(question)"><i class="fa-solid fa-square-pen fa-fw" style="width: 14px;"></i></button></td>
+                                    <td class="text-center">
+                                        <button class="btn btn-outline-danger btn-sm" @onclick="() => selectedQuestionForDeletion = question"
+                                                data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">
+                                            <i class="fa-solid fa-trash fa-fw" style="width: 14px;"></i>
+                                        </button>
+
+
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
         }
     </div>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <!--TOAST comes here-->
+    </div>
+
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">מחיקת משחק</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    מחיקת השאלה תתבצע לצמיתות וללא יכולת שחזור, בטוחים?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="ConfirmDelete">מחיקה</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
 </div>
 
 @if (msg != "")
@@ -237,12 +277,20 @@
     private string imagePreview;
     string myFileImage = "";
     long maxFileSize = 4194304; //4MB
+    private EditContext editContext;
+
 
     string msg = "";
+    bool isDeleteModalOpen = false;
 
     List<string> DeleteImages = new List<string>();
+
+    string questionDescriptionClass = "text-muted"; // Default class
+    private GameQuestions selectedQuestionForDeletion;
+
+
     #endregion
-    
+
     /*METHODS*/
 
     protected override async Task OnInitializedAsync()
@@ -253,6 +301,7 @@
     private void HandleInputChange(ChangeEventArgs e, string inputType)
     {
         var newValue = e.Value.ToString();
+
         switch (inputType)
         {
             case "QuestionDescription":
@@ -273,17 +322,20 @@
             default:
                 break;
         }
-
+        StateHasChanged();
     }
-    
+
     private async Task HandleSubmit()
     {
-        // var newQuestion = await AddQuestion();
-        // if (newQuestion != null)
-        // {
-        //     questions.Add(newQuestion);
-        //     await AddAnswers(newQuestion.ID);
-        // }
+        if (string.IsNullOrWhiteSpace(CorrectAnswer) || CorrectAnswer.Length < 2 || CorrectAnswer.Length > AnswersDescriptionMaxChars ||
+            string.IsNullOrWhiteSpace(WrongAnswer1) || WrongAnswer1.Length < 2 || WrongAnswer1.Length > AnswersDescriptionMaxChars ||
+            string.IsNullOrWhiteSpace(WrongAnswer2) || WrongAnswer2.Length < 2 || WrongAnswer2.Length > AnswersDescriptionMaxChars ||
+            string.IsNullOrWhiteSpace(WrongAnswer3) || WrongAnswer3.Length < 2 || WrongAnswer3.Length > AnswersDescriptionMaxChars)
+        {
+            ShowToast(false, "הזינו שאלה ותשובות במבנה המתאים", "fa-solid fa-circle-exclamation");
+            return;
+        }
+
         var newQuestion = await AddQuestion();
         if (newQuestion != null)
         {
@@ -292,15 +344,23 @@
             {
                 questions.Add(newQuestion);
                 questions = new List<GameQuestions>(questions); // Re-assign to force UI update
-                StateHasChanged(); // This may not be necessary depending on your Blazor version
             }
             await AddAnswers(newQuestion.ID);
+            await ShowToast(true, "השאלה נשמרה בהצלחה!", "fa-solid fa-circle-check");
+
+            StateHasChanged();
+            ClearFormFields();
         }
+    }
+
+    private async Task ShowToast(bool isSuccess, string message, string icon)
+    {
+        await JS.InvokeVoidAsync("showToast", isSuccess, message, icon);
     }
 
     void failedSubmit()
     {
-        Console.WriteLine("Form submission failed");
+        StateHasChanged();
     }
 
     private async Task<GameQuestions> AddQuestion()
@@ -338,7 +398,7 @@
         }
     }
 
-    private async Task AddAnswers(int questionId)
+    private async Task<bool> AddAnswers(int questionId)
     {
         List<GameAnswers> answers = new List<GameAnswers>()
     {
@@ -348,47 +408,76 @@
         new GameAnswers { AnswerDescription = WrongAnswer3, IsCorrect = false, QuestionID = questionId }
     };
 
+        // Validate the answers list (optional, depending on your requirements)
+        // You can add validation logic here if needed
+
         var response = await Http.PostAsJsonAsync($"api/game/{UserId}/addAnswers/{questionId}", answers);
         if (response.IsSuccessStatusCode)
         {
             Console.WriteLine("Successful Answers Creation");
+            return true; // Return true indicating successful creation
         }
         else
         {
             Console.WriteLine("Failed to add answers: " + await response.Content.ReadAsStringAsync());
+            return false; // Return false indicating failure to add answers
         }
     }
 
     private void EditQuestion(GameQuestions question)
     {
-        // Implementation for editing a question
         Nav.NavigateTo($"/edit-question/{question.ID}");
     }
+
+
+    async Task ConfirmDelete()
+    {
+        if (selectedQuestionForDeletion != null)
+        {
+            await DeleteQuestion(selectedQuestionForDeletion);
+            selectedQuestionForDeletion = null; // Reset the selected question
+            isDeleteModalOpen = false; // Close the modal
+            StateHasChanged(); // Refresh UI
+        }
+    }
+
+
 
     private async Task DeleteQuestion(GameQuestions question)
     {
         var response = await Http.DeleteAsync($"api/game/{UserId}/deleteQuestion/{question.ID}");
         if (response.IsSuccessStatusCode)
         {
+            // Remove the question from the local list and update UI
+            questions.Remove(question);
+            StateHasChanged(); // Call this to refresh the component if not automatically updating
+            await ShowToast(true, "השאלה נמחקה בהצלחה.", "fa-solid fa-circle-check");
+
             await OnQuestionDeleted.InvokeAsync(question);
         }
         else
         {
+            ShowToast(false, "פעולת המחיקה נכשלה", "fa-solid fa-circle-exclamation");
+
             Console.WriteLine("Failed to delete question: " + await response.Content.ReadAsStringAsync());
         }
     }
 
     private string GetInputClass(int length, int minChars, int maxChars)
     {
+        string resultClass;
         if (length == 0)
-            return "text-muted"; // Neutral for zero characters
+            resultClass = "text-muted"; // Neutral for zero characters
         else if (length < minChars)
-            return "text-danger";  // Red for less than minimum characters
-        else if (length >= minChars && length <= maxChars - 3)
-            return "text-good";   // Green for within the normal range
-        else if (length > maxChars - 3 && length <= maxChars)
-            return "text-warning";  // Orange for nearing maximum length
-        return "text-muted";  // Fallback, might not be necessary
+            resultClass = "text-danger";  // Red for less than minimum characters
+        else if (length >= minChars && length < maxChars - 3)
+            resultClass = "text-good";   // Green for within the normal range
+        else if (length >= maxChars - 3 && length <= maxChars)
+            resultClass = "text-warning";  // Orange for nearing maximum length
+        else
+            resultClass = "text-muted";  // Fallback
+
+        return resultClass;
     }
 
     private async Task UploadFile(InputFileChangeEventArgs e)
@@ -416,6 +505,23 @@
     {
         DeleteImages.Add(myFileImage);
         myFileImage = "";
+    }
+
+    private void ClearFormFields()
+    {
+        // Reset properties within the questionsAndAnswers model
+        questionsAndAnswers.Questions.QuestionDescription = string.Empty;
+        QuestionDescription = "";
+        CorrectAnswer = "";
+        WrongAnswer1 = "";
+        WrongAnswer2 = "";
+        WrongAnswer3 = "";
+        myFileImage = ""; // Clear any image that might have been uploaded
+
+        // This should explicitly set to 'text-muted'
+        questionDescriptionClass = GetInputClass(0, 2, QuestionDescriptionMaxChars);
+
+        StateHasChanged();
     }
 
     private async Task DeleteImage()

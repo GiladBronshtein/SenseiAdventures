@@ -94,7 +94,6 @@ namespace template.Server.Controllers
             return Ok(user);
         }
 
-
         [HttpGet("All")]
         public async Task<IActionResult> GetGamesByUserWithDetails(int userId)
         {
@@ -109,7 +108,6 @@ namespace template.Server.Controllers
             var detailedGames = await GetUserDetailedGames(userId);
             return Ok(detailedGames);
         }
-
 
         [HttpPost("addGame")]
         public async Task<IActionResult> AddGames(int userId, GameToAdd gameToAdd)
@@ -313,8 +311,6 @@ namespace template.Server.Controllers
                     return BadRequest("User Not Found");
         }
 
-
-        //delete question using question id
         [HttpDelete("deleteQuestion/{questionId}")]
         public async Task<IActionResult> DeleteQuestion(int userId, int questionId)
         {
@@ -352,6 +348,44 @@ namespace template.Server.Controllers
             }
             return BadRequest("User Not Found");
         }
+
+        // method getting how many stages active (active means there are questions with stageid
+        // between 1 and 4) in a game
+        [HttpGet("getActiveStages/{gameCode}")]
+        public async Task<IActionResult> GetActiveStages(int userId, int gameCode)
+        {
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    GameCode = gameCode
+                };
+                string gameQuery = "SELECT GameName FROM Games WHERE GameCode = @GameCode";
+                var gameRecords = await _db.GetRecordsAsync<UserWithGames>(gameQuery, param2);
+                UserWithGames game = gameRecords.FirstOrDefault();
+                if (game != null)
+                {
+                    object param3 = new
+                    {
+                        GameCode = gameCode
+                    };
+                    string getActiveStagesQuery = "SELECT DISTINCT StageID FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
+                    var activeStages = await _db.GetRecordsAsync<int>(getActiveStagesQuery, param3);
+                    return Ok(activeStages.FirstOrDefault());
+                }
+                return BadRequest("Game Not Found");
+            }
+            return BadRequest("User Not Found");
+        }
+
+
 
         //NOTE: Didn't work on that yet 
 

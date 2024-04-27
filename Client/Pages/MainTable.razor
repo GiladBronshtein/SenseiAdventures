@@ -107,11 +107,13 @@
 
 
         <div class="col-10 table-responsive">
-            <table class="table table-hover">
+            <table class="table ">                <!--table-hover removed-->
                 <!--Table HEADER-->
                 <thead class="table-light">
                     <tr>
-                        <th scope="col">קוד</th>
+                        <th scope="col">קוד
+                            <Tooltip Text="באמצעות קוד זה, שחקנים ייכנסו למשחק"><i class="fa-solid fa-circle-info"></i></Tooltip>
+                        </th>
                         <th scope="col">שם המשחק
                             <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
                         </th>
@@ -141,14 +143,16 @@
                                     @if (game.CanPublish == false)
                                     {
                                         <div>
-                                            <input type="checkbox" id="@game.ID" disabled>
+                                                @*<input type="checkbox" id="@game.ID" disabled> *@
+                                                <input class="form-check-input" type="checkbox" id="@game.ID" value="" aria-label="..." disabled>
+
                                             <label for="@game.ID" />
                                         </div>
                                     }
                                     else
                                     {
                                         <div>
-                                            <input type="checkbox" id="@game.ID" checked="@game.IsPublished" @onchange="()=>changePublish(game)" />
+                                            <input class="form-check-input" type="checkbox" id="@game.ID" checked="@game.IsPublished" @onchange="()=>changePublish(game)" />
                                             <label for="@game.ID"></label>
                                         </div>
                                     }
@@ -220,7 +224,7 @@
     private int characterCount = 0;
     string msg = "";
 
-
+    // On page load
     protected override async Task OnInitializedAsync()
     {
         var userRes = await Http.GetAsync("api/game/" + UserId);
@@ -263,13 +267,6 @@
         }
     }
 
-    private void UpdateCharacterCount(ChangeEventArgs e)
-    {
-        characterCount = e.Value.ToString().Length;
-    }
-
-  
-
     //New game creation
     async Task CreateGame()
     {
@@ -296,7 +293,6 @@
             // Optionally handle the error in UI
         }
     }
-
 
     //edit game method to navigate to edit game page
     private void EditGame(Games game)
@@ -376,6 +372,11 @@
                 break;
         }
 
+    }
+
+    private void UpdateCharacterCount(ChangeEventArgs e)
+    {
+        characterCount = e.Value.ToString().Length;
     }
 
     void formSubmit()

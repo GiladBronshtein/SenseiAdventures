@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\css\fontawesome\" />
-    <Folder Include="wwwroot\javascript\" />
     <Folder Include="wwwroot\assets-images\" />
   </ItemGroup>
 
