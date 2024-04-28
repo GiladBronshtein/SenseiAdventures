@@ -1,6 +1,7 @@
 ﻿@page "/maintable"
 @inject HttpClient Http
 @inject NavigationManager Nav
+@inject IJSRuntime JSRuntime;
 @using template.Shared.Models.Games
 @using template.Shared.Models.Users
 @using template.Client.Components
@@ -30,7 +31,7 @@
                             <div class="modal-body">
 
                                 <!-- Form for new game creation -->
-                                <EditForm Model="gameToAdd" OnValidSubmit="formSubmit" OnInvalidSubmit="failedSubmit">
+                                <EditForm Model="gameToAdd" OnValidSubmit="CreateGame" OnInvalidSubmit="failedSubmit">
                                     <DataAnnotationsValidator />
 
                                     <!-- Game Name -->
@@ -69,13 +70,13 @@
                                     <div class="mb-3">
                                         <label for="gameImage" class="form-label">תמונת המשחק</label>
                                         <input type="file" class="form-control" id="gameImage" @bind="gameToAdd.GameImage" />
-                                        <ValidationMessage For="@(() => gameToAdd.GameImage)" style="color:Red;" />
+                                        @* <ValidationMessage For="@(() => gameToAdd.GameImage)" style="color:Red;" /> *@
                                     </div>
                                     
                                     <!-- Submit / Cancel Buttons -->
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">חזרה</button>
-                                        <button type="submit" value="send" class="btn btn-primary" data-bs-dismiss="modal">שמירה</button>
+                                        <button type="submit" value="send" class="btn btn-primary" data-bs-target="#my-modal">שמירה</button> <!--data-bs-dismiss="modal"-->
                                     </div>
                                 </EditForm>
                             </div>
@@ -104,10 +105,8 @@
     <div class="row">
         <h5>טבלת המשחקים</h5>
         
-
-
         <div class="col-10 table-responsive">
-            <table class="table ">                <!--table-hover removed-->
+            <table class="table ">           
                 <!--Table HEADER-->
                 <thead class="table-light">
                     <tr>
@@ -143,9 +142,7 @@
                                     @if (game.CanPublish == false)
                                     {
                                         <div>
-                                                @*<input type="checkbox" id="@game.ID" disabled> *@
-                                                <input class="form-check-input" type="checkbox" id="@game.ID" value="" aria-label="..." disabled>
-
+                                            <input class="form-check-input" type="checkbox" id="@game.ID" value="" aria-label="..." disabled>
                                             <label for="@game.ID" />
                                         </div>
                                     }
@@ -203,6 +200,13 @@
 
 
 </div>
+<script>
+    function dismissModal(modalId) {
+        const modal = document.getElementById(modalId);
+        const modalInstance = bootstrap.Modal.getInstance(modal);
+        modalInstance.hide();
+    }
+</script>
 
 @code {
     [CascadingParameter]
@@ -219,10 +223,12 @@
 
     bool isModalOpen = false;
     bool isDeleteModalOpen = false;
+    bool shouldDismissModal = false;
 
     private Games gameToDelete;
     private int characterCount = 0;
     string msg = "";
+    private bool submitSuccess = false;
 
     // On page load
     protected override async Task OnInitializedAsync()
@@ -270,17 +276,16 @@
     //New game creation
     async Task CreateGame()
     {
-
-
         // Sending the new game to the controller
         var userRes = await Http.PostAsJsonAsync("api/game/" + UserId + "/addGame/", gameToAdd);
         if (userRes.IsSuccessStatusCode)
         {
-            Console.WriteLine(gameToAdd.GameName);
-            Console.WriteLine(gameToAdd.EndingMessage);
+
             // Retrieving the game and adding it to the list of games to update the table
             Games newGame = await userRes.Content.ReadFromJsonAsync<Games>();
             user.Games.Add(newGame);
+
+            await JSRuntime.InvokeVoidAsync("dismissModal", "staticBackdrop");
 
 
             // Redirect to edit game page with the new game code created
@@ -377,12 +382,6 @@
     private void UpdateCharacterCount(ChangeEventArgs e)
     {
         characterCount = e.Value.ToString().Length;
-    }
-
-    void formSubmit()
-    {
-        Console.WriteLine("Success form submit");
-        CreateGame();
     }
 
     void failedSubmit()

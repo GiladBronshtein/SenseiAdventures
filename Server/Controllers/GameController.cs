@@ -48,7 +48,7 @@ namespace template.Server.Controllers
             {
                 CanPublish = false, // Assuming all new games cannot be published initially
                 DifficultLevel = 1, // Default difficulty level
-                EndingMessage = "empty", // Default empty ending message
+                EndingMessage = gameToAdd.EndingMessage, // Default empty ending message
                 GameCode = 0, // Initial game code, will be updated later
                 GameHasImage = false, // From input
                 GameImage = "empty", // Handle image information
@@ -349,8 +349,6 @@ namespace template.Server.Controllers
             return BadRequest("User Not Found");
         }
 
-        // method getting how many stages active (active means there are questions with stageid
-        // between 1 and 4) in a game
         [HttpGet("getActiveStages/{gameCode}")]
         public async Task<IActionResult> GetActiveStages(int userId, int gameCode)
         {
@@ -465,7 +463,6 @@ namespace template.Server.Controllers
             }
             return BadRequest("No Session");
         }
-
        
         [HttpPost("publishGame")]
         public async Task<IActionResult> publishGame(int userId, PublishGame game)

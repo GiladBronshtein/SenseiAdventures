@@ -34,8 +34,8 @@
 }
 
 .sidebar-heading {
-/*    padding: 18px;
-*/    /*text shadow*/
+    /*padding: 20px;*/
+/**/    /*text shadow*/
     text-shadow: 0 0 12px black; /* White glow for emphasis on text */
 }
 
@@ -58,7 +58,7 @@
 .fa-gamepad {
     color: #17a2b8; /* Bright color for icons */
     text-shadow: 0 0 2px #00c4ff; /* Blue glow around icon */
-    font-size: 20px;
+    font-size: 36px;
     padding: 20px;
 }
 

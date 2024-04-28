@@ -18,4 +18,5 @@
       const toastElement = document.getElementById('liveToast');
       const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastElement);
       toastBootstrap.show();
- }
+}
+

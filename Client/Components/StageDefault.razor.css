@@ -1,1 +1,17 @@
-﻿
+﻿/*change save button height and make it center horizontally*/
+/*.saveButton {
+    justify-content: center;
+    align-items: center;
+    height: 44px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    padding: 25px;
+}*/
