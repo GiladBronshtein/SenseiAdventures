@@ -54,14 +54,17 @@
      box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.3); /* Elevated shadow on hover */
 }
 
-/* Glowing effects for icons and key texts */
-.fa-gamepad {
-    color: #17a2b8; /* Bright color for icons */
-    text-shadow: 0 0 2px #00c4ff; /* Blue glow around icon */
-    font-size: 36px;
-    padding: 20px;
+.settingsButton {
+    margin-top: 18px;
+    margin-bottom: 18px;
 }
-
+/* Glowing effects for icons and key texts */
+/*.fa-gear {
+    color: white;*/ /* Bright color for icons */
+/*text-shadow: 0 0 0px #00c4ff;*/ /* Blue glow around icon */
+/*font-size: 16px;
+    padding: 20px;
+}*/
 .btn-success {
     background-image: linear-gradient(to right, #23913B, #218838); /* Gradient for success button */
     border: 1px solid #27A141;

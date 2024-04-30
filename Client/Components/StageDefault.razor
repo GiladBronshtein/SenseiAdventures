@@ -7,7 +7,7 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-6">
+        <div class="col-12">
             <h1>הגדרות המשחק</h1>
         </div>
         @* <div class="col-6">
@@ -28,7 +28,7 @@
                             <!-- Game Name -->
                             <div class="mb-2">
                                 <label for="gameName" class="form-label">שם המשחק</label>
-                                <span>(2-30 תווים)</span>
+                                <small>(2-30 תווים)</small>
                                 <InputText maxlength="30"
                                             @oninput="@(e => { HandleInputChange(e, nameof(gameDataChild.GameName)); gameDataChild.GameName = e.Value.ToString(); StateHasChanged(); })"
                                             id="gameName"
@@ -43,7 +43,7 @@
                             <!-- Ending Message -->
                             <div class="mb-2">
                                 <label for="endingMessage" class="form-label">הודעת הסיום</label>
-                                <span>(2-30 תווים)</span>
+                                <small>(2-30 תווים)</small>
                                 <InputText maxlength="30"
                                             @oninput="@(e => { HandleInputChange(e, nameof(gameDataChild.EndingMessage)); gameDataChild.EndingMessage = e.Value.ToString(); StateHasChanged(); })"
                                             id="endingMessage"
@@ -62,21 +62,6 @@
                     </div>
                 </div>
             </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         </EditForm>
     }
     else
@@ -201,12 +186,19 @@
 </div>
 
 
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <!--TOAST comes here-->
+</div>
+
 @code
 {
     [Parameter]
     public GameDetails gameDataChild { get; set; }
 
-   
+    [Parameter]
+    public int userID { get; set; }
+
+
 
     void failedSubmit()
     {
@@ -214,6 +206,24 @@
 
     async Task EditSettings()
     {
+        //use following control to update gamename, endingmessage and image [HttpPut("updateGameSettings/{gameCode}")]
+        var response = await Http.PutAsJsonAsync<GameDetails>($"api/Game/{userID}/updateGameSettings/" + gameDataChild.GameCode, gameDataChild);
+        if (response.IsSuccessStatusCode)
+        {
+            await ShowToast(true, "הגדרות המשחק נשמרו בהצלחה", "fa-solid fa-circle-check");
+            Console.WriteLine("Success");
+        }
+        else
+        {
+            ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
+            return;
+        }
+
+    }
+    
+    private async Task ShowToast(bool isSuccess, string message, string icon)
+    {
+        await JS.InvokeVoidAsync("showToast", isSuccess, message, icon);
     }
 
     private void HandleInputChange(ChangeEventArgs e, string inputType)

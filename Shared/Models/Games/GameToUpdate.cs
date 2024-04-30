@@ -8,15 +8,13 @@ namespace template.Shared.Models.Games
 {
     public class GameToUpdate
     {
-        public int ID { get; set; }
+            public int ID { get; set; }
+        public string GameCode { get; set; }
         public string GameName { get; set; }
-        public string QuestionDescription { get; set; }
-        public string GameEndMessage { get; set; }
-        public string QuestionCorrectCategory { get; set; }
-        public string QuestionWrongCategory { get; set; }
-        public string QuestionImageText { get; set; }
-        public bool QuestionHasImage { get; set; }
-        public List<GameAnswers> Answers { get; set; }
-        public List<GameAnswers> AnswersToDelete { get; set; }
+            public string EndingMessage { get; set; }
+            public string GameImage { get; set; }
+            public bool GameHasImage { get; set; }
+            public List<GameAnswers> Answers { get; set; }
+            public List<GameAnswers> AnswersToDelete { get; set; }
     }
 }

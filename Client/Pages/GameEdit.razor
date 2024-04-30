@@ -28,7 +28,7 @@
                                 <StageSlashing />
                                 break;
                             default:
-                                <StageDefault gameDataChild="@gameData" />
+                                <StageDefault gameDataChild="@gameData" userID="@UserId"/>
                                 break;
                         }
                     </CascadingValue>
@@ -56,9 +56,18 @@
                 <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageA)">שבירת בקבוקים</button>
                 <span style="color:black;" class="enterExitText text-center">כניסה לפסטיבל</span>
             </div>
+
+            <div class="d-flex flex-column align-items-center justify-content-center ">
+                <button type="button" class="btn btn-light settingsButton" @onclick="SetStageToDefault">
+                    הגדרות המשחק
+                    <i class="fa-solid fa-gear" aria-hidden="true"></i>
+                </button>
+            </div>
+
             <div class="d-flex flex-column align-items-center justify-content-center">
                 <div class="text-center">
-                    <i class="fa fa-gamepad" aria-hidden="true"></i>
+                  
+
                     <!-- Example text or other content -->
                     @if (gameData != null && gameData.Questions != null && gameData.Questions.Count > 0)
                     {
@@ -139,5 +148,10 @@
         UpdateActiveStages();
 
         StateHasChanged(); // Optionally force re-render
+    }
+
+    private void SetStageToDefault()
+    {
+        SetStage(StageEnum.Stage.None); // Assuming StageDefault is defined in your StageEnum
     }
 }

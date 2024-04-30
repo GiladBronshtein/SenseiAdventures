@@ -77,6 +77,89 @@ namespace template.Server.Controllers
             return gameRecord.FirstOrDefault();
         }
 
+        private async Task UpdateAnswers(int gameCode, GameToUpdate gameToUpdate)
+        {
+            //Update existing answers
+            foreach (GameAnswers item in gameToUpdate.Answers)
+            {
+                object param2 = new
+                {
+                    //id = item.ID,
+                    answerDescription = item.AnswerDescription,
+                    isCorrect = item.IsCorrect,
+                    hasImage = item.HasImage,
+                    imageText = item.AnswerImage
+                };
+                string updateAnswerQuery = "UPDATE Items SET AnswerDescription = @answerDescription, " +
+                    "IsCorrect = @isCorrect, " +
+                    "HasImage = @hasImage, " +
+                    "AnswerImageText = @imageText " +
+                    "WHERE ID = @id";
+                int isAnswersUpdate = await _db.SaveDataAsync(updateAnswerQuery, param2);
+
+            }
+        }
+
+        private async Task AddAnswers(int gameId, GameToUpdate gameToUpdate)
+        {
+            ////check if there are new answers
+            //foreach (GameAnswers item in gameToUpdate.Answers)
+            //{
+            //    if (item.ID == 0)
+            //    {
+            //        //add new answers
+            //        object param1 = new
+            //        {
+            //            GameID = gameId,
+            //            AnswerDescription = item.AnswerDescription,
+            //            IsCorrect = item.IsCorrect,
+            //            HasImage = item.HasImage,
+            //            AnswerImageText = item.AnswerImage
+            //        };
+            //        string insertAnswerQuery = "INSERT INTO Items (GameID, AnswerDescription, IsCorrect, HasImage, AnswerImageText) " +
+            //                                        "VALUES (@GameID, @AnswerDescription, @IsCorrect, @HasImage, @AnswerImageText)";
+            //        int addAnswer = await _db.SaveDataAsync(insertAnswerQuery, param1);
+            //    }
+            //}
+
+        }
+
+        private async Task DeleteAnswers(int gameId, GameToUpdate gameToUpdate)
+        {
+            //foreach (GameAnswers item in gameToUpdate.AnswersToDelete)
+            //{
+            //    if (item.ID != 0)
+            //    {
+            //        //delete answers
+            //        object param1 = new
+            //        {
+            //            ID = item.ID
+            //        };
+            //        string deleteAnswerQuery = "DELETE FROM Items WHERE ID = @ID";
+            //        int deleteAnswer = await _db.SaveDataAsync(deleteAnswerQuery, param1);
+            //    }
+            //}
+        }
+
+        private async Task UpdateGameSettings(int gameId, GameSettingsToUpdate gameToUpdate)
+        {
+            object param = new
+            {
+                ID = gameId,
+                GameName = gameToUpdate.GameName,
+                EndingMessage = gameToUpdate.EndingMessage,
+                GameHasImage = gameToUpdate.GameHasImage,
+                GameImage = gameToUpdate.GameImage
+            };
+            string updateGameQuery = "UPDATE Games SET GameName = @GameName, " +
+                "EndingMessage = @EndingMessage, " +
+                "GameHasImage = @GameHasImage, " +
+                "GameImage = @GameImage " +
+                "WHERE ID = @ID";
+            int isGameUpdate = await _db.SaveDataAsync(updateGameQuery, param);
+        }
+
+
         #endregion
 
 
@@ -383,9 +466,43 @@ namespace template.Server.Controllers
             return BadRequest("User Not Found");
         }
 
+        [HttpPut("updateGameSettings/{gameCode}")]
+        public async Task<IActionResult> UpdateGameSettings(int userId, int gameCode, GameSettingsToUpdate gameSettings)
+        {
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName,ID FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    GameCode = gameCode
+                };
+                string gameQuery = "SELECT GameName,EndingMessage,GameCode,ID,GameImage,GameHasImage " +
+                    "FROM Games WHERE GameCode = @GameCode";
+                var gameRecords = await _db.GetRecordsAsync<GameSettingsToUpdate>(gameQuery, param2);
+                GameSettingsToUpdate game = gameRecords.FirstOrDefault();
+                if (game != null)
+                {
+                    await UpdateGameSettings(game.ID, gameSettings);
+                    return Ok("Game settings updated");
+                }
+                return BadRequest("Game Not Found");
+            }
+            return BadRequest("User Not Found");
+        }
+
+
+
+
 
 
         //NOTE: Didn't work on that yet 
+
 
 
 
@@ -419,14 +536,14 @@ namespace template.Server.Controllers
                         {
                             object param3 = new
                             {
-                                GameCode = updateGameCode,
-                                GameName = gameToUpdate.GameName,
-                                GameQuestion = gameToUpdate.QuestionDescription,
-                                GameCorrectCategory = gameToUpdate.QuestionCorrectCategory,
-                                GameWrongCategory = gameToUpdate.QuestionWrongCategory,
-                                TheGameEndMessage = gameToUpdate.GameEndMessage,
-                                QuestionHasImage = gameToUpdate.QuestionHasImage,
-                                QuestionImageText = gameToUpdate.QuestionImageText
+                                //GameCode = updateGameCode,
+                                //GameName = gameToUpdate.GameName,
+                                //GameQuestion = gameToUpdate.QuestionDescription,
+                                //GameCorrectCategory = gameToUpdate.QuestionCorrectCategory,
+                                //GameWrongCategory = gameToUpdate.QuestionWrongCategory,
+                                //TheGameEndMessage = gameToUpdate.GameEndMessage,
+                                //QuestionHasImage = gameToUpdate.QuestionHasImage,
+                                //QuestionImageText = gameToUpdate.QuestionImageText
                                 //ADD MORE PARAMS TO UPDATE
                             };
                             string updateGameQuery =
@@ -585,70 +702,6 @@ namespace template.Server.Controllers
                 int isUpdate = await _db.SaveDataAsync(updateQuery, param);
                 Console.WriteLine($"The update of game: {gameId} was completed successfully {isUpdate}");
             }
-        }
-
-        private async Task UpdateAnswers(int gameCode, GameToUpdate gameToUpdate)
-        {
-            //Update existing answers
-            foreach (GameAnswers item in gameToUpdate.Answers)
-            {
-                object param2 = new
-                {
-                    //id = item.ID,
-                    answerDescription = item.AnswerDescription,
-                    isCorrect = item.IsCorrect,
-                    hasImage = item.HasImage,
-                    imageText = item.AnswerImage
-                };
-                string updateAnswerQuery = "UPDATE Items SET AnswerDescription = @answerDescription, " +
-                    "IsCorrect = @isCorrect, " +
-                    "HasImage = @hasImage, " +
-                    "AnswerImageText = @imageText " +
-                    "WHERE ID = @id";
-                int isAnswersUpdate = await _db.SaveDataAsync(updateAnswerQuery, param2);
-
-            }
-        }
-
-        private async Task AddAnswers(int gameId, GameToUpdate gameToUpdate)
-        {
-            ////check if there are new answers
-            //foreach (GameAnswers item in gameToUpdate.Answers)
-            //{
-            //    if (item.ID == 0)
-            //    {
-            //        //add new answers
-            //        object param1 = new
-            //        {
-            //            GameID = gameId,
-            //            AnswerDescription = item.AnswerDescription,
-            //            IsCorrect = item.IsCorrect,
-            //            HasImage = item.HasImage,
-            //            AnswerImageText = item.AnswerImage
-            //        };
-            //        string insertAnswerQuery = "INSERT INTO Items (GameID, AnswerDescription, IsCorrect, HasImage, AnswerImageText) " +
-            //                                        "VALUES (@GameID, @AnswerDescription, @IsCorrect, @HasImage, @AnswerImageText)";
-            //        int addAnswer = await _db.SaveDataAsync(insertAnswerQuery, param1);
-            //    }
-            //}
-
-        }
-
-        private async Task DeleteAnswers(int gameId, GameToUpdate gameToUpdate)
-        {
-            //foreach (GameAnswers item in gameToUpdate.AnswersToDelete)
-            //{
-            //    if (item.ID != 0)
-            //    {
-            //        //delete answers
-            //        object param1 = new
-            //        {
-            //            ID = item.ID
-            //        };
-            //        string deleteAnswerQuery = "DELETE FROM Items WHERE ID = @ID";
-            //        int deleteAnswer = await _db.SaveDataAsync(deleteAnswerQuery, param1);
-            //    }
-            //}
         }
 
         [HttpGet("GetImageFilesForDeletion/{gameCode}")]

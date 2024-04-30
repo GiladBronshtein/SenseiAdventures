@@ -20,8 +20,8 @@
                 </button>
 
                 <!-- Modal -->
-                <div class="modal fade @(isModalOpen ? "show" : "")" style="display: @(isModalOpen ? "block" : "none");" id="staticBackdrop" 
-                 data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal fade @(isModalOpen ? "show" : "")" style="display: @(isModalOpen ? "block" : "none");" id="staticBackdrop"
+                     data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -65,14 +65,14 @@
                                         <ValidationMessage For="@(() => gameToAdd.EndingMessage)" style="color:Red;" />
                                     </div>
 
-                                    
+
                                     <!-- Image upload input -->
                                     <div class="mb-3">
                                         <label for="gameImage" class="form-label">תמונת המשחק</label>
                                         <input type="file" class="form-control" id="gameImage" @bind="gameToAdd.GameImage" />
                                         @* <ValidationMessage For="@(() => gameToAdd.GameImage)" style="color:Red;" /> *@
                                     </div>
-                                    
+
                                     <!-- Submit / Cancel Buttons -->
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">חזרה</button>
@@ -98,115 +98,117 @@
                     <li>שלישי</li>
                 </ul>
             </div>
-        </div>        
+        </div>
     </div>
 
     <!--Main Games Table-->
     <div class="row">
         <h5>טבלת המשחקים</h5>
-        
-        <div class="col-10 table-responsive">
-            <table class="table ">           
+
+        <div class="col-md-8 table-responsive scrollable-table-body ">
+            <table class="table shadow-sm border border-1">
                 <!--Table HEADER-->
                 <thead class="table-light">
                     <tr>
-                        <th scope="col">קוד
-                            <Tooltip Text="באמצעות קוד זה, שחקנים ייכנסו למשחק"><i class="fa-solid fa-circle-info"></i></Tooltip>
+                        <th scope="col">
+                            קוד
+                            <Tooltip Text="באמצעות הקוד מתחילים משחק"><i class="fa-solid fa-circle-info"></i></Tooltip>
                         </th>
-                        <th scope="col">שם המשחק
+                        <th scope="col">
+                            שם המשחק
                             <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
                         </th>
-                        <th scope="col" class="col-auto text-center">עריכה
+                        <th scope="col" class="col-auto text-center">
+                            עריכה
                             <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
                         </th>
-                        <th scope="col" class="col-auto text-center">פרסום
+                        <th scope="col" class="col-auto text-center">
+                            פרסום
                             <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i> </Tooltip>
                         </th>
-                        <th scope="col" class="col-auto text-center">מחיקה
+                        <th scope="col" class="col-auto text-center">
+                            מחיקה
                             <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
                         </th>
                     </tr>
                 </thead>
 
                 <!--Table TBODY-->
-                <tbody>
-                    @if (GamesList != null && GamesList.Count > 0)
-                    {
-                        @foreach (var game in GamesList)
+                <tbody class="scrollbar-tbody custom-scrollable-tbody">
+                        @if (GamesList != null && GamesList.Count > 0)
                         {
+                            @foreach (var game in GamesList)
+                            {
                             <tr>
                                 <td><b>@game.GameCode</b></td>
                                 <td>@game.GameName</td>
                                 <td class="col-auto text-center"><i class="fa-solid fa-file-pen icon link-success" @onclick="()=>EditGame(game)"></i></td>
                                 <td class="col-auto text-center">
-                                    @if (game.CanPublish == false)
-                                    {
+                                        @if (game.CanPublish == false)
+                                        {
                                         <div>
                                             <input class="form-check-input" type="checkbox" id="@game.ID" value="" aria-label="..." disabled>
                                             <label for="@game.ID" />
                                         </div>
-                                    }
-                                    else
-                                    {
+                                        }
+                                        else
+                                        {
                                         <div>
                                             <input class="form-check-input" type="checkbox" id="@game.ID" checked="@game.IsPublished" @onchange="()=>changePublish(game)" />
                                             <label for="@game.ID"></label>
                                         </div>
-                                    }
+                                        }
                                 </td>
                                 <td class="col-auto text-center">
                                     <i class="fa-solid fa-trash icon link-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" @onclick="() => PromptDelete(game)"></i>
                                 </td>
                             </tr>
+                            }
                         }
-                    }
-                    else
-                    {
+                        else
+                        {
                         <tr>
                             <td colspan="5" class="text-center" style="font-weight:bold;">
                                 בטבלה זו יופיעו כלל המשחקים, טרם הוזנו משחקים - לחצו על "משחק חדש"
                             </td>
                         </tr>
-                    }
+                        }
                 </tbody>
+              
+
             </table>
         </div>
     </div>
 
     @if (msg != "")
     {
-        <p>@msg</p>
+    <p>@msg</p>
     }
 
-    <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="@(!isDeleteModalOpen)">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">מחיקת משחק</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    מחיקת המשחק תתבצע לצמיתות וללא יכולת שחזור, בטוחים?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="ConfirmDelete">מחיקה</button>
-                </div>
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="@(!isDeleteModalOpen)">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">מחיקת משחק</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                מחיקת המשחק תבוצע לצמיתות וללא יכולת שחזור, בטוחים?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="ConfirmDelete">מחיקה</button>
             </div>
         </div>
     </div>
+</div>
 
 
 
 </div>
-<script>
-    function dismissModal(modalId) {
-        const modal = document.getElementById(modalId);
-        const modalInstance = bootstrap.Modal.getInstance(modal);
-        modalInstance.hide();
-    }
-</script>
+
+
 
 @code {
     [CascadingParameter]
@@ -286,7 +288,6 @@
             user.Games.Add(newGame);
 
             await JSRuntime.InvokeVoidAsync("dismissModal", "staticBackdrop");
-
 
             // Redirect to edit game page with the new game code created
             Nav.NavigateTo("./GameEdit/" + newGame.GameCode);
