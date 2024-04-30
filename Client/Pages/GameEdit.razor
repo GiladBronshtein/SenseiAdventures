@@ -51,21 +51,21 @@
             <div class="sidebar-panel nav nav-pills flex-column">
                 <span style="color:black;" class="enterExitText text-center">סיום הפסטיבל</span>
                 <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageD)">לחתוך תשובות</button>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageC)">פגיעה תשובה</button>
+                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageC)">פגיעה בתשובה</button>
                 <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageB)">פגיעה במטרה</button>
                 <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageA)">שבירת בקבוקים</button>
                 <span style="color:black;" class="enterExitText text-center">כניסה לפסטיבל</span>
             </div>
 
             <div class="d-flex flex-column align-items-center justify-content-center ">
-                <button type="button" class="btn btn-light settingsButton" @onclick="SetStageToDefault">
+                <button type="button" class="btn btn-light w-100 settingsButton" @onclick="SetStageToDefault">
                     הגדרות המשחק
                     <i class="fa-solid fa-gear" aria-hidden="true"></i>
                 </button>
             </div>
 
             <div class="d-flex flex-column align-items-center justify-content-center">
-                <div class="text-center">
+                <div class="text-center stagesAndQuestions">
                   
 
                     <!-- Example text or other content -->
@@ -88,7 +88,7 @@
             <div class="mt-auto">
                 <hr class="bg-white">
                 <!-- Sidebar Footer -->
-                <div class="sidebar-footer text-center p-2">
+                <div class="sidebar-footer text-center p-1">
                     <button type="button" class="btn btn-secondary w-100" value="publish">פרסום</button>
                 </div>
             </div>

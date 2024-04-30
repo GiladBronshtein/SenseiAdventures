@@ -24,8 +24,8 @@
             <div class="nested">
 
                 <div class="row">
+                    <!-- Game Name -->
                         <div class="col-md-4">
-                            <!-- Game Name -->
                             <div class="mb-2">
                                 <label for="gameName" class="form-label">שם המשחק</label>
                                 <small>(2-30 תווים)</small>
@@ -39,8 +39,8 @@
                                 <ValidationMessage For="@(() => gameDataChild.GameName)" style="color:Red;" />
                             </div>
                         </div>
+                    <!-- Ending Message -->
                         <div class="col-md-4">
-                            <!-- Ending Message -->
                             <div class="mb-2">
                                 <label for="endingMessage" class="form-label">הודעת הסיום</label>
                                 <small>(2-30 תווים)</small>
@@ -55,12 +55,40 @@
                             </div>
                         </div>
 
+                    <!-- GAME IMAGE -->
+                    <div class="col-md-4">
+                        <div class="mb-2">
+                            @if(gameDataChild.GameHasImage)
+                            {
+                                <div class="mb-2">
+                                    <div class="row">
+                                        <label for="gameImageAdded" class="form-label">תמונת המשחק</label>
+
+                                    </div>
+
+                                    <img id="gameImageAdded" src="@gameDataChild.GameImage" height="90" />
+                                    <i class="fa-solid fa-trash  delete-image-btn" @onclick="DeleteImageMethod"></i>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="mb-2">
+                                    <label for="gameImage" class="form-label">תמונת המשחק</label>
+                                    <InputFile id="gameImage" class="form-control" OnChange="UploadFile" accept="image/*" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+
+
                     </div>
                 <div class="row">
-                    <div class="col-md-2 py-2">
-                        <button type="submit" value="send" class="btn btn-primary">שמירה</button>
+                    <div class="col-12 col-md-2 py-2">
+                        <button type="submit" value="send" class="btn btn-primary w-100">שמירה</button>
                     </div>
                 </div>
+
             </div>
         </EditForm>
     }
@@ -69,42 +97,40 @@
         <p>Loading...</p>
     }
 
-    <i class="bi bi-badge-vr-fill"></i>
-
-    <div class="row mt-4">
-        <div class="col-md-3 col-lg-3 mb-3">
-            <div class="card shadow-sm h-100 d-flex flex-column justify-content-center align-items-center">
+    <hr class="bg-dark" />
+    <h2>מידע על הדוכנים</h2>
+    <div class="row mt-2">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm h-auto d-flex flex-column justify-content-center align-items-center">
                 <img src="./assets-images/stageBottles1.png" class="card-img-top" alt="Image description">
-                <div class="card-body text-center">
+                <div class="card-body text-center p-2">
                     <h6 class="card-title"> שבירת בקבוקים</h6>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target=@($"#modal1")>מידע</button>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-3 col-lg-3 mb-3">
-            <div class="card shadow-sm h-100 d-flex flex-column justify-content-center align-items-center">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm h-auto d-flex flex-column justify-content-center align-items-center">
                 <img src="./assets-images/stageTarget2.png" class="card-img-top" alt="Image description">
-                <div class="card-body text-center">
+                <div class="card-body text-center p-2">
                     <h6 class="card-title"> פגיעה במטרה</h6>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target=@($"#modal2")>מידע</button>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-3 col-lg-3 mb-3">
-            <div class="card shadow-sm h-100 d-flex flex-column justify-content-center align-items-center">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm h-auto d-flex flex-column justify-content-center align-items-center">
                 <img src="./assets-images/stageHit3.png" class="card-img-top" alt="Image description">
-                <div class="card-body text-center">
+                <div class="card-body text-center p-2">
                     <h6 class="card-title"> פגיעה בתשובה</h6>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target=@($"#modal3")>מידע</button>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-lg-3 mb-3">
-            <div class="card shadow-sm h-100 d-flex flex-column justify-content-center align-items-center">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm h-auto d-flex flex-column justify-content-center align-items-center">
                 <img src="./assets-images/stageSlash4.png" class="card-img-top" alt="Image description">
-                <div class="card-body text-center">
+                <div class="card-body text-center p-2">
                     <h6 class="card-title"> לחתוך תשובות</h6>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target=@($"#modal4")>מידע</button>
                 </div>
@@ -198,7 +224,11 @@
     [Parameter]
     public int userID { get; set; }
 
-
+    private string uploadedFileName;
+    private string imagePreview;
+    long maxFileSize = 4194304; //4MB
+    bool hasimage = false;
+    string myFileImage = "";
 
     void failedSubmit()
     {
@@ -206,7 +236,13 @@
 
     async Task EditSettings()
     {
-        //use following control to update gamename, endingmessage and image [HttpPut("updateGameSettings/{gameCode}")]
+        bool hasImage = !string.IsNullOrEmpty(myFileImage);
+
+        if (hasImage)
+        {
+            gameDataChild.GameImage = myFileImage;
+            gameDataChild.GameHasImage = true;
+        }
         var response = await Http.PutAsJsonAsync<GameDetails>($"api/Game/{userID}/updateGameSettings/" + gameDataChild.GameCode, gameDataChild);
         if (response.IsSuccessStatusCode)
         {
@@ -256,5 +292,37 @@
         return "text-muted";  // Fallback, might not be necessary
     }
 
+
+
+
+    private async Task UploadFile(InputFileChangeEventArgs e)
+    {
+        var imageFiles = e.GetMultipleFiles();
+        foreach (var file in imageFiles)
+        {
+            if (file.Size <= maxFileSize)
+            {
+                var buffer = new byte[file.Size];
+                await file.OpenReadStream(maxFileSize).ReadAsync(buffer);
+                var imageBase64 = Convert.ToBase64String(buffer);
+                var saveResponse = await Http.PostAsJsonAsync("api/media/upload", imageBase64);
+
+                if (saveResponse.IsSuccessStatusCode == true)
+                {
+                    string resizeUrl = saveResponse.Content.ReadAsStringAsync().Result;
+                    myFileImage = "uploadedFiles/" + resizeUrl;
+                }
+            }
+        }
+    }
+
+
+
+    //deleteimage method 
+    private void DeleteImageMethod()
+    {
+        gameDataChild.GameImage = "empty";
+        gameDataChild.GameHasImage = false;
+    }
 }
             

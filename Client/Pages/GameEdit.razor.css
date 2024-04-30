@@ -7,7 +7,7 @@
 .main-content {
     border-radius: 5px;
     background-color: #fff; /* Optional: depends on your design preference */
-    padding: 10px; /* Provide some spacing inside the content area */
+    padding: 5px; /* Provide some spacing inside the content area */
 }
 
 .sidebar-panel {
@@ -34,8 +34,6 @@
 }
 
 .sidebar-heading {
-    /*padding: 20px;*/
-/**/    /*text shadow*/
     text-shadow: 0 0 12px black; /* White glow for emphasis on text */
 }
 
@@ -58,13 +56,8 @@
     margin-top: 18px;
     margin-bottom: 18px;
 }
-/* Glowing effects for icons and key texts */
-/*.fa-gear {
-    color: white;*/ /* Bright color for icons */
-/*text-shadow: 0 0 0px #00c4ff;*/ /* Blue glow around icon */
-/*font-size: 16px;
-    padding: 20px;
-}*/
+
+
 .btn-success {
     background-image: linear-gradient(to right, #23913B, #218838); /* Gradient for success button */
     border: 1px solid #27A141;
@@ -81,6 +74,9 @@ a.text-white:hover {
     opacity: 1; /* Brighten on hover for interactivity */
 }
 
+.stagesAndQuestions
+{
+}
 /*on narrow sized screens no box shadow to conatiner-fluid*/
 @media (max-width: 768px) {
     .container-fluid {

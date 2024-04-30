@@ -1,17 +1,22 @@
-﻿/*change save button height and make it center horizontally*/
-/*.saveButton {
-    justify-content: center;
-    align-items: center;
-    height: 44px;
-    border-radius: 5px;
+﻿#gameImageAdded {
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+    border: 1px solid #f8f9fa;
+    border-radius: 3px;
+    margin: 0 auto;
+    height: 50px;
+
+}
+.fa-trash{
+    padding: 5px;
+}
+.fa-trash:hover {
+    color: red;
     cursor: pointer;
-    font-size: 16px;
-    font-weight: 500;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    text-decoration: none;
-    text-transform: uppercase;
-    padding: 25px;
-}*/
+}
+/*upon gameimageadded clicked, show image enlarged*/
+#gameImageAdded:hover {
+    transform: scale(3);
+    transition: transform 0.5s;
+    z-index: 1;
+}
+
