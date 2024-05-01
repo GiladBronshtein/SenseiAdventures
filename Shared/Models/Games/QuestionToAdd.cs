@@ -9,6 +9,7 @@ namespace template.Shared.Models.Games
 {
     public class QuestionToAdd
     {
+        public int ID { get; set; }
         public int GameID { get; set; }
         public bool HasImage { get; set; }
 

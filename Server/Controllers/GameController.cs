@@ -496,12 +496,183 @@ namespace template.Server.Controllers
             return BadRequest("User Not Found");
         }
 
+        //get question details by question id
+        [HttpGet("getQuestion/{questionId}")]
+        public async Task<IActionResult> GetQuestion(int userId, int questionId)
+        {
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    QuestionId = questionId
+                };
+                string questionQuery = "SELECT QuestionDescription FROM Questions WHERE ID = @QuestionId";
+                var questionRecords = await _db.GetRecordsAsync<UserWithGames>(questionQuery, param2);
+                UserWithGames question = questionRecords.FirstOrDefault();
+                if (question != null)
+                {
+                    object param3 = new
+                    {
+                        QuestionId = questionId
+                    };
+                    string getQuestionQuery = "SELECT * FROM Questions WHERE ID = @QuestionId";
+                    var questionDetails = await _db.GetRecordsAsync<GameQuestions>(getQuestionQuery, param3);
+                    return Ok(questionDetails.FirstOrDefault());
+                }
+                return BadRequest("Question Not Found");
+            }
+            return BadRequest("User Not Found");
+        }
 
+        //get answer details by question id 
+        [HttpGet("getAnswers/{questionId}")]
+        public async Task<IActionResult> GetAnswers(int userId, int questionId)
+        {
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    QuestionId = questionId
+                };
+                string questionQuery = "SELECT QuestionDescription FROM Questions WHERE ID = @QuestionId";
+                var questionRecords = await _db.GetRecordsAsync<UserWithGames>(questionQuery, param2);
+                UserWithGames question = questionRecords.FirstOrDefault();
+                if (question != null)
+                {
+                    object param3 = new
+                    {
+                        QuestionId = questionId
+                    };
+                    string getAnswersQuery = "SELECT * FROM Answers WHERE QuestionID = @QuestionId";
+                    var answers = await _db.GetRecordsAsync<GameAnswers>(getAnswersQuery, param3);
+                    return Ok(answers.ToList());
+                }
+                return BadRequest("Question Not Found");
+            }
+            return BadRequest("User Not Found");
+        }
 
+        //update question details by question id
+        [HttpPut("updateQuestion/{questionId}")]
+        public async Task<IActionResult> UpdateQuestion(int userId, int questionId, QuestionToAdd questionToUpdate)
+        {
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    QuestionId = questionId
+                };
+                string questionQuery = "SELECT QuestionDescription FROM Questions WHERE ID = @QuestionId";
+                var questionRecords = await _db.GetRecordsAsync<UserWithGames>(questionQuery, param2);
+                UserWithGames question = questionRecords.FirstOrDefault();
+                if (question != null)
+                {
+                    object param3 = new
+                    {
+                        QuestionId = questionId,
+                        QuestionDescription = questionToUpdate.QuestionDescription,
+                        HasImage = questionToUpdate.HasImage,
+                        QuestionImage = questionToUpdate.QuestionImage,
+                        StageID = questionToUpdate.StageID
+                    };
+                    string updateQuestionQuery = "UPDATE Questions SET " +
+                        "QuestionDescription = @QuestionDescription, " +
+                        "HasImage = @HasImage, " +
+                        "QuestionImage = @QuestionImage, " +
+                        "StageID = @StageID " +
+                        "WHERE ID = @QuestionId";
+                    int isQuestionUpdate = await _db.SaveDataAsync(updateQuestionQuery, param3);
+                    if (isQuestionUpdate > 0)
+                    {
+                        return Ok("Question updated");
+                    }
+                    return BadRequest("Question not updated");
+                }
+                return BadRequest("Question Not Found");
+            }
+            return BadRequest("User Not Found");
+        }
 
+        //update answers by answer id
+        [HttpPut("updateAnswers/{answerId}")]
+        public async Task<IActionResult> UpdateAnswers(int userId, int answerId, GameAnswers answerToUpdate)
+        {
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    AnswerId = answerId
+                };
+                string answerQuery = "SELECT AnswerDescription FROM Answers WHERE ID = @AnswerId";
+                var answerRecords = await _db.GetRecordsAsync<UserWithGames>(answerQuery, param2);
+                UserWithGames answer = answerRecords.FirstOrDefault();
+                if (answer != null)
+                {
+                    object param3 = new
+                    {
+                        AnswerId = answerId,
+                        AnswerDescription = answerToUpdate.AnswerDescription,
+                        IsCorrect = answerToUpdate.IsCorrect,
+                        HasImage = answerToUpdate.HasImage,
+                        AnswerImage = answerToUpdate.AnswerImage
+                    };
+                    string updateAnswerQuery = "UPDATE Answers SET " +
+                        "AnswerDescription = @AnswerDescription, " +
+                        "IsCorrect = @IsCorrect, " +
+                        "HasImage = @HasImage, " +
+                        "AnswerImage = @AnswerImage " +
+                        "WHERE ID = @AnswerId";
+                    int isAnswerUpdate = await _db.SaveDataAsync(updateAnswerQuery, param3);
+                    if (isAnswerUpdate > 0)
+                    {
+                        return Ok("Answer updated");
+                    }
+                    return BadRequest("Answer not updated");
+                }
+                return BadRequest("Answer Not Found");
+            }
+            return BadRequest("User Not Found");
+        }
 
 
         //NOTE: Didn't work on that yet 
+
+
+
+
+
+
+
+
+
 
 
 
@@ -558,7 +729,7 @@ namespace template.Server.Controllers
                             //CHANGE QUERY ACCORDINGLY TO ADD MORE PARAMS TO UPDATE
                             int isGameUpdate = await _db.SaveDataAsync(updateGameQuery, param3);
 
-                            UpdateAnswers(updateGameCode, gameToUpdate);
+                            //UpdateAnswers(updateGameCode, gameToUpdate);
 
                             AddAnswers(gameToUpdate.ID, gameToUpdate);
 

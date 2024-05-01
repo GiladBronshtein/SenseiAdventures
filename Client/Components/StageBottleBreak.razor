@@ -7,15 +7,13 @@
 
 <div class="container-fluid">
 
-
-
     <!-- ROW 1 - TITLE -->
     <div class="row mb-4">
         <div class="col-md-7">
             <h3>
                 דוכן - שבירת בקבוקים
                 <Tooltip Text="בדוכן זה ניתן להוסיף שאלות חד-ברירה. לכל תיאור שאלה ניתן להוסיף גם תמונה. עבור מסיחים ניתן להוסיף טקסט או תמונה.">
-                    <i class="fa fa-info-circle" style="font-size:18px;"> </i> 
+                    <i class="fa fa-info-circle" style="font-size:18px;"> </i>
                 </Tooltip>
             </h3>
 
@@ -49,8 +47,6 @@
                                    @oninput="@(e => HandleInputChange(e, nameof(questionsAndAnswers.Questions.QuestionDescription)))"
                                    placeholder="שאלה"
                                    aria-describedby="questionDescription" required />
-
-
                     </div>
 
                     <div class="col-1 pe-2">
@@ -160,7 +156,17 @@
 
                 <!-- Submit Button -->
                 <div class="mt-3 mb-2">
-                    <button type="submit" id="liveToastBtn" class="btn btn-primary shadow-sm">שמירת שאלה</button>
+                    @if (!editAnswer)
+                    {
+                        <button type="submit" id="liveToastBtn" class="btn btn-primary shadow-sm">הוספת שאלה</button>
+                    }
+                    else
+                    {
+                        <button type="submit" id="liveToastBtn" class="btn btn-primary shadow-sm me-1">שמירה</button>
+                        //cancel button
+                        <button type="button" class="btn btn-secondary shadow-sm" @onclick="ClearFormFields">ביטול</button>
+
+                    }
                 </div>
 
             </EditForm>
@@ -185,15 +191,13 @@
                             {
                                 <tr>
                                     <td>@question.QuestionDescription</td>
-                                    <td class="text-center"><button class="btn btn-outline-primary btn-sm" @onclick="()=>EditQuestion(question)"><i class="fa-solid fa-square-pen fa-fw" style="width: 14px;"></i></button></td>
+                                    <td class="text-center"><button class="btn btn-outline-primary btn-sm" @onclick="()=>EditQuestion(question)">
+                                        <i class="fa-solid fa-square-pen fa-fw" style="width: 14px;"></i></button></td>
                                     <td class="text-center">
                                         <button class="btn btn-outline-danger btn-sm" @onclick="() => selectedQuestionForDeletion = question"
                                                 data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">
                                             <i class="fa-solid fa-trash fa-fw" style="width: 14px;"></i>
                                         </button>
-
-
-
                                     </td>
                                 </tr>
                             }
@@ -227,10 +231,6 @@
             </div>
         </div>
     </div>
-
-
-
-
 
 
 </div>
@@ -273,14 +273,15 @@
 
     int QuestionDescriptionMaxChars = 50;
     int AnswersDescriptionMaxChars = 30;
+    int questionID = 0;
 
+    bool editAnswer = false;
     bool hasimage = false;
     private IBrowserFile questionImageFile;
     private string imagePreview;
     string myFileImage = "";
     long maxFileSize = 4194304; //4MB
     private EditContext editContext;
-
 
     string msg = "";
     bool isDeleteModalOpen = false;
@@ -289,7 +290,6 @@
 
     string questionDescriptionClass = "text-muted"; // Default class
     private GameQuestions selectedQuestionForDeletion;
-
 
     #endregion
 
@@ -329,30 +329,112 @@
 
     private async Task HandleSubmit()
     {
-        if (string.IsNullOrWhiteSpace(CorrectAnswer) || CorrectAnswer.Length < 2 || CorrectAnswer.Length > AnswersDescriptionMaxChars ||
-            string.IsNullOrWhiteSpace(WrongAnswer1) || WrongAnswer1.Length < 2 || WrongAnswer1.Length > AnswersDescriptionMaxChars ||
-            string.IsNullOrWhiteSpace(WrongAnswer2) || WrongAnswer2.Length < 2 || WrongAnswer2.Length > AnswersDescriptionMaxChars ||
-            string.IsNullOrWhiteSpace(WrongAnswer3) || WrongAnswer3.Length < 2 || WrongAnswer3.Length > AnswersDescriptionMaxChars)
+        if (!editAnswer)
         {
-            ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
-            return;
-        }
-
-        var newQuestion = await AddQuestion();
-        if (newQuestion != null)
-        {
-            // Check if the new question is already in the list to avoid duplication
-            if (!questions.Any(q => q.ID == newQuestion.ID))
+            if (string.IsNullOrWhiteSpace(CorrectAnswer) || CorrectAnswer.Length < 2 || CorrectAnswer.Length > AnswersDescriptionMaxChars ||
+               string.IsNullOrWhiteSpace(WrongAnswer1) || WrongAnswer1.Length < 2 || WrongAnswer1.Length > AnswersDescriptionMaxChars ||
+               string.IsNullOrWhiteSpace(WrongAnswer2) || WrongAnswer2.Length < 2 || WrongAnswer2.Length > AnswersDescriptionMaxChars ||
+               string.IsNullOrWhiteSpace(WrongAnswer3) || WrongAnswer3.Length < 2 || WrongAnswer3.Length > AnswersDescriptionMaxChars)
             {
-                questions.Add(newQuestion);
-                questions = new List<GameQuestions>(questions); // Re-assign to force UI update
+                ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
+                return;
             }
-            await AddAnswers(newQuestion.ID);
-            await ShowToast(true, "השאלה נשמרה בהצלחה!", "fa-solid fa-circle-check");
 
-            StateHasChanged();
-            ClearFormFields();
+            var newQuestion = await AddQuestion();
+            if (newQuestion != null)
+            {
+                // Check if the new question is already in the list to avoid duplication
+                if (!questions.Any(q => q.ID == newQuestion.ID))
+                {
+                    questions.Add(newQuestion);
+                    questions = new List<GameQuestions>(questions); // Re-assign to force UI update
+                }
+                await AddAnswers(newQuestion.ID);
+                await ShowToast(true, "השאלה נשמרה בהצלחה!", "fa-solid fa-circle-check");
+
+                StateHasChanged();
+                ClearFormFields();
+            }
         }
+        else
+        {
+            Console.WriteLine("" + questionID.ToString());
+
+
+            QuestionToAdd editedQuestion = new QuestionToAdd()
+            {
+                GameID = game.ID,
+                ID = questionID,
+                HasImage = hasimage,
+                QuestionDescription = QuestionDescription,
+                QuestionImage = myFileImage,
+                StageID = 1
+
+            };
+
+            var response = await Http.PutAsJsonAsync($"api/game/{UserId}/updateQuestion/{questionID}", editedQuestion);
+            if (response.IsSuccessStatusCode)
+            {
+                var currentAnswers = questions.Where(q => q.ID == questionID).FirstOrDefault()?.Answers;
+                if (currentAnswers != null)
+                {
+                    var updatedAnswers = new List<GameAnswers>
+                    {
+                        new GameAnswers { ID = currentAnswers.ElementAtOrDefault(0)?.ID ?? 0, AnswerDescription = CorrectAnswer, IsCorrect = true, QuestionID = questionID,  
+                                            HasImage = false, AnswerImage = "empty"  },
+                        new GameAnswers { ID = currentAnswers.ElementAtOrDefault(1)?.ID ?? 0, AnswerDescription = WrongAnswer1, IsCorrect = false, QuestionID = questionID,
+                                            HasImage = false, AnswerImage = "empty"  },
+                        new GameAnswers { ID = currentAnswers.ElementAtOrDefault(2)?.ID ?? 0, AnswerDescription = WrongAnswer2, IsCorrect = false, QuestionID = questionID,
+                                            HasImage = false, AnswerImage = "empty"  },
+                        new GameAnswers { ID = currentAnswers.ElementAtOrDefault(3)?.ID ?? 0, AnswerDescription = WrongAnswer3, IsCorrect = false, QuestionID = questionID,
+                                            HasImage = false, AnswerImage = "empty"  }
+                    };
+
+                    // Update question after successful API response
+                    var updatedQuestion = questions.FirstOrDefault(q => q.ID == questionID);
+                    if (updatedQuestion != null)
+                    {
+                        updatedQuestion.QuestionDescription = QuestionDescription;
+                        updatedQuestion.QuestionImage = myFileImage; // Update image URL if applicable
+                                                                     // If your model supports it, update other properties as needed
+                    }
+
+                    // After updating answers in the API
+                    foreach (var answer in updatedAnswers)
+                    {
+                        var answerUpdate = await Http.PutAsJsonAsync($"api/game/{UserId}/updateAnswers/{answer.ID}", answer);
+                        if (answerUpdate.IsSuccessStatusCode)
+                        {
+                            // Update local answers
+                            var localAnswer = updatedQuestion?.Answers.FirstOrDefault(a => a.ID == answer.ID);
+                            if (localAnswer != null)
+                            {
+                                localAnswer.AnswerDescription = answer.AnswerDescription;
+                                localAnswer.HasImage = answer.HasImage;
+                                localAnswer.AnswerImage = answer.AnswerImage;
+                            }
+                            Console.WriteLine("Successful Answers Edit");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Failed to edit answer: " + await answerUpdate.Content.ReadAsStringAsync());
+                        }
+                    }
+
+                    // Call StateHasChanged to refresh the UI with updated data
+                    StateHasChanged();
+                    await ShowToast(true, "השאלה נשמרה בהצלחה!", "fa-solid fa-circle-check");
+                    ClearFormFields();
+                    editAnswer = false;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Failed to edit question: " + await response.Content.ReadAsStringAsync());
+                await ShowToast(false, "פעולת העריכה נכשלה", "fa-solid fa-circle-exclamation");
+            }
+        }
+
     }
 
     private async Task ShowToast(bool isSuccess, string message, string icon)
@@ -428,7 +510,20 @@
 
     private void EditQuestion(GameQuestions question)
     {
-        Nav.NavigateTo($"/edit-question/{question.ID}");
+        editAnswer = true;
+
+        //get question details
+        QuestionDescription = question.QuestionDescription;
+        questionID = question.ID;
+
+        //get answer details, use arrays to store the answers
+        var answers = question.Answers;
+        CorrectAnswer = answers.Where(a => a.IsCorrect).FirstOrDefault().AnswerDescription;
+        WrongAnswer1 = answers.Where(a => !a.IsCorrect).ElementAt(0).AnswerDescription;
+        WrongAnswer2 = answers.Where(a => !a.IsCorrect).ElementAt(1).AnswerDescription;
+        WrongAnswer3 = answers.Where(a => !a.IsCorrect).ElementAt(2).AnswerDescription;
+
+
     }
 
     async Task ConfirmDelete()
@@ -441,8 +536,6 @@
             StateHasChanged(); // Refresh UI
         }
     }
-
-
 
     private async Task DeleteQuestion(GameQuestions question)
     {
@@ -510,6 +603,7 @@
 
     private void ClearFormFields()
     {
+        editAnswer = false;
         // Reset properties within the questionsAndAnswers model
         questionsAndAnswers.Questions.QuestionDescription = string.Empty;
         QuestionDescription = "";
