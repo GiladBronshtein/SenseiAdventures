@@ -59,3 +59,38 @@ input#question::placeholder {
     color: #ced4da !important; /* Use !important to override other styles if necessary */
     font-size: 0.875rem !important; /* Use !important to override other styles if necessary */
 }
+
+.delete-image-btn
+{
+    padding: 5px;
+}
+
+.delete-image-btn:hover{
+    color: red;
+    cursor: pointer;
+}
+
+.QuestionImage {
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+    border: 1px solid #f8f9fa;
+    border-radius: 3px;
+    margin: 0 auto;
+}
+.QuestionImage:hover {
+    transform: scale(3);
+    transition: transform 0.5s;
+    z-index: 1;
+}
+
+.info {
+/*    background-color: cyan;
+*/    color: black;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+    .info:hover {
+/*        background-color: deeppink;
+*/        color: blue;
+    }

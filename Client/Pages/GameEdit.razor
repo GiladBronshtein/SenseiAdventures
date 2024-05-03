@@ -57,8 +57,8 @@
                 <span style="color:black;" class="enterExitText text-center">כניסה לפסטיבל</span>
             </div>
 
-            <div class="d-flex flex-column align-items-center justify-content-center ">
-                <button type="button" class="btn btn-light w-100 settingsButton" @onclick="SetStageToDefault">
+            <div class="d-flex flex-column align-items-center justify-content-center mb-3">
+                <button type="button" class="btn btn-light  w-100 settingsButton" @onclick="SetStageToDefault">
                     הגדרות המשחק
                     <i class="fa-solid fa-gear" aria-hidden="true"></i>
                 </button>
@@ -71,13 +71,21 @@
                     {
                         <p>
                             <span>
-                                שאלות :
-                                @gameData.Questions.Count
+                                שאלות 
                             </span>
-                            <br />
+
+                            <span class=" badge rounded-pill  @(gameData.Questions.Count < 20 ? "bg-danger" : "bg-success")">
+                                @gameData.Questions.Count
+                                <span class="visually-hidden">unread messages</span>
+                            </span>  
+                        </p>
+                        <p>
                             <span>
-                                דוכנים :
+                                דוכנים
+                            </span>
+                            <span class=" badge rounded-pill  @(activeStages < 3 ? "bg-danger" : "bg-success")">
                                 @activeStages
+                                <span class="visually-hidden">unread messages</span>
                             </span>
                         </p>
                     }
@@ -86,8 +94,10 @@
             <div class="mt-auto">
                 <hr class="bg-white">
                 <!-- Sidebar Footer -->
-                <div class="sidebar-footer text-center p-1">
-                    <button type="button" class="btn btn-secondary w-100" value="publish">פרסום</button>
+                <div class="sidebar-footer text-center">
+                    <button type="button" class="btn btn-secondary w-100" value="publish">פרסום
+                        
+                    </button>
                 </div>
             </div>
         </div>

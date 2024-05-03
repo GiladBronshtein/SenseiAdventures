@@ -6,98 +6,132 @@
 @using template.Client.Components;
 
 <div class="container-fluid">
+    
     <div class="row">
-        <div class="col-12">
-            <h1>הגדרות המשחק</h1>
-        </div>
-        @* <div class="col-6">
-            <span>בחרו דוכן בסרגל הניווט השמאלי וערכו את השאלות</span>
-        </div> *@
-    </div>
+        <div class="col-md-7">
+            <div class="row">
+                <div class="col-12">
+                    <h1>הגדרות המשחק</h1>
+                </div>
+            </div>
+            @if (gameDataChild != null)
+            {
+                <!-- Form for new game creation -->
+                <EditForm model="gameDataChild" OnValidSubmit="EditSettings" OnInvalidSubmit="failedSubmit">
+                    <DataAnnotationsValidator />
 
-    @if (gameDataChild != null)
-    {
-        <!-- Form for new game creation -->
-        <EditForm model="gameDataChild" OnValidSubmit="EditSettings" OnInvalidSubmit="failedSubmit">
-            <DataAnnotationsValidator />
+                    <div class="nested">
+                        <!-- Game Name -->
 
-            <div class="nested">
+                        <div class="row mt-3">
+                            <label for="gameName" class="form-label"> שם המשחק (2-30 תווים)</label>
+                        </div>
 
-                <div class="row">
-                    <!-- Game Name -->
-                        <div class="col-md-4">
-                            <div class="mb-2">
-                                <label for="gameName" class="form-label">שם המשחק</label>
-                                <small>(2-30 תווים)</small>
+                        <div class="row">
+                            <div class="col-md-6">
                                 <InputText maxlength="30"
-                                            @oninput="@(e => { HandleInputChange(e, nameof(gameDataChild.GameName)); gameDataChild.GameName = e.Value.ToString(); StateHasChanged(); })"
-                                            id="gameName"
-                                            class="form-control"
-                                            @bind-Value="gameDataChild.GameName"
-                                            aria-describedby="gameNameHelp" required />
-                                <small id="gameName" class="@GetInputClass(gameDataChild?.GameName?.Length ?? 0, 2, 30)">@((gameDataChild?.GameName?.Length ?? 0).ToString())/30</small>
+                                           @oninput="@(e => { HandleInputChange(e, nameof(gameDataChild.GameName)); gameDataChild.GameName = e.Value.ToString(); StateHasChanged(); })"
+                                           id="gameName"
+                                           class="form-control"
+                                           @bind-Value="gameDataChild.GameName"
+                                           aria-describedby="gameNameHelp" required />
                                 <ValidationMessage For="@(() => gameDataChild.GameName)" style="color:Red;" />
                             </div>
-                        </div>
-                    <!-- Ending Message -->
-                        <div class="col-md-4">
-                            <div class="mb-2">
-                                <label for="endingMessage" class="form-label">הודעת הסיום</label>
-                                <small>(2-30 תווים)</small>
-                                <InputText maxlength="30"
-                                            @oninput="@(e => { HandleInputChange(e, nameof(gameDataChild.EndingMessage)); gameDataChild.EndingMessage = e.Value.ToString(); StateHasChanged(); })"
-                                            id="endingMessage"
-                                            class="form-control"
-                                            @bind-Value="gameDataChild.EndingMessage"
-                                            aria-describedby="endingMessageHelp" required />
-                            <small id="endingMessage" class="@GetInputClass(gameDataChild?.EndingMessage?.Length ?? 0, 2, 30)">@((gameDataChild?.EndingMessage?.Length ?? 0).ToString())/30</small>
-                                <ValidationMessage For="@(() => gameDataChild.EndingMessage)" style="color:Red;" />
+                            <div class="col-md-1">
+                                <small id="gameName" class="@GetInputClass(gameDataChild?.GameName?.Length ?? 0, 2, 30) ">@((gameDataChild?.GameName?.Length ?? 0).ToString())/30</small>
                             </div>
                         </div>
 
+                        <!-- Ending Message -->
+                        <div class="row mt-3">
+                            <label for="endingMessage" class="form-label">הודעת הסיום (2-30 תווים)</label>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <InputText maxlength="30"
+                                           @oninput="@(e => { HandleInputChange(e, nameof(gameDataChild.EndingMessage)); gameDataChild.EndingMessage = e.Value.ToString(); StateHasChanged(); })"
+                                           id="endingMessage"
+                                           class="form-control"
+                                           @bind-Value="gameDataChild.EndingMessage"
+                                           aria-describedby="endingMessageHelp" required />
+                                <ValidationMessage For="@(() => gameDataChild.EndingMessage)" style="color:Red;" />
+                            </div>
+                            <div class="col-md-1">
+                                <small id="endingMessage" class="@GetInputClass(gameDataChild?.EndingMessage?.Length ?? 0, 2, 30)">@((gameDataChild?.EndingMessage?.Length ?? 0).ToString())/30</small>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- GAME IMAGE -->
-                    <div class="col-md-4">
-                        <div class="mb-2">
-                            @if(gameDataChild.GameHasImage)
-                            {
-                                <div class="mb-2">
-                                    <div class="row">
-                                        <label for="gameImageAdded" class="form-label">תמונת המשחק</label>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                @if (gameDataChild.GameHasImage)
+                                {
+                                    <div class="mb-2">
+                                        <div class="row">
+                                            <label for="gameImageAdded" class="form-label">תמונת המשחק</label>
 
+                                        </div>
+
+                                        <img id="gameImageAdded" src="@gameDataChild.GameImage" height="90" />
+                                        <i class="fa-solid fa-trash  delete-image-btn" @onclick="DeleteImageMethod"></i>
                                     </div>
-
-                                    <img id="gameImageAdded" src="@gameDataChild.GameImage" height="90" />
-                                    <i class="fa-solid fa-trash  delete-image-btn" @onclick="DeleteImageMethod"></i>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="mb-2">
-                                    <label for="gameImage" class="form-label">תמונת המשחק</label>
-                                    <InputFile id="gameImage" class="form-control" OnChange="UploadFile" accept="image/*" />
-                                </div>
-                            }
+                                }
+                                else
+                                {
+                                    <div class="mb-2">
+                                        <label for="gameImage" class="form-label">תמונת המשחק</label>
+                                        <InputFile id="gameImage" class="form-control" OnChange="UploadFile" accept="image/*" />
+                                    </div>
+                                }
+                            </div>
                         </div>
                     </div>
 
 
-
+                    <div class="row">
+                        <div class="col-12 col-md-6 py-2">
+                            <button type="submit" value="send" class="btn btn-primary w-100">שמירה</button>
+                        </div>
                     </div>
-                <div class="row">
-                    <div class="col-12 col-md-2 py-2">
-                        <button type="submit" value="send" class="btn btn-primary w-100">שמירה</button>
+
+                </EditForm>
+            }
+            else
+            {
+                <p>Loading...</p>
+            }
+        </div>
+
+        <div class="col-md-5 ">
+            <div class="row">
+                <div class="col-md-12 d-flex flex-column justify-content-center align-items-center">
+                    <div class="p-2 text-primary-emphasis ">
+                        <i class="fa-regular fa-lightbulb" style="color:darkblue ;"></i>
+                        בתפריט השמאלי עורכים שאלות לדוכנים השונים
                     </div>
                 </div>
-
             </div>
-        </EditForm>
-    }
-    else
-    {
-        <p>Loading...</p>
-    }
 
-    <hr class="bg-dark" />
+
+            <div class="row">
+                <div class="col-md-12 mt-5 d-flex flex-column justify-content-center align-items-center">
+                    <img src="assets-images/Figure3-removebg-preview.png" width="75%" />
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+   
+
+   
+
+</div>
+@* <hr class="bg-dark" />
     <h5>מידע על הדוכנים</h5>
     <div class="row mt-2">
         <div class="col-md-3 mb-3">
@@ -139,23 +173,7 @@
     </div>
 </div>
 
-<!-- Modal 1 -->
-<div class="modal fade" id=@($"modal1") tabindex="-1" aria-labelledby=@($"modalLabel1") aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id=@($"modalLabel1")>שבירת בקבוקים</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                בדוכן זה תוכלו לשבור בקבוקים ולזכות בפרסים נחמדים
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">הבנתי</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <!-- Modal 2 -->
 <div class="modal fade" id=@($"modal2") tabindex="-1" aria-labelledby=@($"modalLabel2") aria-hidden="true">
@@ -209,7 +227,8 @@
             </div>
         </div>
     </div>
-</div>
+</div> *@
+
 
 
 <div class="toast-container position-fixed top-0 end-0 p-3">
@@ -256,7 +275,7 @@
         }
 
     }
-    
+
     private async Task ShowToast(bool isSuccess, string message, string icon)
     {
         await JS.InvokeVoidAsync("showToast", isSuccess, message, icon);
@@ -278,7 +297,7 @@
         }
 
     }
-    
+
     private string GetInputClass(int length, int minChars, int maxChars)
     {
         if (length == 0)
@@ -291,9 +310,6 @@
             return "text-warning";  // Orange for nearing maximum length
         return "text-muted";  // Fallback, might not be necessary
     }
-
-
-
 
     private async Task UploadFile(InputFileChangeEventArgs e)
     {
@@ -316,13 +332,10 @@
         }
     }
 
-
-
-    //deleteimage method 
+    //deleteimage method
     private void DeleteImageMethod()
     {
         gameDataChild.GameImage = "empty";
         gameDataChild.GameHasImage = false;
     }
 }
-            

@@ -11,11 +11,19 @@
     <div class="row mb-4">
         <div class="col-md-7">
             <h3>
-                דוכן - שבירת בקבוקים
-                <Tooltip Text="בדוכן זה ניתן להוסיף שאלות חד-ברירה. לכל תיאור שאלה ניתן להוסיף גם תמונה. עבור מסיחים ניתן להוסיף טקסט או תמונה.">
-                    <i class="fa fa-info-circle" style="font-size:18px;"> </i>
-                </Tooltip>
+                דוכן שבירת בקבוקים
+                <button type="button" class="btn bg-primary-subtle" data-bs-toggle="modal" data-bs-target=@($"#modal1")
+                        style=" --bs-btn-padding-y: .25rem; 
+                                --bs-btn-padding-x: .5rem; 
+                                --bs-btn-font-size: .75rem;
+                               ">
+                    אודות הדוכן
+                    <i class="fa fa-info-circle p-1" style="color:black;"></i>
+                </button>
+              
+
             </h3>
+
 
         </div>
         <div class="col-md-5 text-end">
@@ -39,7 +47,7 @@
 
                 <!-- ROW - Form Input Fields -->
                 <div class="mb-3 d-flex align-items-center">
-                    <div class="col-8 p-0">
+                    <div class="col-7 p-0">
                         <InputText maxlength="@QuestionDescriptionMaxChars"
                                    class="form-control"
                                    id="question"
@@ -49,31 +57,37 @@
                                    aria-describedby="questionDescription" required />
                     </div>
 
-                    <div class="col-1 pe-2">
+                    <div class="col-2 pe-2">
                         <small id="questionDescription" class="@GetInputClass(QuestionDescription.Length, 2, @QuestionDescriptionMaxChars)">
                             @QuestionDescription.Length/@QuestionDescriptionMaxChars
                         </small>
                     </div>
 
-                    <div class="col-1 d-flex justify-content-end pe-0">
-                        <label class="btn btn-outline-secondary btn-sm" for="FileInputID">
-                            <i class="fa-solid fa-image "></i>
-                        </label>
-                        <InputFile id="FileInputID" OnChange="UploadFile" hidden />
-                    </div>
+                    
                     <div class="col-2 ps-1">
 
                         @if (myFileImage != "")
                         {
                             <div class="img-wrapper">
-                                <img src="@myFileImage" width="30" />
-                                <i class="fa-solid fa-trash  delete-image-btn" @onclick="MakeDeleteList"></i>
+                                <img src="@myFileImage" class="QuestionImage" width="30" />
+                                <i class="fa-solid fa-trash  delete-image-btn" @onclick='() => MakeDeleteList("FileInputID")'></i>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-2 ps-1">
+                                <label class="btn btn-outline-dark btn-sm" for="FileInputID">
+                                    <i class="fa-solid fa-image "></i>
+                                </label>
+                                <InputFile id="FileInputID" OnChange="@(e => UploadFile(e, "FileInputID"))" hidden />
                             </div>
                         }
                     </div>
                 </div>
 
-                <div class="mb-3 mt-3 col-9"> </div>
+                <div class="mb-3 mt-3 col-9"> 
+
+                </div>
 
                 <!-- Row -->
                 <div class="row mb-3">
@@ -96,11 +110,37 @@
                                    placeholder="תשובה נכונה"
                                    aria-describedby="correctAnswer" required />
                     </div>
-                    <div class="col-3 p-0">
+                    <div class="col-1 p-0">
                         <small id="correctAnswer" class="@GetInputClass(CorrectAnswer.Length, 2, @AnswersDescriptionMaxChars)
                             col-2 p-0 d-flex justify-content-start">@CorrectAnswer.Length/@AnswersDescriptionMaxChars</small>
                     </div>
 
+                    <div class="col-1">
+                        <span>
+                        או
+                        </span>
+                    </div>
+                      @if (CorrectImage != "")
+                        {
+
+                        <div class="col-2">
+                            <div class="img-wrapper">
+                                <img src="@CorrectImage" class="QuestionImage" width="30" />
+                                <i class="fa-solid fa-trash  delete-image-btn" @onclick='() => MakeDeleteList("CorrectFileInputID")'></i>
+                            </div>
+                        </div>
+                        }
+                        else
+                        {
+                           <div class="col-2">
+
+                                <label class="btn btn-outline-dark btn-sm" for="CorrectFileInputID">
+                                    <i class="fa-solid fa-image "></i>
+                                </label>
+                                <InputFile id="CorrectFileInputID" OnChange="@(e => UploadFile(e, "CorrectFileInputID"))" hidden />
+                            </div>
+                        }
+         
                 </div>
 
 
@@ -116,10 +156,35 @@
                                    placeholder="תשובה שגויה"
                                    aria-describedby="wrongAnswer1" required />
                     </div>
-                    <div class="col-3 p-0">
+                    <div class="col-1 p-0">
                         <small id="wrongAnswer1" class="@GetInputClass(WrongAnswer1.Length, 2, @AnswersDescriptionMaxChars)
                             col-2 p-0 d-flex justify-content-start">@WrongAnswer1.Length/30</small>
                     </div>
+                    <div class="col-1">
+                        <span>
+                            או
+                        </span>
+                    </div>
+                    @if (Wrong1Image != "")
+                    {
+
+                        <div class="col-2">
+                            <div class="img-wrapper">
+                                <img src="@Wrong1Image" class="QuestionImage" width="30" />
+                                <i class="fa-solid fa-trash  delete-image-btn" @onclick='() => MakeDeleteList("Wrong1FileInputID")'></i>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-2">
+
+                            <label class="btn btn-outline-dark btn-sm" for="Wrong1FileInputID">
+                                <i class="fa-solid fa-image "></i>
+                            </label>
+                            <InputFile id="Wrong1FileInputID" OnChange="@(e => UploadFile(e, "Wrong1FileInputID"))" hidden />
+                        </div>
+                    }
                 </div>
 
                 <!-- Wrong Answer 2 -->
@@ -132,13 +197,39 @@
                                    placeholder="תשובה שגויה"
                                    aria-describedby="wrongAnswer2" required />
                     </div>
-                    <div class="col-3 p-0">
+                    <div class="col-1 p-0">
                         <small id="wrongAnswer2" class="@GetInputClass(WrongAnswer2.Length, 2, @AnswersDescriptionMaxChars)
                             col-2 p-0 d-flex justify-content-start">@WrongAnswer2.Length/30</small>
                     </div>
+                    <div class="col-1">
+                        <span>
+                            או
+                        </span>
+                    </div>
+                    @if (Wrong2Image != "")
+                    {
+
+                        <div class="col-2">
+                            <div class="img-wrapper">
+                                <img src="@Wrong2Image" class="QuestionImage" width="30" />
+                                <i class="fa-solid fa-trash  delete-image-btn" @onclick='() => MakeDeleteList("Wrong2FileInputID")'></i>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-2">
+
+                            <label class="btn btn-outline-dark btn-sm" for="Wrong2FileInputID">
+                                <i class="fa-solid fa-image "></i>
+                            </label>
+                            <InputFile id="Wrong2FileInputID" OnChange="@(e => UploadFile(e, "Wrong2FileInputID"))" hidden />
+                        </div>
+                    }
                 </div>
 
                 <!-- Wrong Answer 3 -->
+
                 <div class="d-flex align-items-center mb-3">
                     <div class="col-7 p-0">
                         <InputText maxlength="@AnswersDescriptionMaxChars"
@@ -148,10 +239,35 @@
                                    placeholder="תשובה שגויה"
                                    aria-describedby="wrongAnswer3" required />
                     </div>
-                    <div class="col-3 p-0">
+                    <div class="col-1 p-0">
                         <small id="wrongAnswer3" class="@GetInputClass(WrongAnswer3.Length, 2, @AnswersDescriptionMaxChars)
                             col-2 p-0 d-flex justify-content-start">@WrongAnswer3.Length/30</small>
                     </div>
+                    <div class="col-1">
+                        <span>
+                            או
+                        </span>
+                    </div>
+                    @if (Wrong3Image != "")
+                    {
+
+                        <div class="col-2">
+                            <div class="img-wrapper">
+                                <img src="@Wrong3Image" class="QuestionImage" width="30" />
+                                <i class="fa-solid fa-trash  delete-image-btn" @onclick='() => MakeDeleteList("Wrong3FileInputID")'></i>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-2">
+
+                            <label class="btn btn-outline-dark btn-sm" for="Wrong3FileInputID">
+                                <i class="fa-solid fa-image "></i>
+                            </label>
+                            <InputFile id="Wrong3FileInputID" OnChange="@(e => UploadFile(e, "Wrong3FileInputID"))" hidden />
+                        </div>
+                    }
                 </div>
 
                 <!-- Submit Button -->
@@ -182,6 +298,7 @@
                         <thead>
                             <tr>
                                 <th>שאלה</th>
+                                <th>תמונה</th>
                                 <th class="text-center">עריכה</th>
                                 <th class="text-center">מחיקה</th>
                             </tr>
@@ -191,6 +308,12 @@
                             {
                                 <tr>
                                     <td>@question.QuestionDescription</td>
+                                    <td>
+                                        @if (question.HasImage)
+                                        {
+                                            <img src="@question.QuestionImage" height="30" />
+                                        }
+                                    </td>
                                     <td class="text-center"><button class="btn btn-outline-primary btn-sm" @onclick="()=>EditQuestion(question)">
                                         <i class="fa-solid fa-square-pen fa-fw" style="width: 14px;"></i></button></td>
                                     <td class="text-center">
@@ -227,6 +350,32 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="ConfirmDelete">מחיקה</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <!-- Modal 1 -->
+    <div class="modal fade" id=@($"modal1") tabindex="-1" aria-labelledby=@($"modalLabel1") aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id=@($"modalLabel1")>שבירת בקבוקים</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    בדוכן זה תוכלו לשבור בקבוקים ולזכות בפרסים נחמדים
+                </div>
+                <div class="text-center p-2">
+                    <img src="./assets-images/stageBottles1.png" class="img-fluid rounded mx-auto d-block" alt="Image description">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">הבנתי</button>
                 </div>
             </div>
         </div>
@@ -278,15 +427,22 @@
     bool editAnswer = false;
     bool hasimage = false;
     private IBrowserFile questionImageFile;
+
     private string imagePreview;
-    string myFileImage = "";
+    string myFileImage = ""; //Question Image
+    string CorrectImage = "";
+    string Wrong1Image = "";
+    string Wrong2Image = "";
+    string Wrong3Image = "";
+
     long maxFileSize = 4194304; //4MB
     private EditContext editContext;
 
     string msg = "";
     bool isDeleteModalOpen = false;
 
-    List<string> DeleteImages = new List<string>();
+    List
+    <string> DeleteImages = new List<string>();
 
     string questionDescriptionClass = "text-muted"; // Default class
     private GameQuestions selectedQuestionForDeletion;
@@ -340,6 +496,8 @@
                 return;
             }
 
+
+
             var newQuestion = await AddQuestion();
             if (newQuestion != null)
             {
@@ -358,13 +516,22 @@
         }
         else
         {
-            Console.WriteLine("" + questionID.ToString());
+            if (string.IsNullOrWhiteSpace(CorrectAnswer) || CorrectAnswer.Length < 2 || CorrectAnswer.Length > AnswersDescriptionMaxChars ||
+               string.IsNullOrWhiteSpace(WrongAnswer1) || WrongAnswer1.Length < 2 || WrongAnswer1.Length > AnswersDescriptionMaxChars ||
+               string.IsNullOrWhiteSpace(WrongAnswer2) || WrongAnswer2.Length < 2 || WrongAnswer2.Length > AnswersDescriptionMaxChars ||
+               string.IsNullOrWhiteSpace(WrongAnswer3) || WrongAnswer3.Length < 2 || WrongAnswer3.Length > AnswersDescriptionMaxChars)
+            {
+                ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
+                return;
+            }
 
-
+            if (myFileImage != "")
+            {
+                hasimage = true;
+            }
             QuestionToAdd editedQuestion = new QuestionToAdd()
             {
                 GameID = game.ID,
-                ID = questionID,
                 HasImage = hasimage,
                 QuestionDescription = QuestionDescription,
                 QuestionImage = myFileImage,
@@ -395,8 +562,7 @@
                     if (updatedQuestion != null)
                     {
                         updatedQuestion.QuestionDescription = QuestionDescription;
-                        updatedQuestion.QuestionImage = myFileImage; // Update image URL if applicable
-                                                                     // If your model supports it, update other properties as needed
+                        updatedQuestion.QuestionImage = myFileImage; // Update image URL if applicable                                          
                     }
 
                     // After updating answers in the API
@@ -413,14 +579,12 @@
                                 localAnswer.HasImage = answer.HasImage;
                                 localAnswer.AnswerImage = answer.AnswerImage;
                             }
-                            Console.WriteLine("Successful Answers Edit");
                         }
                         else
                         {
                             Console.WriteLine("Failed to edit answer: " + await answerUpdate.Content.ReadAsStringAsync());
                         }
                     }
-
                     // Call StateHasChanged to refresh the UI with updated data
                     StateHasChanged();
                     await ShowToast(true, "השאלה נשמרה בהצלחה!", "fa-solid fa-circle-check");
@@ -434,7 +598,6 @@
                 await ShowToast(false, "פעולת העריכה נכשלה", "fa-solid fa-circle-exclamation");
             }
         }
-
     }
 
     private async Task ShowToast(bool isSuccess, string message, string icon)
@@ -450,7 +613,6 @@
     private async Task<GameQuestions> AddQuestion()
     {
         bool hasImage = !string.IsNullOrEmpty(myFileImage);
-
         QuestionToAdd questionToAdd = new QuestionToAdd()
             {
                 GameID = game.ID,
@@ -511,11 +673,17 @@
     private void EditQuestion(GameQuestions question)
     {
         editAnswer = true;
+        
+        if (question.HasImage)
+        {
+            myFileImage = question.QuestionImage;
+        }
 
         //get question details
         QuestionDescription = question.QuestionDescription;
         questionID = question.ID;
 
+     
         //get answer details, use arrays to store the answers
         var answers = question.Answers;
         CorrectAnswer = answers.Where(a => a.IsCorrect).FirstOrDefault().AnswerDescription;
@@ -574,7 +742,7 @@
         return resultClass;
     }
 
-    private async Task UploadFile(InputFileChangeEventArgs e)
+    private async Task UploadFile(InputFileChangeEventArgs e,string inputId)
     {
         var imageFiles = e.GetMultipleFiles();
         foreach (var file in imageFiles)
@@ -589,16 +757,57 @@
                 if (saveResponse.IsSuccessStatusCode == true)
                 {
                     string resizeUrl = saveResponse.Content.ReadAsStringAsync().Result;
-                    myFileImage = "uploadedFiles/" + resizeUrl;
+                    switch (inputId)
+                    {
+                        case "FileInputID":
+                            myFileImage = "uploadedFiles/" + resizeUrl;
+                            break;
+                        case "CorrectFileInputID":
+                            CorrectImage = "uploadedFiles/" + resizeUrl;
+                            break;
+                        case "Wrong1FileInputID":
+                            Wrong1Image = "uploadedFiles/" + resizeUrl;
+                            break;
+                        case "Wrong2FileInputID":
+                            Wrong2Image = "uploadedFiles/" + resizeUrl;
+                            break;
+                        case "Wrong3FileInputID":
+                            Wrong3Image = "uploadedFiles/" + resizeUrl;
+                            break;
+                    }
+  
+
                 }
             }
         }
     }
 
-    private void MakeDeleteList()
+    private void MakeDeleteList(string inputId)
     {
-        DeleteImages.Add(myFileImage);
-        myFileImage = "";
+        switch (inputId)
+        {
+            case "FileInputID":
+                DeleteImages.Add(myFileImage);
+                myFileImage = "";
+                break;
+            case "CorrectFileInputID":
+                DeleteImages.Add(CorrectImage);
+                CorrectImage = "";
+                break;
+            case "Wrong1FileInputID":
+                DeleteImages.Add(Wrong1Image);
+                Wrong1Image = "";
+                break;
+            case "Wrong2FileInputID":
+                DeleteImages.Add(Wrong2Image);
+                Wrong2Image = "";
+                break;
+            case "Wrong3FileInputID":
+                DeleteImages.Add(Wrong3Image);
+                Wrong3Image = "";
+                break;
+        }
+
     }
 
     private void ClearFormFields()
@@ -612,6 +821,14 @@
         WrongAnswer2 = "";
         WrongAnswer3 = "";
         myFileImage = ""; // Clear any image that might have been uploaded
+
+
+        CorrectImage = "";
+        Wrong1Image = "";
+        Wrong2Image = "";
+        Wrong3Image = "";
+
+
 
         // This should explicitly set to 'text-muted'
         questionDescriptionClass = GetInputClass(0, 2, QuestionDescriptionMaxChars);

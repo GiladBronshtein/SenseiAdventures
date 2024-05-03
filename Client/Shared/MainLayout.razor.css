@@ -17,10 +17,19 @@ main {
     flex: 1; /* This allows the main content to expand and fill the available space */
 }
 
+/*footer {
+    flex-shrink: 0;*/ /* This ensures that the footer does not shrink */
+/*}*/
+
+
+
+
 footer {
-    flex-shrink: 0; /* This ensures that the footer does not shrink */
+    position: relative; /* Fix position to bottom - fixed */
+
+    width: 100%; /* Span full width of the viewport */
+    bottom: 0; /* Stick to bottom */
+    z-index: 10; /* Ensure it's on top of other content if needed */
+    flex-shrink: 0;
+
 }
-
-
-
-

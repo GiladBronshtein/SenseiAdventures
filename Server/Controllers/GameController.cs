@@ -44,14 +44,25 @@ namespace template.Server.Controllers
 
         private async Task<int> CreateGame(GameToAdd gameToAdd, int userId)
         {
+            bool hasImage = false;
+            string gameImage = gameToAdd.GameImage;
+            if (gameToAdd.GameImage != "")
+            {
+                hasImage = true;
+                gameImage = gameToAdd.GameImage;
+            }
+            else
+            {
+                gameImage = "empty";
+            }
             var newGameParam = new
             {
                 CanPublish = false, // Assuming all new games cannot be published initially
                 DifficultLevel = 1, // Default difficulty level
                 EndingMessage = gameToAdd.EndingMessage, // Default empty ending message
                 GameCode = 0, // Initial game code, will be updated later
-                GameHasImage = false, // From input
-                GameImage = "empty", // Handle image information
+                GameHasImage = hasImage,
+                GameImage = gameImage, // Handle image information
                 GameName = gameToAdd.GameName,
                 IsPublished = false, // New games are not published initially
                 UserID = userId

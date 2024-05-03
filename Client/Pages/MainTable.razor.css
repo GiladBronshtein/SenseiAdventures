@@ -1,1 +1,23 @@
-﻿
+﻿.img-text-container {
+    position: relative;
+}
+
+.inner {
+    position: absolute;
+    top: 58%;
+    left: 50%;
+    width: 65%;
+    transform: translate(-50%, -50%);
+    color: black;
+    font-size: 1.2vw;   
+}
+
+@media (max-width: 480px) {
+    .inner {
+        font-size:2vw;
+    }
+@media (max-width: 1100px) {
+        .inner {
+            font-size: 4vw;
+        }
+    }
