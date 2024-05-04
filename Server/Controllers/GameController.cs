@@ -344,15 +344,28 @@ namespace template.Server.Controllers
             {
                 return BadRequest("User Not Found");
             }
+            string answerImage = "empty";
 
             foreach (GameAnswers answer in answers)
             {
+                bool hasImage = false;
+                if (answer.AnswerImage != "")
+                {
+                    hasImage = true;
+                    answerImage = answer.AnswerImage;
+                }
+                else
+                {
+                    answerImage = "empty";
+                }
+
+
                 object answerParam = new
                 {
                     AnswerDescription = answer.AnswerDescription,
                     IsCorrect = answer.IsCorrect,
-                    HasImage = false, // Assuming no image for the answer
-                    AnswerImage = "empty", // Default value if no image
+                    HasImage = hasImage,
+                    AnswerImage = answerImage,
                     QuestionID = questionId
                 };
                 string insertAnswerQuery = "INSERT INTO Answers (AnswerDescription, IsCorrect, HasImage, AnswerImage, QuestionID) " +

@@ -13,18 +13,10 @@
             <h3>
                 דוכן שבירת בקבוקים
                 <button type="button" class="btn bg-primary-subtle" data-bs-toggle="modal" data-bs-target=@($"#modal1")
-                        style=" --bs-btn-padding-y: .25rem; 
-                                --bs-btn-padding-x: .5rem; 
-                                --bs-btn-font-size: .75rem;
-                               ">
-                    אודות הדוכן
-                    <i class="fa fa-info-circle p-1" style="color:black;"></i>
+                        style=" --bs-btn-padding-y: .25rem;  --bs-btn-padding-x: .5rem;  --bs-btn-font-size: .75rem;"> הסבר 
+                        <i class="fa fa-info-circle p-1" style="color:black;"></i>
                 </button>
-              
-
             </h3>
-
-
         </div>
         <div class="col-md-5 text-end">
             <button type="button" class="btn btn-secondary">כיבוי דוכן</button>
@@ -516,6 +508,8 @@
         }
         else
         {
+
+            //Validations
             if (string.IsNullOrWhiteSpace(CorrectAnswer) || CorrectAnswer.Length < 2 || CorrectAnswer.Length > AnswersDescriptionMaxChars ||
                string.IsNullOrWhiteSpace(WrongAnswer1) || WrongAnswer1.Length < 2 || WrongAnswer1.Length > AnswersDescriptionMaxChars ||
                string.IsNullOrWhiteSpace(WrongAnswer2) || WrongAnswer2.Length < 2 || WrongAnswer2.Length > AnswersDescriptionMaxChars ||
@@ -525,6 +519,8 @@
                 return;
             }
 
+
+            //QUESTION and its image
             if (myFileImage != "")
             {
                 hasimage = true;
@@ -542,19 +538,34 @@
             var response = await Http.PutAsJsonAsync($"api/game/{UserId}/updateQuestion/{questionID}", editedQuestion);
             if (response.IsSuccessStatusCode)
             {
+                //ANSWERS and their image
                 var currentAnswers = questions.Where(q => q.ID == questionID).FirstOrDefault()?.Answers;
                 if (currentAnswers != null)
                 {
+                    Console.WriteLine("Current Correct AnswerImage: " + currentAnswers.ElementAtOrDefault(0).AnswerImage);
+
                     var updatedAnswers = new List<GameAnswers>
                     {
-                        new GameAnswers { ID = currentAnswers.ElementAtOrDefault(0)?.ID ?? 0, AnswerDescription = CorrectAnswer, IsCorrect = true, QuestionID = questionID,  
-                                            HasImage = false, AnswerImage = "empty"  },
+                        new GameAnswers { ID = currentAnswers.ElementAtOrDefault(0)?.ID ?? 0, AnswerDescription = CorrectAnswer, IsCorrect = true, QuestionID = questionID,
+                                                HasImage = !string.IsNullOrEmpty(CorrectImage),
+                                                AnswerImage = currentAnswers.ElementAtOrDefault(0)?.HasImage == true ? CorrectImage : "empty"
+                                        },
+
                         new GameAnswers { ID = currentAnswers.ElementAtOrDefault(1)?.ID ?? 0, AnswerDescription = WrongAnswer1, IsCorrect = false, QuestionID = questionID,
-                                            HasImage = false, AnswerImage = "empty"  },
+                                            HasImage = !string.IsNullOrEmpty(Wrong1Image),
+
+                                            AnswerImage = currentAnswers.ElementAtOrDefault(1)?.HasImage == true ? Wrong1Image : "empty"  },
+
+
                         new GameAnswers { ID = currentAnswers.ElementAtOrDefault(2)?.ID ?? 0, AnswerDescription = WrongAnswer2, IsCorrect = false, QuestionID = questionID,
-                                            HasImage = false, AnswerImage = "empty"  },
+                                            HasImage = !string.IsNullOrEmpty(Wrong2Image),
+                                                AnswerImage = currentAnswers.ElementAtOrDefault(2)?.HasImage == true ? Wrong2Image : "empty"  },
+
+
                         new GameAnswers { ID = currentAnswers.ElementAtOrDefault(3)?.ID ?? 0, AnswerDescription = WrongAnswer3, IsCorrect = false, QuestionID = questionID,
-                                            HasImage = false, AnswerImage = "empty"  }
+                                            HasImage = !string.IsNullOrEmpty(Wrong3Image),
+                                                AnswerImage = currentAnswers.ElementAtOrDefault(3)?.HasImage == true ? Wrong3Image : "empty"  }
+
                     };
 
                     // Update question after successful API response
@@ -568,6 +579,7 @@
                     // After updating answers in the API
                     foreach (var answer in updatedAnswers)
                     {
+                        Console.WriteLine(answer.AnswerImage.ToString());
                         var answerUpdate = await Http.PutAsJsonAsync($"api/game/{UserId}/updateAnswers/{answer.ID}", answer);
                         if (answerUpdate.IsSuccessStatusCode)
                         {
@@ -646,16 +658,17 @@
 
     private async Task<bool> AddAnswers(int questionId)
     {
-        List<GameAnswers> answers = new List<GameAnswers>()
-    {
-        new GameAnswers { AnswerDescription = CorrectAnswer, IsCorrect = true, QuestionID = questionId },
-        new GameAnswers { AnswerDescription = WrongAnswer1, IsCorrect = false, QuestionID = questionId },
-        new GameAnswers { AnswerDescription = WrongAnswer2, IsCorrect = false, QuestionID = questionId },
-        new GameAnswers { AnswerDescription = WrongAnswer3, IsCorrect = false, QuestionID = questionId }
-    };
 
-        // Validate the answers list (optional, depending on your requirements)
-        // You can add validation logic here if needed
+        //check which answer has image and by that create the new list of answers
+        List<GameAnswers> answers = new List<GameAnswers>
+        {
+            new GameAnswers { AnswerDescription = CorrectAnswer, IsCorrect = true, QuestionID = questionId, HasImage = CorrectImage != "", AnswerImage = CorrectImage },
+            new GameAnswers { AnswerDescription = WrongAnswer1, IsCorrect = false, QuestionID = questionId, HasImage = Wrong1Image != "", AnswerImage = Wrong1Image },
+            new GameAnswers { AnswerDescription = WrongAnswer2, IsCorrect = false, QuestionID = questionId, HasImage = Wrong2Image != "", AnswerImage = Wrong2Image },
+            new GameAnswers { AnswerDescription = WrongAnswer3, IsCorrect = false, QuestionID = questionId, HasImage = Wrong3Image != "", AnswerImage = Wrong3Image }
+        };
+
+
 
         var response = await Http.PostAsJsonAsync($"api/game/{UserId}/addAnswers/{questionId}", answers);
         if (response.IsSuccessStatusCode)
@@ -672,8 +685,9 @@
 
     private void EditQuestion(GameQuestions question)
     {
+        ClearFormFields();
         editAnswer = true;
-        
+
         if (question.HasImage)
         {
             myFileImage = question.QuestionImage;
@@ -683,13 +697,34 @@
         QuestionDescription = question.QuestionDescription;
         questionID = question.ID;
 
-     
+
         //get answer details, use arrays to store the answers
         var answers = question.Answers;
         CorrectAnswer = answers.Where(a => a.IsCorrect).FirstOrDefault().AnswerDescription;
         WrongAnswer1 = answers.Where(a => !a.IsCorrect).ElementAt(0).AnswerDescription;
         WrongAnswer2 = answers.Where(a => !a.IsCorrect).ElementAt(1).AnswerDescription;
         WrongAnswer3 = answers.Where(a => !a.IsCorrect).ElementAt(2).AnswerDescription;
+
+        //assign correct image text and hasiamge bool only if hasimage equals to true
+        if (answers.Where(a => a.IsCorrect).FirstOrDefault().HasImage)
+        {
+            CorrectImage = answers.Where(a => a.IsCorrect).FirstOrDefault().AnswerImage;
+        }
+        if (answers.Where(a => !a.IsCorrect).ElementAt(0).HasImage)
+        {
+            Wrong1Image = answers.Where(a => !a.IsCorrect).ElementAt(0).AnswerImage;
+        }
+        if (answers.Where(a => !a.IsCorrect).ElementAt(1).HasImage)
+        {
+            Wrong2Image = answers.Where(a => !a.IsCorrect).ElementAt(1).AnswerImage;
+        }
+        if (answers.Where(a => !a.IsCorrect).ElementAt(2).HasImage)
+        {
+            Wrong3Image = answers.Where(a => !a.IsCorrect).ElementAt(2).AnswerImage;
+        }
+
+
+
 
 
     }
@@ -775,11 +810,12 @@
                             Wrong3Image = "uploadedFiles/" + resizeUrl;
                             break;
                     }
-  
+
 
                 }
             }
         }
+        Console.WriteLine(CorrectImage.ToString());
     }
 
     private void MakeDeleteList(string inputId)
