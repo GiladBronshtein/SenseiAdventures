@@ -5,7 +5,7 @@
 @using template.Shared.Models.Users;
 @using template.Client.Components;
 
-<div class="container-fluid">
+<div class="container-fluid" >
     
     <div class="row">
         <div class="col-md-7">
@@ -105,8 +105,8 @@
             }
         </div>
 
-        <div class="col-md-5 ">
-            <div class="row">
+        <div class="col-md-5 mt-3">
+            <div class="row mt-3">
                 <div class="col-md-12 d-flex flex-column justify-content-left align-items-left">
                     <div class="p-2 text-primary-emphasis ">
                         <i class="fa-regular fa-lightbulb" style="color:darkblue ;"></i>
@@ -118,121 +118,14 @@
                     </div>
                 </div>
             </div>
-
-
             <div class="row">
                 <div class="col-md-12 mt-5 d-flex flex-column justify-content-center align-items-center">
-                    <img src="assets-images/Figure3-removebg-preview.png" width="65%" class=" justify-content-center align-items-center" />
-                </div>
-            </div>
-
-
-        </div>
-    </div>
-
-   
-
-   
-
-</div>
-@* <hr class="bg-dark" />
-    <h5>מידע על הדוכנים</h5>
-    <div class="row mt-2">
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm h-auto d-flex flex-column justify-content-center align-items-center">
-                <img src="./assets-images/stageBottles1.png" class="card-img-top" alt="Image description">
-                <div class="card-body text-center p-2">
-                    <h6 class="card-title"> שבירת בקבוקים</h6>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target=@($"#modal1")>מידע</button>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm h-auto d-flex flex-column justify-content-center align-items-center">
-                <img src="./assets-images/stageTarget2.png" class="card-img-top" alt="Image description">
-                <div class="card-body text-center p-2">
-                    <h6 class="card-title"> פגיעה במטרה</h6>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target=@($"#modal2")>מידע</button>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm h-auto d-flex flex-column justify-content-center align-items-center">
-                <img src="./assets-images/stageHit3.png" class="card-img-top" alt="Image description">
-                <div class="card-body text-center p-2">
-                    <h6 class="card-title"> פגיעה בתשובה</h6>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target=@($"#modal3")>מידע</button>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm h-auto d-flex flex-column justify-content-center align-items-center">
-                <img src="./assets-images/stageSlash4.png" class="card-img-top" alt="Image description">
-                <div class="card-body text-center p-2">
-                    <h6 class="card-title"> לחתוך תשובות</h6>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target=@($"#modal4")>מידע</button>
+                    <img src="assets-images/Figure3-removebg-preview.png" width="50%" class=" justify-content-center align-items-center" />
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-
-
-<!-- Modal 2 -->
-<div class="modal fade" id=@($"modal2") tabindex="-1" aria-labelledby=@($"modalLabel2") aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id=@($"modalLabel2")>פגיעה במטרה</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                בדוכן זה תוכלו לפגוע במטרה ולזכות בפרסים נחמדים
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">הבנתי</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal 3 -->
-<div class="modal fade" id=@($"modal3") tabindex="-1" aria-labelledby=@($"modalLabel3") aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id=@($"modalLabel3")>פגיעה בתשובה</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                בדוכן זה תוכלו לפגוע בתשובה ולזכות בפרסים נחמדים
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">הבנתי</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal 4 -->
-<div class="modal fade" id=@($"modal4") tabindex="-1" aria-labelledby=@($"modalLabel4") aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id=@($"modalLabel4")>לחתוך תשובות</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                בדוכן זה תוכלו לחתוך תשובות ולזכות בפרסים נחמדים
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">הבנתי</button>
-            </div>
-        </div>
-    </div>
-</div> *@
-
 
 
 <div class="toast-container position-fixed top-0 end-0 p-3">
@@ -341,5 +234,15 @@
     {
         gameDataChild.GameImage = "empty";
         gameDataChild.GameHasImage = false;
+    }
+
+    // Get Background Image Style Method
+    private string GetBackgroundImageStyle()
+    {
+        if (!string.IsNullOrEmpty(gameDataChild?.GameImage) && gameDataChild.GameHasImage)
+        {
+            return $"background-image: url('{gameDataChild.GameImage}'); background-size: cover; background-position: center; opacity: 0.3; z-index: -1; position: absolute; width: 100%; height: 100%;";
+        }
+        return string.Empty;
     }
 }

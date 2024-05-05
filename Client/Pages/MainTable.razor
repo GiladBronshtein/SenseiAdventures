@@ -75,14 +75,6 @@
                                                 <InputFile id="gameImage" class="form-control" OnChange="UploadFile" accept="image/*" />
                                             </div>
 
-                                            @*
-                                            <div class="mb-2">
-                                            <label for="gameImage" class="form-label">תמונת המשחק</label>
-                                            <InputFile id="gameImage" class="form-control" OnChange="UploadFile" accept="image/*" />
-                                            </div>
-
-                                            *@
-
                                             <!-- Submit / Cancel Buttons -->
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">חזרה</button>
@@ -190,30 +182,16 @@
             <div class="img-text-container">
                 <img src="assets-images/Figure4-removebg-preview.png" class="img-fluid" alt="Responsive image">
                 <div class="text-center inner">
-                    <p>הוראות פרסום
-                    <ul>
-                        <li>מינימום 2 דוכנים</li>
-                        <li>מינימום 20 שאלות</li>
-                    </ul>
+                    <p><b>הוראות פרסום</b><br />
+                        <span>מינימום 2 דוכנים</span>
+                        <br />
+                        <span>מינימום 20 שאלות</span>
+
                     </p>
                 </div>
             </div>
-
-
-
-            
-
         </div>
-
-
-
-
-
     </div>
-    
-    
-    
-    
     
     
     <!-- Delete Confirmation Modal -->
@@ -235,208 +213,6 @@
         </div>
     </div>
 </div>
-
-
-
-
-@* 
-
-<div class="container-fluid">
-    <!-- Page Header -->
-    <div class="row">
-        <div class="col col-sm-8">
-            <div>
-                <!-- Button - Create New Game -->
-                <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="height: 86px;">
-                    <span style="vertical-align: middle;">יצירת משחק חדש</span>
-                    <span style="vertical-align: middle;">
-                        <i class="fa-solid fa-square-plus" style="font-size: 36px;  vertical-align: middle;"></i>
-                    </span>
-                </button>
-
-                <!-- Modal -->
-                <div class="modal fade @(isModalOpen ? "show" : "")" style="display: @(isModalOpen ? "block" : "none");" id="staticBackdrop"
-                     data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="staticBackdropLabel">משחק חדש</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-
-                                <!-- Form for new game creation -->
-                                <EditForm Model="gameToAdd" OnValidSubmit="CreateGame" OnInvalidSubmit="failedSubmit">
-                                    <DataAnnotationsValidator />
-
-                                    <!-- Game Name -->
-                                    <div class="mb-3">
-                                        <label for="gameName" class="form-label">שם המשחק</label>
-                                        <span>(2-30 תווים)</span>
-                                        <InputText maxlength="30"
-                                                   @oninput="@(e => { HandleInputChange(e, nameof(gameToAdd.GameName)); gameToAdd.GameName = e.Value.ToString(); StateHasChanged(); })"
-                                                   id="gameName"
-                                                   class="form-control"
-                                                   @bind-Value="gameToAdd.GameName"
-                                                   aria-describedby="gameNameHelp" required />
-
-                                        <small id="gameName" class="@GetInputClass(gameToAdd?.GameName?.Length ?? 0, 2, 30)">@((gameToAdd?.GameName?.Length ?? 0).ToString())/30</small>
-                                        <ValidationMessage For="@(() => gameToAdd.GameName)" style="color:Red;" />
-                                    </div>
-
-
-                                    <!-- Ending Message -->
-                                    <div class="mb-3">
-                                        <label for="endingMessage" class="form-label">הודעת הסיום</label>
-                                        <span>(2-30 תווים)</span>
-                                        <InputText maxlength="30"
-                                                   @oninput="@(e => { HandleInputChange(e, nameof(gameToAdd.EndingMessage)); gameToAdd.EndingMessage = e.Value.ToString(); StateHasChanged(); })"
-                                                   id="endingMessage"
-                                                   class="form-control"
-                                                   @bind-Value="gameToAdd.EndingMessage"
-                                                   aria-describedby="endingMessageHelp" required />
-
-                                        <small id="endingMessage" class="@GetInputClass(gameToAdd?.EndingMessage?.Length ?? 0, 2, 30)">@((gameToAdd?.EndingMessage?.Length ?? 0).ToString())/30</small>
-                                        <ValidationMessage For="@(() => gameToAdd.EndingMessage)" style="color:Red;" />
-                                    </div>
-
-
-                                    <!-- Image upload input -->
-                                    <div class="mb-3">
-                                        <label for="gameImage" class="form-label">תמונת המשחק</label>
-                                        <input type="file" class="form-control" id="gameImage" @bind="gameToAdd.GameImage" />
-                                    </div>
-
-                                    <!-- Submit / Cancel Buttons -->
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">חזרה</button>
-                                        <button type="submit" value="send" class="btn btn-primary" data-bs-target="#my-modal">שמירה</button> <!--data-bs-dismiss="modal"-->
-                                    </div>
-                                </EditForm>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Publish Instructions -->
-        <div class="col col-sm-4">
-            <div class="col-md-12 mt-5 d-flex flex-column justify-content-center align-items-center">
-                <img src="assets-images/Figure3-removebg-preview.png" width="75%" />
-            </div>
-
-        </div>
-    </div>
-
-    <!--Main Games Table-->
-    <div class="row">
-        <h5>טבלת המשחקים</h5>
-
-        <div class="col-md-8 table-responsive scrollable-table-body ">
-            <table class="table shadow-sm border border-1">
-                <!--Table HEADER-->
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">
-                            קוד
-                            <Tooltip Text="באמצעות הקוד מתחילים משחק"><i class="fa-solid fa-circle-info"></i></Tooltip>
-                        </th>
-                        <th scope="col">
-                            שם המשחק
-                            <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
-                        </th>
-                        <th scope="col" class="col-auto text-center">
-                            עריכה
-                            <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
-                        </th>
-                        <th scope="col" class="col-auto text-center">
-                            פרסום
-                            <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i> </Tooltip>
-                        </th>
-                        <th scope="col" class="col-auto text-center">
-                            מחיקה
-                            <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
-                        </th>
-                    </tr>
-                </thead>
-
-                <!--Table TBODY-->
-                <tbody class="scrollbar-tbody custom-scrollable-tbody">
-                        @if (GamesList != null && GamesList.Count > 0)
-                        {
-                            @foreach (var game in GamesList)
-                            {
-                            <tr>
-                                <td><b>@game.GameCode</b></td>
-                                <td>@game.GameName</td>
-                                <td class="col-auto text-center"><i class="fa-solid fa-file-pen icon link-success" @onclick="()=>EditGame(game)"></i></td>
-                                <td class="col-auto text-center">
-                                        @if (game.CanPublish == false)
-                                        {
-                                        <div>
-                                            <input class="form-check-input" type="checkbox" id="@game.ID" value="" aria-label="..." disabled>
-                                            <label for="@game.ID" />
-                                        </div>
-                                        }
-                                        else
-                                        {
-                                        <div>
-                                            <input class="form-check-input" type="checkbox" id="@game.ID" checked="@game.IsPublished" @onchange="()=>changePublish(game)" />
-                                            <label for="@game.ID"></label>
-                                        </div>
-                                        }
-                                </td>
-                                <td class="col-auto text-center">
-                                    <i class="fa-solid fa-trash icon link-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" @onclick="() => PromptDelete(game)"></i>
-                                </td>
-                            </tr>
-                            }
-                        }
-                        else
-                        {
-                        <tr>
-                            <td colspan="5" class="text-center" style="font-weight:bold;">
-                                בטבלה זו יופיעו כלל המשחקים, טרם הוזנו משחקים - לחצו על "משחק חדש"
-                            </td>
-                        </tr>
-                        }
-                </tbody>
-              
-
-            </table>
-        </div>
-    </div>
-
-    @if (msg != "")
-    {
-    <p>@msg</p>
-    }
-
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="@(!isDeleteModalOpen)">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">מחיקת משחק</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                מחיקת המשחק תבוצע לצמיתות וללא יכולת שחזור, בטוחים?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="ConfirmDelete">מחיקה</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-</div>
- *@
-
 
 @code {
     [CascadingParameter]

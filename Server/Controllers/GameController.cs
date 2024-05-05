@@ -88,28 +88,33 @@ namespace template.Server.Controllers
             return gameRecord.FirstOrDefault();
         }
 
-        private async Task UpdateAnswers(int gameCode, GameToUpdate gameToUpdate)
-        {
-            //Update existing answers
-            foreach (GameAnswers item in gameToUpdate.Answers)
-            {
-                object param2 = new
-                {
-                    //id = item.ID,
-                    answerDescription = item.AnswerDescription,
-                    isCorrect = item.IsCorrect,
-                    hasImage = item.HasImage,
-                    imageText = item.AnswerImage
-                };
-                string updateAnswerQuery = "UPDATE Items SET AnswerDescription = @answerDescription, " +
-                    "IsCorrect = @isCorrect, " +
-                    "HasImage = @hasImage, " +
-                    "AnswerImageText = @imageText " +
-                    "WHERE ID = @id";
-                int isAnswersUpdate = await _db.SaveDataAsync(updateAnswerQuery, param2);
 
-            }
+        private async Task<bool> UpdateAnswer(GameAnswers answer)
+        {
+            string answerImage = string.IsNullOrEmpty(answer.AnswerImage) ? "empty" : answer.AnswerImage;
+            bool hasImage = answerImage != "empty";
+
+            var answerParam = new
+            {
+                AnswerDescription = answer.AnswerDescription,
+                IsCorrect = answer.IsCorrect,
+                HasImage = hasImage,
+                AnswerImage = answerImage,
+                AnswerId = answer.ID
+            };
+
+            string updateAnswerQuery = @"
+            UPDATE Answers SET 
+                AnswerDescription = @AnswerDescription, 
+                IsCorrect = @IsCorrect, 
+                HasImage = @HasImage, 
+                AnswerImage = @AnswerImage 
+            WHERE ID = @AnswerId";
+
+            var updateCount = await _db.SaveDataAsync(updateAnswerQuery, answerParam);
+            return updateCount > 0;
         }
+
 
         private async Task AddAnswers(int gameId, GameToUpdate gameToUpdate)
         {
@@ -357,6 +362,7 @@ namespace template.Server.Controllers
                 else
                 {
                     answerImage = "empty";
+                    hasImage = false;
                 }
 
 
@@ -642,6 +648,9 @@ namespace template.Server.Controllers
         [HttpPut("updateAnswers/{answerId}")]
         public async Task<IActionResult> UpdateAnswers(int userId, int answerId, GameAnswers answerToUpdate)
         {
+            //if (answerToUpdate.AnswerImage != "") or "empty" or null assign answerimage to be "empty"
+            //string answerImage = string.IsNullOrEmpty(answerToUpdate.AnswerImage) ? "empty" : answerToUpdate.AnswerImage;
+
             object param = new
             {
                 UserId = userId
@@ -685,6 +694,10 @@ namespace template.Server.Controllers
             }
             return BadRequest("User Not Found");
         }
+
+
+
+
 
 
         //NOTE: Didn't work on that yet 
