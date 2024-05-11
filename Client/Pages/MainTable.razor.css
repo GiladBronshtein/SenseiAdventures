@@ -1,5 +1,10 @@
 ﻿.img-text-container {
     position: relative;
+    justify-content: center;
+}
+
+.img-fluid {
+    justify-content: center;
 }
 
 .inner {
@@ -9,7 +14,8 @@
     width: 65%;
     transform: translate(-50%, -50%);
     color: black;
-    font-size: 4vw;   
+    font-size: 4vw;
+    justify-content: center;
 }
 
 @media (min-width: 576px) 

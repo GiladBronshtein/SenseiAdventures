@@ -1,12 +1,11 @@
-﻿@inject HttpClient Http
+﻿@* @inject HttpClient Http
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 @using template.Shared.Models.Games;
 @using template.Shared.Models.Users;
 @using template.Client.Components;
 
-<div class="container-fluid" >
-    
+<div class="container-fluid">
     <div class="row">
         <div class="col-md-7">
             <div class="row">
@@ -89,8 +88,6 @@
                             </div>
                         </div>
                     </div>
-
-
                     <div class="row">
                         <div class="col-12 col-md-6 py-2">
                             <button type="submit" value="send" class="btn btn-primary w-100">שמירה</button>
@@ -109,8 +106,7 @@
             <div class="row mt-3">
                 <div class="col-md-12 d-flex flex-column justify-content-left align-items-left">
                     <div class="p-2 text-primary-emphasis ">
-                        <i class="fa-regular fa-lightbulb" style="color:darkblue ;"></i>
-                        בתפריט השמאלי עורכים שאלות לדוכנים השונים
+  
                     </div>
                     <div class="p-2 text-primary-emphasis ">
                         <i class="fa-regular fa-lightbulb" style="color:darkblue ;"></i>
@@ -119,9 +115,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12 mt-5 d-flex flex-column justify-content-center align-items-center">
-                    <img src="assets-images/Figure3-removebg-preview.png" width="50%" class=" justify-content-center align-items-center" />
-                </div>
+
             </div>
         </div>
     </div>
@@ -229,14 +223,271 @@
         }
     }
 
-    //deleteimage method
     private void DeleteImageMethod()
     {
         gameDataChild.GameImage = "empty";
         gameDataChild.GameHasImage = false;
     }
 
-    // Get Background Image Style Method
+    private string GetBackgroundImageStyle()
+    {
+        if (!string.IsNullOrEmpty(gameDataChild?.GameImage) && gameDataChild.GameHasImage)
+        {
+            return $"background-image: url('{gameDataChild.GameImage}'); background-size: cover; background-position: center; opacity: 0.3; z-index: -1; position: absolute; width: 100%; height: 100%;";
+        }
+        return string.Empty;
+    }
+} *@
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@using template.Shared.Models.Games
+@using template.Shared.Models.Users
+@using template.Client.Components
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="row">
+                <div class="col-12">
+                    <h1>הגדרות המשחק</h1>
+                </div>
+            </div>
+            @if (gameDataChild != null)
+            {
+                <!-- Form for game settings -->
+                <EditForm model="gameDataChild" OnValidSubmit="EditSettings" OnInvalidSubmit="failedSubmit">
+                    <DataAnnotationsValidator />
+
+                    <div class="nested">
+                        <!-- Game Name -->
+                        <div class="row mt-3">
+                            <label for="gameName" class="form-label"> שם המשחק (2-30 תווים)</label>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <InputText maxlength="30"
+                                           @oninput="@(e => { HandleInputChange(e, nameof(gameDataChild.GameName)); gameDataChild.GameName = e.Value.ToString(); StateHasChanged(); })"
+                                           id="gameName"
+                                           class="form-control"
+                                           @bind-Value="gameDataChild.GameName"
+                                           aria-describedby="gameNameHelp" required />
+                                <ValidationMessage For="@(() => gameDataChild.GameName)" style="color:Red;" />
+                            </div>
+                            <div class="col-md-1">
+                                <small id="gameName" class="@GetInputClass(gameDataChild?.GameName?.Length ?? 0, 2, 30)">@((gameDataChild?.GameName?.Length ?? 0).ToString())/30</small>
+                            </div>
+                        </div>
+
+                        <!-- Ending Message -->
+                        <div class="row mt-3">
+                            <label for="endingMessage" class="form-label">הודעת הסיום (2-30 תווים)</label>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <InputText maxlength="30"
+                                           @oninput="@(e => { HandleInputChange(e, nameof(gameDataChild.EndingMessage)); gameDataChild.EndingMessage = e.Value.ToString(); StateHasChanged(); })"
+                                           id="endingMessage"
+                                           class="form-control"
+                                           @bind-Value="gameDataChild.EndingMessage"
+                                           aria-describedby="endingMessageHelp" required />
+                                <ValidationMessage For="@(() => gameDataChild.EndingMessage)" style="color:Red;" />
+                            </div>
+                            <div class="col-md-1">
+                                <small id="endingMessage" class="@GetInputClass(gameDataChild?.EndingMessage?.Length ?? 0, 2, 30)">@((gameDataChild?.EndingMessage?.Length ?? 0).ToString())/30</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GAME IMAGE -->
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                @if (gameDataChild.GameHasImage)
+                                {
+                                    <div class="mb-2">
+                                        <div class="row">
+                                            <label for="gameImageAdded" class="form-label">תמונת המשחק</label>
+                                        </div>
+
+                                        <img id="gameImageAdded" src="@gameDataChild.GameImage" height="90" />
+                                        <i class="fa-solid fa-trash delete-image-btn" @onclick="QueueImageForDeletion"></i>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="mb-2">
+                                        <label for="gameImage" class="form-label">תמונת המשחק</label>
+                                        <InputFile id="gameImage" class="form-control" OnChange="UploadFile" accept="image/*" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-6 py-2">
+                            <button type="submit" value="send" class="btn btn-primary w-100">שמירה</button>
+                        </div>
+                    </div>
+
+                </EditForm>
+            }
+            else
+            {
+                <p>Loading...</p>
+            }
+        </div>
+
+        <div class="col-md-5 mt-3">
+            <div class="row mt-3">
+                <div class="col-md-12 d-flex flex-column justify-content-left align-items-left">
+                    <div class="p-2 text-primary-emphasis ">
+                        <i class="fa-regular fa-lightbulb" style="color:darkblue ;"></i>
+                        הגיעו למינימום הדוכנים והשאלות בכדי לפרסם
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <!--TOAST comes here-->
+</div>
+
+@code
+{
+    [Parameter]
+    public GameDetails gameDataChild { get; set; }
+
+    [Parameter]
+    public int userID { get; set; }
+
+    private string uploadedFileName;
+    private string imagePreview;
+    long maxFileSize = 4194304; //4MB
+    bool hasimage = false;
+    string myFileImage = "";
+    private List<string> imagesToDelete = new List<string>();
+
+    void failedSubmit()
+    {
+    }
+
+    async Task EditSettings()
+    {
+        bool hasImage = !string.IsNullOrEmpty(myFileImage);
+
+        if (hasImage)
+        {
+            gameDataChild.GameImage = myFileImage;
+            gameDataChild.GameHasImage = true;
+        }
+
+        var response = await Http.PutAsJsonAsync<GameDetails>($"api/Game/{userID}/updateGameSettings/" + gameDataChild.GameCode, gameDataChild);
+        if (response.IsSuccessStatusCode)
+        {
+            // Delete the images marked for deletion
+            if (imagesToDelete.Count > 0)
+            {
+                await DeleteImages(imagesToDelete);
+                imagesToDelete.Clear();
+            }
+
+            await ShowToast(true, "הגדרות המשחק נשמרו בהצלחה", "fa-solid fa-circle-check");
+            Console.WriteLine("Success");
+        }
+        else
+        {
+            await ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
+            return;
+        }
+    }
+
+    private async Task ShowToast(bool isSuccess, string message, string icon)
+    {
+        await JS.InvokeVoidAsync("showToast", isSuccess, message, icon);
+    }
+
+    private void HandleInputChange(ChangeEventArgs e, string inputType)
+    {
+        var newValue = e.Value.ToString();
+        switch (inputType)
+        {
+            case "gameName":
+                gameDataChild.GameName = newValue;
+                break;
+            case "endingMessage":
+                gameDataChild.EndingMessage = newValue;
+                break;
+            default:
+                break;
+        }
+    }
+
+    private string GetInputClass(int length, int minChars, int maxChars)
+    {
+        if (length == 0)
+            return "text-muted"; // Neutral for zero characters
+        else if (length < minChars)
+            return "text-danger";  // Red for less than minimum characters
+        else if (length >= minChars && length <= maxChars - 3)
+            return "text-success";   // Green for within the normal range
+        else if (length > maxChars - 3 && length <= maxChars)
+            return "text-warning";  // Orange for nearing maximum length
+        return "text-muted";  // Fallback, might not be necessary
+    }
+
+    private async Task UploadFile(InputFileChangeEventArgs e)
+    {
+        var imageFiles = e.GetMultipleFiles();
+        foreach (var file in imageFiles)
+        {
+            if (file.Size <= maxFileSize)
+            {
+                var buffer = new byte[file.Size];
+                await file.OpenReadStream(maxFileSize).ReadAsync(buffer);
+                var imageBase64 = Convert.ToBase64String(buffer);
+                var saveResponse = await Http.PostAsJsonAsync("api/media/upload", imageBase64);
+
+                if (saveResponse.IsSuccessStatusCode)
+                {
+                    string resizeUrl = await saveResponse.Content.ReadAsStringAsync();
+                    myFileImage = "uploadedFiles/" + resizeUrl;
+                    gameDataChild.GameImage = myFileImage;
+                    gameDataChild.GameHasImage = true;
+                }
+            }
+        }
+    }
+
+    private async Task DeleteImages(List<string> imagesToDelete)
+    {
+        var response = await Http.PostAsJsonAsync("api/media/deleteImages", imagesToDelete);
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Images deleted successfully");
+        }
+        else
+        {
+            Console.WriteLine("Image deletion failed");
+        }
+    }
+
+    private void QueueImageForDeletion()
+    {
+        if (!string.IsNullOrEmpty(gameDataChild.GameImage) && gameDataChild.GameImage != "empty")
+        {
+            imagesToDelete.Add(gameDataChild.GameImage);
+        }
+
+        gameDataChild.GameImage = "empty";
+        gameDataChild.GameHasImage = false;
+    }
+
     private string GetBackgroundImageStyle()
     {
         if (!string.IsNullOrEmpty(gameDataChild?.GameImage) && gameDataChild.GameHasImage)

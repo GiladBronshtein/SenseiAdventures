@@ -1,29 +1,77 @@
-﻿ @page "/"
- @inject NavigationManager Nav
+﻿@page "/"
+@inject NavigationManager Nav
 
 <style>
+    h1 {
+        font-size: 50px;
+        font-weight: 600;
+        background-image: linear-gradient(to left, black, lightgray);
+        color: transparent;
+        background-clip: text;
+        -webkit-background-clip: text;
+    }
+
     body {
         background-image: url('../assets-images/bg.jpg');
         background-size: cover;
+        margin: 0;
+        padding: 0;
+    }
+
+    .full-height-container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding: 16px;
+    }
+
+    .main-card {
+        width: 100%; /* Responsive width */
+        height: 90%; /* Takes full container height */
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(12px);
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        padding: 16px;
+    }
+
+    .iframe-container {
+        width:100%; /* Responsive width */
+        max-width: 400px; /* Prevent over-expansion */
+    }
+
+    .iframe-video {
+        width: 100%;
+        height: 240px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        background: #000;
     }
 </style>
 
-<div class="container-fluid">
-    <div class="card shadow" style="background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px); border-radius: 6px;">
-        <div class="card-body text-center">
-            <div class="row">
-                <div class="col-12 col-sm-10 col-md-8 mx-auto">
-                    <div class="one">
+<div class="container-fluid full-height-container ">
+    <div class="card main-card shadow">
+        <div class="card-body text-center w-100">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="one mt-2">
                         <h1>Sensei Adventures</h1>
                     </div>
                     <p class="lead">משחק VR מעצים למידה עם עורך מתקדם</p>
-                    <!-- Use col-12 for full width on small screens and col-md-10 for slight reduction on medium screens up -->
-                    <div class="mb-2 col-12 col-md-10 mx-auto" style="max-width: 400px;">
-                        <iframe src="https://player.vimeo.com/video/533879616" frameborder="0" allow="autoplay; fullscreen; picture-in-picture"
-                                allowfullscreen style="width: 100%; height: 250px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); background: #000;"></iframe>
+                    <div class="mb-2 iframe-container mx-auto">
+                        <iframe class="iframe-video" src="https://player.vimeo.com/video/533879616" frameborder="0"
+                                allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
                     </div>
-                    <h6 style="color: #1c1c1e;">המשתמש שמחובר כעת: @UserId</h6>
-                    <button @onclick="NavigateToEditor" class="btn btn-primary mt-4" style="transition: transform 0.2s;">כניסה לעורך</button>
+                    <h6 class="mb-2" style="color: #1c1c1e;">המשתמש שמחובר כעת: @UserId</h6>
+                    <button @onclick="NavigateToEditor" class="btn btn-primary mt-4 mb-3" style="transition: transform 0.2s;">כניסה לעורך</button>
                 </div>
             </div>
         </div>

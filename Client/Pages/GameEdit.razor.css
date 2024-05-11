@@ -1,13 +1,14 @@
 ﻿.container-fluid {
-    border-radius: 5px;
-    box-shadow: 5px 5px 6px rgba(0, 0, 0, 0.3); /* Soft shadow for depth */
-    margin-bottom: 10px;
+    border-radius: 7px;
+    box-shadow: -1px -1px 12px rgba(0, 0, 0, 0.3); /* Soft shadow for depth */
+   margin-bottom: 10px;
+   
 }
 
 .main-content {
-    border-radius: 5px;
+    border-radius: 7px;
     background-color: #fff; /* Optional: depends on your design preference */
-    padding: 5px; /* Provide some spacing inside the content area */
+    padding: 10px; /* Provide some spacing inside the content area */
 }
 
 .sidebar-panel {
@@ -29,8 +30,11 @@
 
 /* Sidebar Styles */
 .sidebar {
-    border-radius: 5px;
-    background: linear-gradient(to bottom right, #3A4148 , #212529); /* Dark gradient background */
+    border-radius: 7px;
+    border-bottom-left-radius: 0px;
+    border-top-left-radius: 0px;
+    background: linear-gradient(to bottom right, #3A4148, #212529); /* Dark gradient background */
+    box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.3); /* Soft shadow for depth */
 }
 
 .sidebar-heading {

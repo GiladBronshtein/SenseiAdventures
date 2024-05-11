@@ -6,11 +6,8 @@
 @using template.Shared.Models.Users
 @using template.Client.Components
 
-
-
 <div class="container-fluid">
     <div class="row">
-       
         <div class="col-sm-9">
             <div class="row">
                 <div class="col-12 col-sm-12">
@@ -19,9 +16,10 @@
                         <button type="button" class="shadow-sm btn btn-primary btn-lg mb-5" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="height: 60px; width: 240px;">
                             <span style="vertical-align: middle;">יצירת משחק חדש</span>
                             <span style="vertical-align: middle;">
-                                <i class="fa-solid fa-square-plus" style="font-size: 36px;  vertical-align: middle;"></i>
+                                <i class="fa-solid fa-square-plus" style="font-size: 36px; vertical-align: middle;"></i>
                             </span>
                         </button>
+
                         <!-- Modal -->
                         <div class="modal fade @(isModalOpen ? "show" : "")" style="display: @(isModalOpen ? "block" : "none");" id="staticBackdrop"
                              data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -29,14 +27,12 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h1 class="modal-title fs-5" id="staticBackdropLabel">משחק חדש</h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="ClearGameInputFields"></button>
                                     </div>
                                     <div class="modal-body">
-
                                         <!-- Form for new game creation -->
                                         <EditForm Model="gameToAdd" OnValidSubmit="CreateGame" OnInvalidSubmit="failedSubmit">
                                             <DataAnnotationsValidator />
-
                                             <!-- Game Name -->
                                             <div class="mb-3">
                                                 <label for="gameName" class="form-label">שם המשחק</label>
@@ -51,7 +47,6 @@
                                                 <small id="gameName" class="@GetInputClass(gameToAdd?.GameName?.Length ?? 0, 2, 30)">@((gameToAdd?.GameName?.Length ?? 0).ToString())/30</small>
                                                 <ValidationMessage For="@(() => gameToAdd.GameName)" style="color:Red;" />
                                             </div>
-
 
                                             <!-- Ending Message -->
                                             <div class="mb-3">
@@ -68,7 +63,6 @@
                                                 <ValidationMessage For="@(() => gameToAdd.EndingMessage)" style="color:Red;" />
                                             </div>
 
-
                                             <!-- Image upload input -->
                                             <div class="mb-3">
                                                 <label for="gameImage" class="form-label">תמונת המשחק</label>
@@ -77,99 +71,88 @@
 
                                             <!-- Submit / Cancel Buttons -->
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">חזרה</button>
-                                                <button type="submit" value="send" class="btn btn-primary" data-bs-target="#my-modal">שמירה</button> <!--data-bs-dismiss="modal"-->
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="ClearGameInputFields">חזרה</button>
+                                                <button type="submit" value="send" class="btn btn-primary">שמירה</button>
                                             </div>
                                         </EditForm>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                     <div class="row">
                         <!--Main Games Table-->
-                            <h5>טבלת המשחקים</h5>
-                            <div class="mt-3 col-md-12 table-responsive scrollable-table-body ">
-                                <table class="table shadow-sm border border-1">
-                                    <!--Table HEADER-->
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th scope="col">
-                                                קוד
-                                                <Tooltip Text="באמצעות הקוד מתחילים משחק"><i class="fa-solid fa-circle-info"></i></Tooltip>
-                                            </th>
-                                            <th scope="col">
-                                                שם המשחק
-                                                <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
-                                            </th>
-                                            <th scope="col" class="col-auto text-center">
-                                                עריכה
-                                                <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
-                                            </th>
-                                            <th scope="col" class="col-auto text-center">
-                                                פרסום
-                                                <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i> </Tooltip>
-                                            </th>
-                                            <th scope="col" class="col-auto text-center">
-                                                מחיקה
-                                                <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
-                                            </th>
-                                        </tr>
-                                    </thead>
+                        <h5>טבלת המשחקים</h5>
+                        <div class="mt-3 col-md-12 table-responsive scrollable-table-body">
+                            <table class="table shadow-sm border border-1">
+                                <!--Table HEADER-->
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col">קוד
+                                            <Tooltip Text="באמצעות הקוד מתחילים משחק"><i class="fa-solid fa-circle-info"></i></Tooltip>
+                                        </th>
+                                        <th scope="col">                                            שם המשחק
+                                            <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
+                                        </th>
+                                        <th scope="col" class="col-auto text-center">                                            עריכה
+                                            <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
+                                        </th>
+                                        <th scope="col" class="col-auto text-center">                                            פרסום
+                                            <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i> </Tooltip>
+                                        </th>
+                                        <th scope="col" class="col-auto text-center">                                            מחיקה
+                                            <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
+                                        </th>
+                                    </tr>
+                                </thead>
 
-                                    <!--Table TBODY-->
-                                    <tbody class="scrollbar-tbody custom-scrollable-tbody">
-                                        @if (GamesList != null && GamesList.Count > 0)
-                                        {
-                                            @foreach (var game in GamesList)
-                                            {
-                                                <tr>
-                                                    <td><b>@game.GameCode</b></td>
-                                                    <td>@game.GameName</td>
-                                                    <td class="col-auto text-center"><i class="fa-solid fa-file-pen icon link-success" @onclick="()=>EditGame(game)"></i></td>
-                                                    <td class="col-auto text-center">
-                                                        @if (game.CanPublish == false)
-                                                        {
-                                                            <div>
-                                                                <input class="form-check-input" type="checkbox" id="@game.ID" value="" aria-label="..." disabled>
-                                                                <label for="@game.ID" />
-                                                            </div>
-                                                        }
-                                                        else
-                                                        {
-                                                            <div>
-                                                                <input class="form-check-input" type="checkbox" id="@game.ID" checked="@game.IsPublished" @onchange="()=>changePublish(game)" />
-                                                                <label for="@game.ID"></label>
-                                                            </div>
-                                                        }
-                                                    </td>
-                                                    <td class="col-auto text-center">
-                                                        <i class="fa-solid fa-trash icon link-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" @onclick="() => PromptDelete(game)"></i>
-                                                    </td>
-                                                </tr>
-                                            }
-                                        }
-                                        else
+                                <!--Table TBODY-->
+                                <tbody class="scrollbar-tbody custom-scrollable-tbody">
+                                    @if (GamesList != null && GamesList.Count > 0)
+                                    {
+                                        @foreach (var game in GamesList)
                                         {
                                             <tr>
-                                                <td colspan="5" class="text-center" style="font-weight:bold;">
-                                                    בטבלה זו יופיעו כלל המשחקים, טרם הוזנו משחקים - לחצו על "משחק חדש"
+                                                <td><b>@game.GameCode</b></td>
+                                                <td>@game.GameName</td>
+                                                <td class="col-auto text-center"><i class="fa-solid fa-file-pen icon link-success" @onclick="()=>EditGame(game)"></i></td>
+                                                <td class="col-auto text-center">
+                                                    @if (game.CanPublish == false)
+                                                    {
+                                                        <div>
+                                                            <input class="form-check-input" type="checkbox" id="@game.ID" value="" aria-label="..." disabled>
+                                                            <label for="@game.ID" />
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <input class="form-check-input" type="checkbox" id="@game.ID" checked="@game.IsPublished" @onchange="()=>changePublish(game)" />
+                                                            <label for="@game.ID"></label>
+                                                        </div>
+                                                    }
+                                                </td>
+                                                <td class="col-auto text-center">
+                                                    <i class="fa-solid fa-trash icon link-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" @onclick="() => PromptDelete(game)"></i>
                                                 </td>
                                             </tr>
                                         }
-                                    </tbody>
-
-
-                                </table>
-                            </div>
-                      
-
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="5" class="text-center" style="font-weight:bold;">
+                                                בטבלה זו יופיעו כלל המשחקים, טרם הוזנו משחקים - לחצו על "משחק חדש"
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                         @if (msg != "")
                         {
                             <p>@msg</p>
                         }
-
                     </div>
                 </div>
             </div>
@@ -177,23 +160,20 @@
 
         <!--PUBLISH INSTRUCTIONS-->
         <div class="col-12 col-sm-3">
-
-
             <div class="img-text-container">
                 <img src="assets-images/Figure4-removebg-preview.png" class="img-fluid" alt="Responsive image">
                 <div class="text-center inner">
-                    <p><b>הוראות פרסום</b><br />
+                    <p>
+                        <b>הוראות פרסום</b><br />
                         <span>מינימום 2 דוכנים</span>
                         <br />
                         <span>מינימום 20 שאלות</span>
-
                     </p>
                 </div>
             </div>
         </div>
     </div>
-    
-    
+
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="@(!isDeleteModalOpen)">
         <div class="modal-dialog">
@@ -236,12 +216,9 @@
     string msg = "";
     private bool submitSuccess = false;
 
-
-
     long maxFileSize = 4194304; //4MB
     string myFileImage = "";
 
-    // On page load
     protected override async Task OnInitializedAsync()
     {
         var userRes = await Http.GetAsync("api/game/" + UserId);
@@ -257,19 +234,12 @@
         if (gameRes.IsSuccessStatusCode == true)
         {
             GamesList = gameRes.Content.ReadFromJsonAsync<List<Games>>().Result;
-            if (GamesList != null)
-            {
-                Console.WriteLine("GameList is Full");
-            }
-            else
-            {
-                Console.WriteLine("GamesList is NULL");
-            }
         }
         else
         {
             error = userRes.Content.ReadAsStringAsync().Result;
         }
+
         switch (error)
         {
             case "No Session":
@@ -284,39 +254,28 @@
         }
     }
 
-    //New game creation
     async Task CreateGame()
     {
-        // Sending the new game to the controller
         var userRes = await Http.PostAsJsonAsync("api/game/" + UserId + "/addGame/", gameToAdd);
         if (userRes.IsSuccessStatusCode)
         {
-
-            // Retrieving the game and adding it to the list of games to update the table
             Games newGame = await userRes.Content.ReadFromJsonAsync<Games>();
             user.Games.Add(newGame);
-
             await JSRuntime.InvokeVoidAsync("dismissModal", "staticBackdrop");
-
-            // Redirect to edit game page with the new game code created
             Nav.NavigateTo("./GameEdit/" + newGame.GameCode);
         }
         else
         {
             string error = await userRes.Content.ReadAsStringAsync();
             Console.WriteLine($"Error creating game: {error}");
-            // Optionally handle the error in UI
         }
     }
 
-    //edit game method to navigate to edit game page
     private void EditGame(Games game)
     {
-
         Nav.NavigateTo("./GameEdit/" + game.GameCode);
     }
 
-    //edit publish status method to change IsPublished value on the server db
     protected async Task changePublish(Games game)
     {
     }
@@ -338,9 +297,9 @@
         {
             await DeleteGame(gameToDelete);
             gameToDelete = null;
-            isDeleteModalOpen = false; // This should hide the modal
+            isDeleteModalOpen = false;
         }
-        StateHasChanged(); // Request Blazor to re-render the component
+        StateHasChanged();
     }
 
     private async Task DeleteGame(Games game)
@@ -350,8 +309,8 @@
         if (response.IsSuccessStatusCode)
         {
             GamesList.Remove(game);
-            isDeleteModalOpen = false; // Add this line to close the modal
-            StateHasChanged(); // Add this line to update the UI
+            isDeleteModalOpen = false;
+            StateHasChanged();
         }
         else
         {
@@ -362,14 +321,14 @@
     private string GetInputClass(int length, int minChars, int maxChars)
     {
         if (length == 0)
-            return "text-muted"; // Neutral for zero characters
+            return "text-muted";
         else if (length < minChars)
-            return "text-danger";  // Red for less than minimum characters
+            return "text-danger";
         else if (length >= minChars && length <= maxChars - 3)
-            return "text-success";   // Green for within the normal range
+            return "text-success";
         else if (length > maxChars - 3 && length <= maxChars)
-            return "text-warning";  // Orange for nearing maximum length
-        return "text-muted";  // Fallback, might not be necessary
+            return "text-warning";
+        return "text-muted";
     }
 
     private void HandleInputChange(ChangeEventArgs e, string inputType)
@@ -386,7 +345,6 @@
             default:
                 break;
         }
-
     }
 
     private void UpdateCharacterCount(ChangeEventArgs e)
@@ -398,6 +356,7 @@
     {
         Console.WriteLine("OOPS! There was a problem with creating a new game");
     }
+
 
     private async Task UploadFile(InputFileChangeEventArgs e)
     {
@@ -411,13 +370,48 @@
                 var imageBase64 = Convert.ToBase64String(buffer);
                 var saveResponse = await Http.PostAsJsonAsync("api/media/upload", imageBase64);
 
-                if (saveResponse.IsSuccessStatusCode == true)
+                if (saveResponse.IsSuccessStatusCode)
                 {
-                    string resizeUrl = saveResponse.Content.ReadAsStringAsync().Result;
+                    string resizeUrl = await saveResponse.Content.ReadAsStringAsync();
                     myFileImage = "uploadedFiles/" + resizeUrl;
+                    gameToAdd.GameImage = myFileImage;
                 }
             }
         }
-        gameToAdd.GameImage = myFileImage;
     }
+
+    private async Task ClearGameInputFields()
+    {
+        // Collect the images that should be deleted
+        var imagesToDelete = new List<string>();
+        if (!string.IsNullOrEmpty(myFileImage))
+        {
+            imagesToDelete.Add(myFileImage);
+        }
+
+        // Delete the images if any were uploaded
+        if (imagesToDelete.Count > 0)
+        {
+            await DeleteImages(imagesToDelete);
+        }
+
+        // Clear input fields
+        gameToAdd = new GameToAdd();
+        myFileImage = "";
+        StateHasChanged();
+    }
+
+    private async Task DeleteImages(List<string> imagesToDelete)
+    {
+        var response = await Http.PostAsJsonAsync("api/Media/deleteImages", imagesToDelete);
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Images deleted successfully");
+        }
+        else
+        {
+            Console.WriteLine("Image deletion failed");
+        }
+    }
+
 }

@@ -1,4 +1,12 @@
- function showToast(isSuccess, message, icon) {
+document.addEventListener("DOMContentLoaded", function (event)
+{
+
+  
+
+});
+
+
+function showToast(isSuccess, message, icon) {
      // Prepare the toast HTML with dynamic values
      const toastHtml = `
          <div class="toast shadow align-items-center text-bg-${isSuccess ? 'success' : 'danger'} border-0" style="--bs-bg-opacity: .97;" id="liveToast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -26,3 +34,4 @@ function dismissModal(modalId) {
     const modalInstance = bootstrap.Modal.getInstance(modal);
     modalInstance.hide();
 }
+

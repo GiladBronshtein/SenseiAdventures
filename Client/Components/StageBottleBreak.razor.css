@@ -1,6 +1,6 @@
 ﻿.scrollable-table-body {
     display: block;
-    max-height: 450px; /* Adjust based on the height needed to show 10 rows */
+    max-height: 380px; /* Adjust based on the height needed to show 10 rows */
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -94,3 +94,47 @@ input#question::placeholder {
 /*        background-color: deeppink;
 */        color: blue;
     }
+
+
+
+
+
+
+
+
+
+.scrollable-table-body {
+    max-height: 440px;
+/*    overflow-y: auto;
+*/    /*margin-bottom: 15px;*/
+}
+
+.table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+    .table th, .table td {
+        overflow: hidden;
+/*        white-space: nowrap;
+        text-overflow: ellipsis;*/
+    }
+
+.truncate-text {
+    width: 100%; /* Ensure text fits the width */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.table .col-md-6 {
+    width: 55%;
+}
+
+
+
+.btn-outline-primary, .btn-outline-danger {
+
+    padding: 2px 6px;
+    text-align: center;
+}
