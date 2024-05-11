@@ -11,6 +11,7 @@ namespace template.Shared.Models.Games
         public int ID { get; set; }
         public int GameID { get; set; }
         public int StageID { get; set; }
+        public bool isActive { get; set; }
         public bool HasImage { get; set; }
         public string QuestionImage { get; set; }
         public string QuestionDescription { get; set; }

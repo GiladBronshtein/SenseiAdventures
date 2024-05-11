@@ -382,6 +382,7 @@
 
 
 @code {
+    
     #region Variables
     [CascadingParameter] public int UserId { get; set; } // Inject UserId
 
@@ -444,11 +445,18 @@
 
     protected override async Task OnInitializedAsync()
     {
+
         questions = game.Questions;
-        //add all answers in questions to answerstoshow
-        foreach (var question in questions)
+        // Ensure that questions is not null and has items
+        if (questions != null && questions.Any())
         {
-            answersToShow.AddRange(question.Answers);
+            foreach (var question in questions)
+            {
+                if (question.Answers != null) // Check if the answers are null
+                {
+                    answersToShow.AddRange(question.Answers);
+                }
+            }
         }
     }
 
@@ -481,7 +489,7 @@
 
     private async Task HandleSubmit()
     {
-        if (!editAnswer)
+        if (!editAnswer) //add new question
         {
             // Perform field validation
             if (string.IsNullOrWhiteSpace(CorrectAnswer) || CorrectAnswer.Length < 2 || CorrectAnswer.Length > AnswersDescriptionMaxChars ||
@@ -494,6 +502,8 @@
             }
 
             var newQuestion = await AddQuestion();
+            Console.WriteLine($"After adding 2, count: {questions.Count}");
+
             if (newQuestion != null)
             {
                 await AddAnswers(newQuestion.ID);
@@ -513,9 +523,8 @@
             }
         }
 
-        else
+        else // edit existing question
         {
-
             //Validations
             if (string.IsNullOrWhiteSpace(CorrectAnswer) || CorrectAnswer.Length < 2 || CorrectAnswer.Length > AnswersDescriptionMaxChars ||
                string.IsNullOrWhiteSpace(WrongAnswer1) || WrongAnswer1.Length < 2 || WrongAnswer1.Length > AnswersDescriptionMaxChars ||
@@ -525,7 +534,6 @@
                 ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
                 return;
             }
-
 
             //QUESTION and its image
             if (myFileImage != "")
@@ -541,12 +549,6 @@
                 StageID = 1
 
             };
-
-            Console.WriteLine("Answer Image: " + CorrectImage);
-            Console.WriteLine("Answer Image: " + Wrong1Image);
-            Console.WriteLine("Answer Image: " + Wrong2Image);
-            Console.WriteLine("Answer Image: " + Wrong3Image);
-
             var response = await Http.PutAsJsonAsync($"api/game/{UserId}/updateQuestion/{questionID}", editedQuestion);
             if (response.IsSuccessStatusCode)
             {
@@ -560,23 +562,16 @@
                     {
                         new GameAnswers { ID = currentAnswers.ElementAtOrDefault(0)?.ID ?? 0, AnswerDescription = CorrectAnswer, IsCorrect = true, QuestionID = questionID,
                                                 HasImage = !string.IsNullOrEmpty(CorrectImage),
-                                                AnswerImage = CorrectImage
-                                        },
-
+                                                AnswerImage = CorrectImage},
                         new GameAnswers { ID = currentAnswers.ElementAtOrDefault(1)?.ID ?? 0, AnswerDescription = WrongAnswer1, IsCorrect = false, QuestionID = questionID,
                                             HasImage = !string.IsNullOrEmpty(Wrong1Image),
-                                            AnswerImage = Wrong1Image },
-
-
+                                            AnswerImage = Wrong1Image},
                         new GameAnswers { ID = currentAnswers.ElementAtOrDefault(2)?.ID ?? 0, AnswerDescription = WrongAnswer2, IsCorrect = false, QuestionID = questionID,
                                             HasImage = !string.IsNullOrEmpty(Wrong2Image),
-                                                AnswerImage = Wrong2Image  },
-
-
+                                                AnswerImage = Wrong2Image},
                         new GameAnswers { ID = currentAnswers.ElementAtOrDefault(3)?.ID ?? 0, AnswerDescription = WrongAnswer3, IsCorrect = false, QuestionID = questionID,
                                             HasImage = !string.IsNullOrEmpty(Wrong3Image),
-                                                AnswerImage =  Wrong3Image }
-
+                                                AnswerImage =  Wrong3Image}
                     };
 
                     // Update question after successful API response
@@ -602,7 +597,6 @@
                                 localAnswer.HasImage = answer.HasImage;
                                 localAnswer.AnswerImage = answer.AnswerImage;
                             }
-
                         }
                         else
                         {
@@ -621,8 +615,8 @@
                 Console.WriteLine("Failed to edit question: " + await response.Content.ReadAsStringAsync());
                 await ShowToast(false, "פעולת העריכה נכשלה", "fa-solid fa-circle-exclamation");
             }
-            //gameData = await Http.GetFromJsonAsync<GameDetails>($"api/Game/{UserId}/getGame/{gameCode}");
         }
+        
         await DeleteImage();
     }
 
@@ -638,6 +632,8 @@
 
     private async Task<GameQuestions> AddQuestion()
     {
+        Console.WriteLine($"Before adding, count: {questions.Count}");
+
         bool hasImage = !string.IsNullOrEmpty(myFileImage);
         QuestionToAdd questionToAdd = new QuestionToAdd()
             {
@@ -654,8 +650,6 @@
         {
             var result = await response.Content.ReadAsStringAsync();
             int questionId = int.Parse(result);
-            Console.WriteLine("Successful Question Creation - ID: " + result);
-
             GameQuestions newQuestion = new GameQuestions
                 {
                     ID = questionId,
@@ -670,15 +664,14 @@
 
             // Invoke the event callback
             await OnQuestionAdded.InvokeAsync(newQuestion);
+            StateHasChanged(); // This might be redundant if handled in parent
 
             return newQuestion;
         }
         else
         {
-            Console.WriteLine("Error: " + response.StatusCode);
             return null;
         }
-
 
     }
 
@@ -826,7 +819,7 @@
         return resultClass;
     }
 
-    private async Task UploadFile(InputFileChangeEventArgs e,string inputId)
+    private async Task UploadFile(InputFileChangeEventArgs e, string inputId)
     {
         var imageFiles = e.GetMultipleFiles();
         foreach (var file in imageFiles)
@@ -838,29 +831,41 @@
                 var imageBase64 = Convert.ToBase64String(buffer);
                 var saveResponse = await Http.PostAsJsonAsync("api/media/upload", imageBase64);
 
-                if (saveResponse.IsSuccessStatusCode == true)
+                if (saveResponse.IsSuccessStatusCode)
                 {
-                    string resizeUrl = saveResponse.Content.ReadAsStringAsync().Result;
+                    string resizeUrl = await saveResponse.Content.ReadAsStringAsync();
+                    string imageUrl = "uploadedFiles/" + resizeUrl; // Assuming the server returns just the file name
                     switch (inputId)
                     {
                         case "FileInputID":
-                            myFileImage = "uploadedFiles/" + resizeUrl;
+                            myFileImage = imageUrl;
+                            UpdateQuestionImageInList(questionID, imageUrl);
                             break;
                         case "CorrectFileInputID":
-                            CorrectImage = "uploadedFiles/" + resizeUrl;
+                            CorrectImage = imageUrl;
                             break;
                         case "Wrong1FileInputID":
-                            Wrong1Image = "uploadedFiles/" + resizeUrl;
+                            Wrong1Image = imageUrl;
                             break;
                         case "Wrong2FileInputID":
-                            Wrong2Image = "uploadedFiles/" + resizeUrl;
+                            Wrong2Image = imageUrl;
                             break;
                         case "Wrong3FileInputID":
-                            Wrong3Image = "uploadedFiles/" + resizeUrl;
+                            Wrong3Image = imageUrl;
                             break;
                     }
+                    StateHasChanged(); // This ensures the UI updates with the new image
                 }
             }
+        }
+    }
+
+    private void UpdateQuestionImageInList(int questionId, string newImageUrl)
+    {
+        var question = questions.FirstOrDefault(q => q.ID == questionId);
+        if (question != null)
+        {
+            question.QuestionImage = newImageUrl;
         }
     }
 
@@ -930,15 +935,17 @@
 
     private async Task DeleteImage()
     {
-        var saveResponse = await Http.PostAsJsonAsync("api/Media/deleteImages", DeleteImages);
-        if (saveResponse.IsSuccessStatusCode == true)
+        //if deleteimages list count > 0 then delete the images
+        if (DeleteImages.Count == 0)
         {
-            msg = "deleted Successfully";
-            DeleteImages.Clear();
-        }
-        else
-        {
-            msg = "DELETE ERROR";
+            var saveResponse = await Http.PostAsJsonAsync("api/Media/deleteImages", DeleteImages);
+            if (saveResponse.IsSuccessStatusCode == true)
+            {
+                DeleteImages.Clear();
+            }
+            else
+            {
+            }
         }
     }
 } 

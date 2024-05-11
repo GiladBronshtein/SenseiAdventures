@@ -16,7 +16,7 @@ namespace template.Shared.Models.Games
         [Required(ErrorMessage = "זהו שדה חובה")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "יש להזין שאלת משחק בין 2 ל-50 תווים")]
         public string QuestionDescription { get; set; }
-        
+        public bool isActive { get; set; }
         public string QuestionImage { get; set; }
         public int StageID { get; set; }
 

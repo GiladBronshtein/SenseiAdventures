@@ -88,7 +88,6 @@ namespace template.Server.Controllers
             return gameRecord.FirstOrDefault();
         }
 
-
         private async Task<bool> UpdateAnswer(GameAnswers answer)
         {
             string answerImage = string.IsNullOrEmpty(answer.AnswerImage) ? "empty" : answer.AnswerImage;
@@ -113,31 +112,6 @@ namespace template.Server.Controllers
 
             var updateCount = await _db.SaveDataAsync(updateAnswerQuery, answerParam);
             return updateCount > 0;
-        }
-
-
-        private async Task AddAnswers(int gameId, GameToUpdate gameToUpdate)
-        {
-            ////check if there are new answers
-            //foreach (GameAnswers item in gameToUpdate.Answers)
-            //{
-            //    if (item.ID == 0)
-            //    {
-            //        //add new answers
-            //        object param1 = new
-            //        {
-            //            GameID = gameId,
-            //            AnswerDescription = item.AnswerDescription,
-            //            IsCorrect = item.IsCorrect,
-            //            HasImage = item.HasImage,
-            //            AnswerImageText = item.AnswerImage
-            //        };
-            //        string insertAnswerQuery = "INSERT INTO Items (GameID, AnswerDescription, IsCorrect, HasImage, AnswerImageText) " +
-            //                                        "VALUES (@GameID, @AnswerDescription, @IsCorrect, @HasImage, @AnswerImageText)";
-            //        int addAnswer = await _db.SaveDataAsync(insertAnswerQuery, param1);
-            //    }
-            //}
-
         }
 
         private async Task DeleteAnswers(int gameId, GameToUpdate gameToUpdate)
@@ -324,12 +298,12 @@ namespace template.Server.Controllers
                 HasImage = questionToAdd.HasImage,
                 QuestionDescription = questionToAdd.QuestionDescription,
                 QuestionImage = questionToAdd.QuestionImage,
-                StageID = questionToAdd.StageID
+                StageID = questionToAdd.StageID,
+                isActive = questionToAdd.isActive
             };
             string insertQuestionQuery = @"
-        INSERT INTO Questions (GameID, HasImage, QuestionDescription, QuestionImage, StageID) 
-        VALUES (@GameID, @HasImage, @QuestionDescription, @QuestionImage, @StageID);
-        ";
+                                    INSERT INTO Questions (GameID, HasImage, QuestionDescription, QuestionImage, StageID, isActive) 
+                                    VALUES (@GameID, @HasImage, @QuestionDescription, @QuestionImage, @StageID, @isActive);";
             int questionId = await _db.InsertReturnIdAsync(insertQuestionQuery, questionParam);
             if (questionId > 0)
             {
@@ -490,6 +464,41 @@ namespace template.Server.Controllers
                     string getActiveStagesQuery = "SELECT DISTINCT StageID FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
                     var activeStages = await _db.GetRecordsAsync<int>(getActiveStagesQuery, param3);
                     return Ok(activeStages.FirstOrDefault());
+                }
+                return BadRequest("Game Not Found");
+            }
+            return BadRequest("User Not Found");
+        }
+
+        //getActiveQuestions
+        [HttpGet("getActiveQuestions/{gameCode}")]
+        public async Task<IActionResult> GetActiveQuestions(int userId, int gameCode)
+        {
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    GameCode = gameCode
+                };
+                string gameQuery = "SELECT GameName FROM Games WHERE GameCode = @GameCode";
+                var gameRecords = await _db.GetRecordsAsync<UserWithGames>(gameQuery, param2);
+                UserWithGames game = gameRecords.FirstOrDefault();
+                if (game != null)
+                {
+                    object param3 = new
+                    {
+                        GameCode = gameCode
+                    };
+                    string getActiveQuestionsQuery = "SELECT Distinct ID FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
+                    var activeQuestions = await _db.GetRecordsAsync<GameQuestions>(getActiveQuestionsQuery, param3);
+                    return Ok(activeQuestions.ToList().Count);
                 }
                 return BadRequest("Game Not Found");
             }
@@ -711,83 +720,6 @@ namespace template.Server.Controllers
 
 
 
-
-
-
-
-
-        [HttpPut("updateGame/{updateGameCode}")]
-        public async Task<IActionResult> UpdateGame(int userId, int updateGameCode, GameToUpdate gameToUpdate)
-        {
-            int? sessionId = HttpContext.Session.GetInt32("userId");
-            if (sessionId != null)
-            {
-                if (userId == sessionId)
-                {
-                    object param = new
-                    {
-                        UserId = userId
-                    };
-                    string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
-                    var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
-                    UserWithGames user = userRecords.FirstOrDefault();
-                    if (user != null)
-                    {
-                        object param2 = new
-                        {
-                            GameCode = updateGameCode
-                        };
-                        string gameQuery = "SELECT GameName FROM Games WHERE GameCode = @GameCode";
-                        var gameRecords = await _db.GetRecordsAsync<UserWithGames>(gameQuery, param2);
-                        UserWithGames game = gameRecords.FirstOrDefault();
-                        if (game != null)
-                        {
-                            object param3 = new
-                            {
-                                //GameCode = updateGameCode,
-                                //GameName = gameToUpdate.GameName,
-                                //GameQuestion = gameToUpdate.QuestionDescription,
-                                //GameCorrectCategory = gameToUpdate.QuestionCorrectCategory,
-                                //GameWrongCategory = gameToUpdate.QuestionWrongCategory,
-                                //TheGameEndMessage = gameToUpdate.GameEndMessage,
-                                //QuestionHasImage = gameToUpdate.QuestionHasImage,
-                                //QuestionImageText = gameToUpdate.QuestionImageText
-                                //ADD MORE PARAMS TO UPDATE
-                            };
-                            string updateGameQuery =
-                                "UPDATE Games SET GameName = @GameName, " +
-                                "QuestionDescription = @GameQuestion, " +
-                                "QuestionCorrectCategory = @GameCorrectCategory, " +
-                                "QuestionWrongCategory = @GameWrongCategory, " +
-                                "GameEndMessage = @TheGameEndMessage, " +
-                                "QuestionHasImage = @QuestionHasImage," +
-                                "QuestionImageText = @QuestionImageText " +
-                                "WHERE GameCode = @GameCode";
-                            //CHANGE QUERY ACCORDINGLY TO ADD MORE PARAMS TO UPDATE
-                            int isGameUpdate = await _db.SaveDataAsync(updateGameQuery, param3);
-
-                            //UpdateAnswers(updateGameCode, gameToUpdate);
-
-                            AddAnswers(gameToUpdate.ID, gameToUpdate);
-
-                            DeleteAnswers(gameToUpdate.ID, gameToUpdate);
-
-
-                            if (isGameUpdate > 0)
-                            {
-                                return Ok("Game updated");
-                            }
-
-                            return BadRequest("Game not updated");
-                        }
-                        return BadRequest("Game Not Found");
-                    }
-                    return BadRequest("User Not Found");
-                }
-                return BadRequest("User Not Logged In");
-            }
-            return BadRequest("No Session");
-        }
        
         [HttpPost("publishGame")]
         public async Task<IActionResult> publishGame(int userId, PublishGame game)
