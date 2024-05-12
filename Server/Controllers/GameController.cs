@@ -19,8 +19,6 @@ namespace template.Server.Controllers
             _db = db;
         }
 
-        #region Helpers
-
         private async Task<UserWithGames> GetUserWithFirstName(int userId)
         {
             string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
@@ -150,7 +148,6 @@ namespace template.Server.Controllers
         }
 
 
-        #endregion
 
 
         [HttpGet]
@@ -301,8 +298,7 @@ namespace template.Server.Controllers
                 StageID = questionToAdd.StageID,
                 isActive = questionToAdd.isActive
             };
-            string insertQuestionQuery = @"
-                                    INSERT INTO Questions (GameID, HasImage, QuestionDescription, QuestionImage, StageID, isActive) 
+            string insertQuestionQuery = @"INSERT INTO Questions (GameID, HasImage, QuestionDescription, QuestionImage, StageID, isActive) 
                                     VALUES (@GameID, @HasImage, @QuestionDescription, @QuestionImage, @StageID, @isActive);";
             int questionId = await _db.InsertReturnIdAsync(insertQuestionQuery, questionParam);
             if (questionId > 0)
@@ -470,7 +466,6 @@ namespace template.Server.Controllers
             return BadRequest("User Not Found");
         }
 
-        //getActiveQuestions
         [HttpGet("getActiveQuestions/{gameCode}")]
         public async Task<IActionResult> GetActiveQuestions(int userId, int gameCode)
         {
@@ -535,7 +530,6 @@ namespace template.Server.Controllers
             return BadRequest("User Not Found");
         }
 
-        //get question details by question id
         [HttpGet("getQuestion/{questionId}")]
         public async Task<IActionResult> GetQuestion(int userId, int questionId)
         {
@@ -570,7 +564,6 @@ namespace template.Server.Controllers
             return BadRequest("User Not Found");
         }
 
-        //get answer details by question id 
         [HttpGet("getAnswers/{questionId}")]
         public async Task<IActionResult> GetAnswers(int userId, int questionId)
         {
@@ -605,7 +598,6 @@ namespace template.Server.Controllers
             return BadRequest("User Not Found");
         }
 
-        //update question details by question id
         [HttpPut("updateQuestion/{questionId}")]
         public async Task<IActionResult> UpdateQuestion(int userId, int questionId, QuestionToAdd questionToUpdate)
         {
@@ -653,7 +645,6 @@ namespace template.Server.Controllers
             return BadRequest("User Not Found");
         }
 
-        //update answers by answer id
         [HttpPut("updateAnswers/{answerId}")]
         public async Task<IActionResult> UpdateAnswers(int userId, int answerId, GameAnswers answerToUpdate)
         {

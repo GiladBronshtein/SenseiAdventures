@@ -66,7 +66,9 @@
                                             <!-- Image upload input -->
                                             <div class="mb-3">
                                                 <label for="gameImage" class="form-label">תמונת המשחק</label>
-                                                <InputFile id="gameImage" class="form-control" OnChange="UploadFile" accept="image/*" />
+                                                <InputFile id="gameImage" class="form-control"
+                                                           @oninput="@(e => { HandleInputChange(e, nameof(gameToAdd.GameImage)); gameToAdd.GameImage = e.Value.ToString(); StateHasChanged(); })"
+                                                OnChange="UploadFile" accept="image/*" />
                                             </div>
 
                                             <!-- Submit / Cancel Buttons -->
@@ -223,14 +225,11 @@
     {
         var userRes = await Http.GetAsync("api/game/" + UserId);
         string error = userRes.Content.ReadAsStringAsync().Result;
-
         if (userRes.IsSuccessStatusCode == true)
         {
             user = userRes.Content.ReadFromJsonAsync<UserWithGames>().Result;
         }
-
         var gameRes = await Http.GetAsync("api/game/" + UserId + "/all");
-
         if (gameRes.IsSuccessStatusCode == true)
         {
             GamesList = gameRes.Content.ReadFromJsonAsync<List<Games>>().Result;
@@ -238,19 +237,6 @@
         else
         {
             error = userRes.Content.ReadAsStringAsync().Result;
-        }
-
-        switch (error)
-        {
-            case "No Session":
-                msg = "Session error, please reload page";
-                break;
-            case "User Not Logged In":
-                msg = "You are not logged in, please reload page to try again";
-                break;
-            case "User Not Found":
-                msg = "the user details not found, please reload page to try again";
-                break;
         }
     }
 
@@ -342,6 +328,9 @@
             case "endingMessage":
                 gameToAdd.EndingMessage = newValue;
                 break;
+            case "gameImage":
+                gameToAdd.GameImage = newValue;
+                break;  
             default:
                 break;
         }
@@ -356,7 +345,6 @@
     {
         Console.WriteLine("OOPS! There was a problem with creating a new game");
     }
-
 
     private async Task UploadFile(InputFileChangeEventArgs e)
     {

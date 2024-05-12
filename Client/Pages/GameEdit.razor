@@ -106,19 +106,13 @@
 </div>
 
 @code {
-    [CascadingParameter]
-    public int UserId { get; set; }
-
-    [Parameter]
-    public string gameCode { get; set; }
-
+    [CascadingParameter] public int UserId { get; set; }
+    [Parameter] public string gameCode { get; set; }
     GameDetails gameData;
-
     UserWithGames user;
 
     private int activeStages;
     private int activeQuestions; 
-
     private StageEnum.Stage currentStage = StageEnum.Stage.None;
 
     protected override async Task OnInitializedAsync()
@@ -132,7 +126,6 @@
     {
         activeStages = await Http.GetFromJsonAsync<int>($"api/Game/{UserId}/getActiveStages/{gameCode}");
         activeQuestions = await Http.GetFromJsonAsync<int>($"api/Game/{UserId}/getActiveQuestions/{gameCode}");
-        StateHasChanged(); // Force update the UI
     }
 
     private void SetStage(StageEnum.Stage stage)
@@ -142,20 +135,13 @@
 
     private async Task HandleQuestionAdded(GameQuestions question)
     {
-        if (gameData.Questions == null)
-        {
-            gameData.Questions = new List<GameQuestions>();
-        }
         await UpdateActiveStagesAndQuestions();
         StateHasChanged(); // Force a re-render of the component
     }
 
     private async Task HandleQuestionDeleted(GameQuestions question)
     {
-        gameData.Questions.Remove(question);
-        gameData.Questions = new List<GameQuestions>(gameData.Questions); // Re-assign to force UI update
         await UpdateActiveStagesAndQuestions();
-
         StateHasChanged(); // Optionally force re-render
     }
 
