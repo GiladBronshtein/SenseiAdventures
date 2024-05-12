@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using template.Server.Data;
-using template.Shared.Models.Games; 
+using template.Shared.Models.Games;
 using template.Shared.Models.Users;
 
 namespace template.Server.Controllers
@@ -207,7 +207,7 @@ namespace template.Server.Controllers
             var newGame = await GetGameById(newGameId);
             return Ok(newGame);
         }
-        
+
         [HttpGet("getGame/{gameCode}")]
         public async Task<IActionResult> GetGame(int userId, int gameCode)
         {
@@ -319,29 +319,15 @@ namespace template.Server.Controllers
             {
                 return BadRequest("User Not Found");
             }
-            string answerImage = "empty";
 
             foreach (GameAnswers answer in answers)
             {
-                bool hasImage = false;
-                if (answer.AnswerImage != "")
-                {
-                    hasImage = true;
-                    answerImage = answer.AnswerImage;
-                }
-                else
-                {
-                    answerImage = "empty";
-                    hasImage = false;
-                }
-
-
                 object answerParam = new
                 {
                     AnswerDescription = answer.AnswerDescription,
                     IsCorrect = answer.IsCorrect,
-                    HasImage = hasImage,
-                    AnswerImage = answerImage,
+                    HasImage = answer.HasImage,
+                    AnswerImage = answer.AnswerImage,
                     QuestionID = questionId
                 };
                 string insertAnswerQuery = "INSERT INTO Answers (AnswerDescription, IsCorrect, HasImage, AnswerImage, QuestionID) " +
@@ -356,42 +342,42 @@ namespace template.Server.Controllers
         public async Task<IActionResult> DeleteGame(int userId, int deleteGameCode)
         {
             Console.WriteLine("deleteGameCode");
-           
-                    object param = new
+
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    GameCodeId = deleteGameCode
+                };
+                string gameQuery = "SELECT GameName FROM Games WHERE GameCode = @GameCodeId";
+                var gameRecords = await _db.GetRecordsAsync<UserWithGames>(gameQuery, param2);
+                UserWithGames game = gameRecords.FirstOrDefault();
+                if (game != null)
+                {
+                    object param3 = new
                     {
-                        UserId = userId
+                        GameCodeId = deleteGameCode
                     };
-                    string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
-                    var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
-                    UserWithGames user = userRecords.FirstOrDefault();
-                    if (user != null)
+                    string deleteGameQuery = "DELETE FROM Games WHERE GameCode = @GameCodeId";
+                    int isDelete = await _db.SaveDataAsync(deleteGameQuery, param3);
+                    if (isDelete > 0)
                     {
-                        object param2 = new
-                        {
-                            GameCodeId = deleteGameCode
-                        };
-                        string gameQuery = "SELECT GameName FROM Games WHERE GameCode = @GameCodeId";
-                        var gameRecords = await _db.GetRecordsAsync<UserWithGames>(gameQuery, param2);
-                        UserWithGames game = gameRecords.FirstOrDefault();
-                        if (game != null)
-                        {
-                            object param3 = new
-                            {
-                                GameCodeId = deleteGameCode
-                            };
-                            string deleteGameQuery = "DELETE FROM Games WHERE GameCode = @GameCodeId";
-                            int isDelete = await _db.SaveDataAsync(deleteGameQuery, param3);
-                            if (isDelete > 0)
-                            {
-                                return Ok("Game deleted");
-                            }
-
-
-                            return BadRequest("Game not deleted");
-                        }
-                        return BadRequest("Game Not Found");
+                        return Ok("Game deleted");
                     }
-                    return BadRequest("User Not Found");
+
+
+                    return BadRequest("Game not deleted");
+                }
+                return BadRequest("Game Not Found");
+            }
+            return BadRequest("User Not Found");
         }
 
         [HttpDelete("deleteQuestion/{questionId}")]
@@ -645,58 +631,106 @@ namespace template.Server.Controllers
             return BadRequest("User Not Found");
         }
 
+        //[HttpPut("updateAnswers/{answerId}")]
+        //public async Task<IActionResult> UpdateAnswers(int userId, int answerId, GameAnswers answerToUpdate)
+        //{
+        //    //if (answerToUpdate.AnswerImage != "") or "empty" or null assign answerimage to be "empty"
+        //    //string answerImage = string.IsNullOrEmpty(answerToUpdate.AnswerImage) ? "empty" : answerToUpdate.AnswerImage;
+
+        //    object param = new
+        //    {
+        //        UserId = userId
+        //    };
+        //    string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+        //    var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+        //    UserWithGames user = userRecords.FirstOrDefault();
+        //    if (user != null)
+        //    {
+        //        object param2 = new
+        //        {
+        //            AnswerId = answerId
+        //        };
+        //        string answerQuery = "SELECT AnswerDescription FROM Answers WHERE ID = @AnswerId";
+        //        var answerRecords = await _db.GetRecordsAsync<UserWithGames>(answerQuery, param2);
+        //        UserWithGames answer = answerRecords.FirstOrDefault();
+        //        if (answer != null)
+        //        {
+        //            object param3 = new
+        //            {
+        //                AnswerId = answerId,
+        //                AnswerDescription = answerToUpdate.AnswerDescription,
+        //                IsCorrect = answerToUpdate.IsCorrect,
+        //                HasImage = answerToUpdate.HasImage,
+        //                AnswerImage = answerToUpdate.AnswerImage
+        //            };
+        //            string updateAnswerQuery = "UPDATE Answers SET " +
+        //                "AnswerDescription = @AnswerDescription, " +
+        //                "IsCorrect = @IsCorrect, " +
+        //                "HasImage = @HasImage, " +
+        //                "AnswerImage = @AnswerImage " +
+        //                "WHERE ID = @AnswerId";
+        //            int isAnswerUpdate = await _db.SaveDataAsync(updateAnswerQuery, param3);
+        //            if (isAnswerUpdate > 0)
+        //            {
+        //                return Ok("Answer updated");
+        //            }
+        //            return BadRequest("Answer not updated");
+        //        }
+        //        return BadRequest("Answer Not Found");
+        //    }
+        //    return BadRequest("User Not Found");
+        //}
+
+
+
         [HttpPut("updateAnswers/{answerId}")]
         public async Task<IActionResult> UpdateAnswers(int userId, int answerId, GameAnswers answerToUpdate)
         {
-            //if (answerToUpdate.AnswerImage != "") or "empty" or null assign answerimage to be "empty"
-            //string answerImage = string.IsNullOrEmpty(answerToUpdate.AnswerImage) ? "empty" : answerToUpdate.AnswerImage;
+            // Verify User
+            object userParam = new { UserId = userId };
+            string userQuery = "SELECT ID FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, userParam);
+            if (userRecords.FirstOrDefault() == null)
+            {
+                return BadRequest("User Not Found");
+            }
 
-            object param = new
+            // Retrieve the existing answer to check existence
+            string existingAnswerQuery = "SELECT * FROM Answers WHERE ID = @AnswerId";
+            var existingAnswer = await _db.GetRecordsAsync<GameAnswers>(existingAnswerQuery, new { AnswerId = answerId });
+            if (existingAnswer.FirstOrDefault() == null)
             {
-                UserId = userId
-            };
-            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
-            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
-            UserWithGames user = userRecords.FirstOrDefault();
-            if (user != null)
-            {
-                object param2 = new
-                {
-                    AnswerId = answerId
-                };
-                string answerQuery = "SELECT AnswerDescription FROM Answers WHERE ID = @AnswerId";
-                var answerRecords = await _db.GetRecordsAsync<UserWithGames>(answerQuery, param2);
-                UserWithGames answer = answerRecords.FirstOrDefault();
-                if (answer != null)
-                {
-                    object param3 = new
-                    {
-                        AnswerId = answerId,
-                        AnswerDescription = answerToUpdate.AnswerDescription,
-                        IsCorrect = answerToUpdate.IsCorrect,
-                        HasImage = answerToUpdate.HasImage,
-                        AnswerImage = answerToUpdate.AnswerImage
-                    };
-                    string updateAnswerQuery = "UPDATE Answers SET " +
-                        "AnswerDescription = @AnswerDescription, " +
-                        "IsCorrect = @IsCorrect, " +
-                        "HasImage = @HasImage, " +
-                        "AnswerImage = @AnswerImage " +
-                        "WHERE ID = @AnswerId";
-                    int isAnswerUpdate = await _db.SaveDataAsync(updateAnswerQuery, param3);
-                    if (isAnswerUpdate > 0)
-                    {
-                        return Ok("Answer updated");
-                    }
-                    return BadRequest("Answer not updated");
-                }
                 return BadRequest("Answer Not Found");
             }
-            return BadRequest("User Not Found");
+
+            // Update answer details
+            object param = new
+            {
+                AnswerDescription = answerToUpdate.AnswerDescription,
+                IsCorrect = answerToUpdate.IsCorrect,
+                HasImage = answerToUpdate.HasImage,  // Make sure this is correctly handled
+                AnswerImage = answerToUpdate.AnswerImage,
+                AnswerId = answerId
+            };
+
+            string updateAnswerQuery = @"
+        UPDATE Answers SET 
+        AnswerDescription = @AnswerDescription, 
+        IsCorrect = @IsCorrect, 
+        HasImage = @HasImage, 
+        AnswerImage = @AnswerImage 
+        WHERE ID = @AnswerId";
+
+            int updateCount = await _db.SaveDataAsync(updateAnswerQuery, param);
+            if (updateCount > 0)
+            {
+                return Ok("Answer updated successfully");
+            }
+            else
+            {
+                return BadRequest("Failed to update answer");
+            }
         }
-
-
-
 
 
 
@@ -711,7 +745,7 @@ namespace template.Server.Controllers
 
 
 
-       
+
         [HttpPost("publishGame")]
         public async Task<IActionResult> publishGame(int userId, PublishGame game)
         {
