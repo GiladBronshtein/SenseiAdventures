@@ -20,7 +20,7 @@
                             </span>
                         </button>
 
-                        <!-- Modal -->
+                        <!-- Create NEW GAME Modal -->
                         <div class="modal fade @(isModalOpen ? "show" : "")" style="display: @(isModalOpen ? "block" : "none");" id="staticBackdrop"
                              data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                             <div class="modal-dialog">
@@ -66,9 +66,22 @@
                                             <!-- Image upload input -->
                                             <div class="mb-3">
                                                 <label for="gameImage" class="form-label">תמונת המשחק</label>
-                                                <InputFile id="gameImage" class="form-control"
-                                                           @oninput="@(e => { HandleInputChange(e, nameof(gameToAdd.GameImage)); gameToAdd.GameImage = e.Value.ToString(); StateHasChanged(); })"
-                                                OnChange="UploadFile" accept="image/*" />
+                                                @if (myFileImage != "")
+                                                {
+                                                    <div class="img-wrapper">
+                                                        <img src="@myFileImage" class="QuestionImage" width="30" />
+                                                        <i class="fa-solid fa-trash delete-image-btn" @onclick='() => MakeDeleteList(myFileImage)'></i>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="col-2 ps-1">
+                                                        <label class="btn btn-outline-dark btn-sm" for="FileInputID">
+                                                            <i class="fa-solid fa-image "></i>
+                                                        </label>
+                                                        <InputFile id="FileInputID" OnChange="@(e => UploadFile(e, "FileInputID"))" hidden />
+                                                    </div>
+                                                }
                                             </div>
 
                                             <!-- Submit / Cancel Buttons -->
@@ -208,6 +221,7 @@
 
     UserWithGames user;
     GameToAdd gameToAdd = new GameToAdd();
+    List<string> imagesToDelete = new List<string>();
 
     bool isModalOpen = false;
     bool isDeleteModalOpen = false;
@@ -245,6 +259,7 @@
         var userRes = await Http.PostAsJsonAsync("api/game/" + UserId + "/addGame/", gameToAdd);
         if (userRes.IsSuccessStatusCode)
         {
+            await DeleteImages();
             Games newGame = await userRes.Content.ReadFromJsonAsync<Games>();
             user.Games.Add(newGame);
             await JSRuntime.InvokeVoidAsync("dismissModal", "staticBackdrop");
@@ -346,7 +361,7 @@
         Console.WriteLine("OOPS! There was a problem with creating a new game");
     }
 
-    private async Task UploadFile(InputFileChangeEventArgs e)
+    private async Task UploadFile(InputFileChangeEventArgs e, string inputId)
     {
         var imageFiles = e.GetMultipleFiles();
         foreach (var file in imageFiles)
@@ -364,9 +379,43 @@
                     myFileImage = "uploadedFiles/" + resizeUrl;
                     gameToAdd.GameImage = myFileImage;
                 }
+                else
+                {
+                    // Handle the error properly here
+                    Console.WriteLine("Failed to upload image");
+                }
             }
         }
     }
+
+
+    private void MakeDeleteList(string imageToDelete)
+    {
+        if (!string.IsNullOrEmpty(imageToDelete))
+        {
+            imagesToDelete.Add(imageToDelete);
+            myFileImage = ""; // Assuming you want to clear the current image variable
+            StateHasChanged(); // Update the UI to reflect changes
+        }
+    }
+
+    private async Task DeleteImages()
+    {
+        Console.WriteLine("Yo1");
+        Console.WriteLine("Images to delete:" + imagesToDelete.Count.ToString());
+        if (imagesToDelete.Count > 0)
+        {
+            var saveResponse = await Http.PostAsJsonAsync("api/Media/deleteImages", imagesToDelete);
+            if (saveResponse.IsSuccessStatusCode == true)
+            {
+                imagesToDelete.Clear();
+            }
+            else
+            {
+            }
+        }
+    }
+
 
     private async Task ClearGameInputFields()
     {

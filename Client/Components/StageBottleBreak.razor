@@ -107,11 +107,34 @@
                         <small id="correctAnswer" class="@GetInputClass(CorrectAnswer.Length, 2, @AnswersDescriptionMaxChars)
                             col-2 p-0 d-flex justify-content-start">@CorrectAnswer.Length/@AnswersDescriptionMaxChars</small>
                     </div>
-                    <div class="col-1">
+
+
+                   @*  <div class="col-1">
                         <span>
                             או
                         </span>
+                    </div> *@
+                    
+
+
+
+
+
+                    <div class="col-1 position-relative" style="padding-top: .5rem; height: 38px;">
+                        <!-- Custom Icon Toggle -->
+                        <div class="form-check form-switch">
+                            <input class="form-check-input custom-icon-toggle" type="checkbox" id="iconToggle" disabled
+                                   checked="@(!string.IsNullOrWhiteSpace(CorrectImage) && CorrectImage != "empty")">
+                            <label class="form-check-label" for="iconToggle"></label>
+                        </div>
                     </div>
+
+
+
+
+
+
+
                     @if (!string.IsNullOrWhiteSpace(CorrectImage) && CorrectImage != "empty")
                     {
                         <div class="col-2">
@@ -150,10 +173,20 @@
                         <small id="wrongAnswer1" class="@GetInputClass(WrongAnswer1.Length, 2, @AnswersDescriptionMaxChars)
                             col-2 p-0 d-flex justify-content-start">@WrongAnswer1.Length/30</small>
                     </div>
-                    <div class="col-1">
+                   @*  <div class="col-1">
                         <span>
                             או
                         </span>
+                    </div> *@
+
+
+                    <div class="col-1 position-relative" style="padding-top: .5rem; height: 38px;">
+                        <!-- Custom Icon Toggle -->
+                        <div class="form-check form-switch">
+                            <input class="form-check-input custom-icon-toggle" type="checkbox" id="iconToggle" disabled
+                                   checked="@(!string.IsNullOrWhiteSpace(Wrong1Image) && Wrong1Image != "empty")">
+                            <label class="form-check-label" for="iconToggle"></label>
+                        </div>
                     </div>
                     @if (Wrong1Image != "empty")
                     {
@@ -192,10 +225,18 @@
                         <small id="wrongAnswer2" class="@GetInputClass(WrongAnswer2.Length, 2, @AnswersDescriptionMaxChars)
                             col-2 p-0 d-flex justify-content-start">@WrongAnswer2.Length/30</small>
                     </div>
-                    <div class="col-1">
+                   @*  <div class="col-1">
                         <span>
                             או
                         </span>
+                    </div> *@
+                    <div class="col-1 position-relative" style="padding-top: .5rem; height: 38px;">
+                        <!-- Custom Icon Toggle -->
+                        <div class="form-check form-switch">
+                            <input class="form-check-input custom-icon-toggle" type="checkbox" id="iconToggle" disabled
+                                   checked="@(!string.IsNullOrWhiteSpace(Wrong2Image) && Wrong2Image != "empty")">
+                            <label class="form-check-label" for="iconToggle"></label>
+                        </div>
                     </div>
                     @if (Wrong2Image != "empty")
                     {
@@ -235,11 +276,21 @@
                         <small id="wrongAnswer3" class="@GetInputClass(WrongAnswer3.Length, 2, @AnswersDescriptionMaxChars)
                             col-2 p-0 d-flex justify-content-start">@WrongAnswer3.Length/30</small>
                     </div>
-                    <div class="col-1">
+                    @* <div class="col-1">
                         <span>
                             או
                         </span>
+                    </div> *@
+
+                    <div class="col-1 position-relative" style="padding-top: .5rem; height: 38px;">
+                        <!-- Custom Icon Toggle -->
+                        <div class="form-check form-switch">
+                            <input class="form-check-input custom-icon-toggle" type="checkbox" id="iconToggle" disabled
+                                   checked="@(!string.IsNullOrWhiteSpace(Wrong3Image) && Wrong3Image != "empty")">
+                            <label class="form-check-label" for="iconToggle"></label>
+                        </div>
                     </div>
+
                     @if (Wrong3Image != "empty")
                     {
 
@@ -454,6 +505,7 @@
     private async Task HandleSubmit()
     {
         isLoading = true;  // Start showing the spinner immediately
+        await DeleteImage();
         StateHasChanged(); 
 
         if (!editAnswer) // Adding a new question
@@ -471,9 +523,10 @@
             if (newQuestion != null)
             {
                 await AddAnswers(newQuestion.ID);
-                await ShowToast(true, "השאלה נשמרה בהצלחה!", "fa-solid fa-circle-check");
                 StateHasChanged();
                 ClearFormFields(); // Clear form fields after state change
+                await ShowToast(true, "השאלה נשמרה בהצלחה!", "fa-solid fa-circle-check");
+
             }
             await RefreshGameDetails();
         }
@@ -525,10 +578,11 @@
                             Console.WriteLine("Failed to edit answer: " + await answerUpdate.Content.ReadAsStringAsync());
                         }
                     }
-                    await ShowToast(true, "השאלה נשמרה בהצלחה!", "fa-solid fa-circle-check");
                     StateHasChanged();
                     ClearFormFields();
                     editAnswer = false;
+                    await ShowToast(true, "השאלה נשמרה בהצלחה!", "fa-solid fa-circle-check");
+
                 }
             }
             else
@@ -650,8 +704,9 @@
         if (response.IsSuccessStatusCode)
         {
             StateHasChanged(); // Call this to refresh the component if not automatically updating
-            await ShowToast(true, "השאלה נמחקה בהצלחה.", "fa-solid fa-circle-check");
             await OnQuestionDeleted.InvokeAsync(question);
+            await ShowToast(true, "השאלה נמחקה בהצלחה.", "fa-solid fa-circle-check");
+
 
         }
         else
@@ -778,7 +833,7 @@
 
     private async Task DeleteImage()
     {
-        if (DeleteImages.Count == 0)
+        if (DeleteImages.Count > 0)
         {
             var saveResponse = await Http.PostAsJsonAsync("api/Media/deleteImages", DeleteImages);
             if (saveResponse.IsSuccessStatusCode == true)
@@ -838,4 +893,7 @@
     {
         await JS.InvokeVoidAsync("showToast", isSuccess, message, icon);
     }
+
+    
+
 }  
