@@ -55,20 +55,20 @@ table {
 .text-muted {
     color: #6c757d; /* Default color, change as needed */
 }
+
 input#question::placeholder {
     color: #ced4da !important; /* Use !important to override other styles if necessary */
     font-size: 0.875rem !important; /* Use !important to override other styles if necessary */
 }
 
-.delete-image-btn
-{
+.delete-image-btn {
     padding: 5px;
 }
 
-.delete-image-btn:hover{
-    color: red;
-    cursor: pointer;
-}
+    .delete-image-btn:hover {
+        color: red;
+        cursor: pointer;
+    }
 
 .QuestionImage {
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
@@ -76,21 +76,22 @@ input#question::placeholder {
     border-radius: 3px;
     margin: 0 auto;
 }
-.QuestionImage:hover {
-    transform: scale(3);
-    transition: transform 0.5s;
-    z-index: 1;
-}
+
+    .QuestionImage:hover {
+        transform: scale(3);
+        transition: transform 0.5s;
+        z-index: 1;
+    }
 
 .info {
-   color: black;
+    color: black;
     border-radius: 10px;
     padding: 10px;
     cursor: pointer;
 }
 
     .info:hover {
-       color: blue;
+        color: blue;
     }
 
 
@@ -119,8 +120,7 @@ input#question::placeholder {
 }
 
 .btn-outline-primary, .btn-outline-danger {
-
     padding: 1px 4px;
     text-align: center;
-    justify-content:center;
+    justify-content: center;
 }

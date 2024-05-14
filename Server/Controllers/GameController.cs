@@ -443,7 +443,7 @@ namespace template.Server.Controllers
                     {
                         GameCode = gameCode
                     };
-                    string getActiveStagesQuery = "SELECT DISTINCT StageID FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
+                    string getActiveStagesQuery = "SELECT COUNT(DISTINCT StageID) FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
                     var activeStages = await _db.GetRecordsAsync<int>(getActiveStagesQuery, param3);
                     return Ok(activeStages.FirstOrDefault());
                 }

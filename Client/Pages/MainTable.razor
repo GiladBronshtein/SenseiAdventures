@@ -103,20 +103,17 @@
                                 <!--Table HEADER-->
                                 <thead class="table-light">
                                     <tr>
-                                        <th scope="col">קוד
-                                            <Tooltip Text="באמצעות הקוד מתחילים משחק"><i class="fa-solid fa-circle-info"></i></Tooltip>
+                                        <th scope="col">קוד<Tooltip Text="באמצעות הקוד מתחילים משחק"><i class="fa-solid fa-circle-info"></i></Tooltip>
                                         </th>
-                                        <th scope="col">                                            שם המשחק
-                                            <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
+                                        <th scope="col">שם המשחק<Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
                                         </th>
-                                        <th scope="col" class="col-auto text-center">                                            עריכה
-                                            <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
+                                        <th scope="col" class="col-auto text-center">עריכה<Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
                                         </th>
-                                        <th scope="col" class="col-auto text-center">                                            פרסום
-                                            <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i> </Tooltip>
+                                        <th scope="col" class="col-auto text-center">פרסום<Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i> </Tooltip>
                                         </th>
-                                        <th scope="col" class="col-auto text-center">                                            מחיקה
-                                            <Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
+                                        <th scope="col" class="col-auto text-center">סטטיסטיקה<Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i> </Tooltip>
+                                        </th>
+                                        <th scope="col" class="col-auto text-center">מחיקה<Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
                                         </th>
                                     </tr>
                                 </thead>
@@ -147,6 +144,11 @@
                                                         </div>
                                                     }
                                                 </td>
+
+                                                <td class="col-auto text-center">
+                                                    <i class="fa-solid fa-chart-simple icon link-primary"></i>
+                                                </td>
+
                                                 <td class="col-auto text-center">
                                                     <i class="fa-solid fa-trash icon link-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" @onclick="() => PromptDelete(game)"></i>
                                                 </td>
@@ -388,7 +390,6 @@
         }
     }
 
-
     private void MakeDeleteList(string imageToDelete)
     {
         if (!string.IsNullOrEmpty(imageToDelete))
@@ -415,7 +416,6 @@
             }
         }
     }
-
 
     private async Task ClearGameInputFields()
     {
@@ -450,5 +450,4 @@
             Console.WriteLine("Image deletion failed");
         }
     }
-
 }

@@ -1,1 +1,20 @@
-﻿
+﻿@keyframes shine {
+    0% {
+        background-position: -200%;
+    }
+
+    100% {
+        background-position: 200%;
+    }
+}
+
+.navbar-brand span {
+    font-family: 'Raleway', sans-serif;
+    font-weight: bold;
+    font-size: 24px;
+    background: linear-gradient(90deg, #ffffff, #d3d3d3, #f5b8d6, #d3d3d3, #ffffff);
+    background-size: 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 3s infinite linear;
+}

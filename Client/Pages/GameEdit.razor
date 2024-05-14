@@ -13,10 +13,18 @@
             <!-- Sidebar Header -->
             <div class="sidebar-heading d-flex justify-content-center align-items-center text-center mt-2 mb-2">
                 <a class="icon-link icon-link-hover text-white text-decoration-none" href="./maintable">
-                    חזרה למשחקים
-                    <svg class="bi" width="14" height="14" fill="currentColor" viewBox="0 0 14 14">
-                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 1-.5-.5H2.707l5.147-5.146a.5.5 0 1 0-.708-.708l-6 6a.5.5 0 0 0 0 .708l6 6a.5.5 0 1 0 .708-.708L2.707 8.5H14.5a.5.5 0 0 1 .5-.5z" />
+                    @* <svg class="bi" width="14" height="14" fill="currentColor" viewBox="0 0 14 14">
+                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.293l-5.147-5.146a.5.5 0 1 1 .708-.708l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 1 1-.708-.708L12.793 8.5H1.5A.5.5 0 0 1 1 8z" />
+                    </svg> *@
+
+                    <svg class="bi" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M1 8a.75.75 0 0 1 .75-.75h10.793l-4.147-4.146a.75.75 0 0 1 1.06-1.06l5.5 5.5a.75.75 0 0 1 0 1.06l-5.5 5.5a.75.75 0 1 1-1.06-1.06L12.543 8.75H1.75A.75.75 0 0 1 1 8z" />
                     </svg>
+
+
+                    חזרה למשחקים
+                  
+
                 </a>
             </div>
 
@@ -56,7 +64,7 @@
                             <span>
                                 דוכנים
                             </span>
-                            <span class=" badge rounded-pill  @(activeStages < 3 ? "bg-danger" : "bg-success")">
+                            <span class=" badge rounded-pill  @(activeStages < 2 ? "bg-danger" : "bg-success")">
                                 @activeStages
                                 <span class="visually-hidden">unread messages</span>
                             </span>
@@ -83,13 +91,13 @@
                         @switch (currentStage)
                         {
                             case StageEnum.Stage.StageA:
-                                <StageBottleBreak gameCode="@gameCode" game="@gameData" OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" />
+                                <StageBottleBreak gameCode="@gameCode" game="@gameData" stage=1 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" />
                                 break;
                             case StageEnum.Stage.StageB:
                                 <StageTargetHit />
                                 break;
                             case StageEnum.Stage.StageC:
-                                <StageBazzerHit />
+                                <StageBazzerHit gameCode="@gameCode" game="@gameData" stage=3 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" />
                                 break;
                             case StageEnum.Stage.StageD:
                                 <StageSlashing />

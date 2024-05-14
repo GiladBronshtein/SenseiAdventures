@@ -1,5 +1,893 @@
-﻿<h3>StageBazzerHit</h3>
+﻿@inject IJSRuntime JS
+@inject HttpClient Http
+@inject NavigationManager Nav
+@using template.Shared.Models.Games;
+@using template.Shared.Models.Users;
+
+
+<div class="container-fluid">
+
+    <!-- ROW 1 - TITLE -->
+    <div class="row mb-4">
+        <div class="col-md-7">
+            <h3>
+                דוכן פגיעה בתשובה (באזרים)
+                <button type="button" class="btn bg-primary-subtle" data-bs-toggle="modal" data-bs-target=@($"#modal1")
+                        style=" --bs-btn-padding-y: .25rem;  --bs-btn-padding-x: .5rem;  --bs-btn-font-size: .75rem;">
+                    הסבר
+                    <i class="fa fa-info-circle p-1" style="color:black;"></i>
+                </button>
+            </h3>
+        </div>
+        <div class="col-md-5 text-end">
+            <button type="button" class="btn btn-secondary">כיבוי דוכן</button>
+        </div>
+    </div>
+
+    <!-- ROW 2 - FORM AND QUESTION LIST -->
+    <div class="row">
+        <!-- Edit Form Column -->
+        <div class="col-md-7 ">
+            <div class="row mb-3">
+                <div class="col-12">
+                    <span> שאלה</span>
+                    <span>(2-30 טווח תווים)</span>
+                </div>
+            </div>
+
+            <EditForm Model="questionsAndAnswers" OnValidSubmit="HandleSubmit" OnInvalidSubmit="failedSubmit">
+                <DataAnnotationsValidator />
+
+                <!-- ROW - Form Input Fields -->
+                <div class="mb-3 d-flex align-items-center">
+                    <div class="col-7 p-0">
+                        <InputText maxlength="@QuestionDescriptionMaxChars"
+                                   class="form-control"
+                                   id="question"
+                                   @bind-Value="QuestionDescription"
+                                   @oninput="@(e => HandleInputChange(e, nameof(questionsAndAnswers.Questions.QuestionDescription)))"
+                                   placeholder="טקסט השאלה"
+                                   aria-describedby="questionDescription" required />
+                    </div>
+
+                    <div class="col-2 pe-2">
+                        <small id="questionDescription" class="@GetInputClass(QuestionDescription.Length, 2, @QuestionDescriptionMaxChars)">
+                            @QuestionDescription.Length/@QuestionDescriptionMaxChars
+                        </small>
+                    </div>
+
+
+                    <div class="col-2 ps-1">
+
+                        @if (myFileImage != "")
+                        {
+                            <div class="img-wrapper">
+                                <img src="@myFileImage" class="QuestionImage" width="30" />
+                                <i class="fa-solid fa-trash  delete-image-btn" @onclick='() => MakeDeleteList("FileInputID")'></i>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-2 ps-1">
+                                <label class="btn btn-outline-dark btn-sm" for="FileInputID">
+                                    <i class="fa-solid fa-image "></i>
+                                </label>
+                                <InputFile id="FileInputID" OnChange="@(e => UploadFile(e, "FileInputID"))" hidden />
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="mb-3 mt-3 col-9">
+                </div>
+
+                <!-- Row -->
+                <div class="row mb-3">
+                    <div class="col col-12">
+                        <span>תשובות לשאלה</span>
+                        <span>(2-30 טווח תווים)</span>
+                    </div>
+                </div>
+
+                <!-- Correct Answer -->
+                <label for="correctAnswer" class="form-label">תשובה נכונה:</label>
+                <div class="mb-3 align-items-center">
+                    <div class="col-7">
+                        <InputText maxlength="@AnswersDescriptionMaxChars"
+                                   class="form-control"
+                                   id="correctAnswer"
+                                   @bind-Value="CorrectAnswer"
+                                   @oninput="@(e => HandleInputChange(e, nameof(CorrectAnswer)))"
+                                   placeholder="טקסט לתשובה נכונה"
+                                   aria-describedby="correctAnswer"
+                                   disabled="@(!string.IsNullOrWhiteSpace(CorrectImage) && CorrectImage != "empty")"
+                                   required />
+                    </div>
+                    <div class="col-1 p-0">
+                        <small id="correctAnswer" class="@GetInputClass(CorrectAnswer.Length, 2, @AnswersDescriptionMaxChars)
+                            col-2 p-0 d-flex justify-content-start">@CorrectAnswer.Length/@AnswersDescriptionMaxChars</small>
+                    </div>
+
+
+
+                    <div class="col-1 position-relative" style="padding-top: .5rem; height: 38px;">
+                        <!-- Custom Icon Toggle -->
+                        <div class="form-check form-switch">
+                            <input class="form-check-input custom-icon-toggle" type="checkbox" id="iconToggle" disabled
+                                   checked="@(!string.IsNullOrWhiteSpace(CorrectImage) && CorrectImage != "empty")">
+                            <label class="form-check-label" for="iconToggle"></label>
+                        </div>
+                    </div>
+
+
+                    @if (!string.IsNullOrWhiteSpace(CorrectImage) && CorrectImage != "empty")
+                    {
+                        <div class="col-2">
+                            <div class="img-wrapper">
+                                <img src="@CorrectImage" class="QuestionImage" width="30" />
+                                <i class="fa-solid fa-trash delete-image-btn" @onclick='() => MakeDeleteList("CorrectFileInputID")'></i>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-2">
+                            <label class="btn btn-outline-dark btn-sm" for="CorrectFileInputID">
+                                <i class="fa-solid fa-image"></i>
+                            </label>
+                            <InputFile id="CorrectFileInputID" OnChange="@(e => UploadFile(e, "CorrectFileInputID"))" hidden />
+                        </div>
+                    }
+                </div>
+
+                <span>תשובות נוספות:</span>
+
+                <!-- Wrong Answer 1 -->
+                <div class="d-flex align-items-center mb-3">
+                    <div class="col-7 p-0">
+                        <InputText maxlength="@AnswersDescriptionMaxChars"
+                                   class="form-control"
+                                   @bind-Value="WrongAnswer1"
+                                   @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer1)))"
+                                   placeholder="טקסט לתשובה שגויה"
+                                   aria-describedby="wrongAnswer1"
+                                   disabled="@(!string.IsNullOrWhiteSpace(Wrong1Image) && Wrong1Image != "empty")"
+                                   required />
+                    </div>
+                    <div class="col-1 p-0">
+                        <small id="wrongAnswer1" class="@GetInputClass(WrongAnswer1.Length, 2, @AnswersDescriptionMaxChars)
+                            col-2 p-0 d-flex justify-content-start">@WrongAnswer1.Length/30</small>
+                    </div>
+
+                    <div class="col-1 position-relative" style="padding-top: .5rem; height: 38px;">
+                        <!-- Custom Icon Toggle -->
+                        <div class="form-check form-switch">
+                            <input class="form-check-input custom-icon-toggle" type="checkbox" id="iconToggle" disabled
+                                   checked="@(!string.IsNullOrWhiteSpace(Wrong1Image) && Wrong1Image != "empty")">
+                            <label class="form-check-label" for="iconToggle"></label>
+                        </div>
+                    </div>
+                    @if (Wrong1Image != "empty")
+                    {
+
+                        <div class="col-2">
+                            <div class="img-wrapper">
+                                <img src="@Wrong1Image" class="QuestionImage" width="30" />
+                                <i class="fa-solid fa-trash  delete-image-btn" @onclick='() => MakeDeleteList("Wrong1FileInputID")'></i>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-2">
+                            <label class="btn btn-outline-dark btn-sm" for="Wrong1FileInputID">
+                                <i class="fa-solid fa-image "></i>
+                            </label>
+                            <InputFile id="Wrong1FileInputID" OnChange="@(e => UploadFile(e, "Wrong1FileInputID"))" hidden />
+                        </div>
+                    }
+                </div>
+
+                <!-- Wrong Answer 2 -->
+                <div class="d-flex align-items-center mb-3">
+                    <div class="col-7 p-0">
+                        <InputText maxlength="@AnswersDescriptionMaxChars"
+                                   class="form-control"
+                                   @bind-Value="WrongAnswer2"
+                                   @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer2)))"
+                                   placeholder="טקסט לתשובה שגויה"
+                                   aria-describedby="wrongAnswer2"
+                                   disabled="@(!string.IsNullOrWhiteSpace(Wrong2Image) && Wrong2Image != "empty")"
+                                   required />
+                    </div>
+                    <div class="col-1 p-0">
+                        <small id="wrongAnswer2" class="@GetInputClass(WrongAnswer2.Length, 2, @AnswersDescriptionMaxChars)
+                            col-2 p-0 d-flex justify-content-start">@WrongAnswer2.Length/30</small>
+                    </div>
+
+                    <div class="col-1 position-relative" style="padding-top: .5rem; height: 38px;">
+                        <!-- Custom Icon Toggle -->
+                        <div class="form-check form-switch">
+                            <input class="form-check-input custom-icon-toggle" type="checkbox" id="iconToggle" disabled
+                                   checked="@(!string.IsNullOrWhiteSpace(Wrong2Image) && Wrong2Image != "empty")">
+                            <label class="form-check-label" for="iconToggle"></label>
+                        </div>
+                    </div>
+                    @if (Wrong2Image != "empty")
+                    {
+
+                        <div class="col-2">
+                            <div class="img-wrapper">
+                                <img src="@Wrong2Image" class="QuestionImage" width="30" />
+                                <i class="fa-solid fa-trash  delete-image-btn" @onclick='() => MakeDeleteList("Wrong2FileInputID")'></i>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-2">
+
+                            <label class="btn btn-outline-dark btn-sm" for="Wrong2FileInputID">
+                                <i class="fa-solid fa-image "></i>
+                            </label>
+                            <InputFile id="Wrong2FileInputID" OnChange="@(e => UploadFile(e, "Wrong2FileInputID"))" hidden />
+                        </div>
+                    }
+                </div>
+
+                <!-- Wrong Answer 3 -->
+                <div class="d-flex align-items-center mb-3">
+                    <div class="col-7 p-0">
+                        <InputText maxlength="@AnswersDescriptionMaxChars"
+                                   class="form-control"
+                                   @bind-Value="WrongAnswer3"
+                                   @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer3)))"
+                                   placeholder="טקסט לתשובה שגויה"
+                                   aria-describedby="wrongAnswer3"
+                                   disabled="@(!string.IsNullOrWhiteSpace(Wrong3Image) && Wrong3Image != "empty")"
+                                   required />
+                    </div>
+                    <div class="col-1 p-0">
+                        <small id="wrongAnswer3" class="@GetInputClass(WrongAnswer3.Length, 2, @AnswersDescriptionMaxChars)
+                            col-2 p-0 d-flex justify-content-start">@WrongAnswer3.Length/30</small>
+                    </div>
+
+                    <div class="col-1 position-relative" style="padding-top: .5rem; height: 38px;">
+                        <!-- Custom Icon Toggle -->
+                        <div class="form-check form-switch">
+                            <input class="form-check-input custom-icon-toggle" type="checkbox" id="iconToggle" disabled
+                                   checked="@(!string.IsNullOrWhiteSpace(Wrong3Image) && Wrong3Image != "empty")">
+                            <label class="form-check-label" for="iconToggle"></label>
+                        </div>
+                    </div>
+
+                    @if (Wrong3Image != "empty")
+                    {
+
+                        <div class="col-2">
+                            <div class="img-wrapper">
+                                <img src="@Wrong3Image" class="QuestionImage" width="30" />
+                                <i class="fa-solid fa-trash  delete-image-btn" @onclick='() => MakeDeleteList("Wrong3FileInputID")'></i>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-2">
+
+                            <label class="btn btn-outline-dark btn-sm" for="Wrong3FileInputID">
+                                <i class="fa-solid fa-image "></i>
+                            </label>
+                            <InputFile id="Wrong3FileInputID" OnChange="@(e => UploadFile(e, "Wrong3FileInputID"))" hidden />
+                        </div>
+                    }
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mt-3 mb-2">
+                    @if (!editAnswer)
+                    {
+                        <button type="submit" id="liveToastBtn" class="btn btn-primary shadow-sm">הוספת שאלה</button>
+                    }
+                    else
+                    {
+                    //Save button
+                        <button type="submit" id="liveToastBtn" class="btn btn-primary shadow-sm me-1">שמירה</button>
+                        //Cancel button
+                        <button type="button" class="btn btn-secondary shadow-sm" @onclick="ClearFormFields">ביטול</button>
+
+                    }
+                </div>
+
+            </EditForm>
+        </div>
+
+        <!--QUESTIONS LIST -->
+        @if (game.Questions.Count > 0)
+        {
+            <div class="col-md-5 mt-4">
+                <h5>רשימת שאלות</h5>
+                <div class="scrollable-table-body">
+                    <table class="table shadow-sm table-striped table-responsive border border-1">
+                        <thead>
+                            <tr>
+                                <th class="col-md-6">שאלה</th>
+                                <th class="col-md-2">תמונה</th>
+                                <th class="col-md-2 text-center">עריכה</th>
+                                <th class="col-md-2 text-center">מחיקה</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if (isLoading)
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center">
+                                        <div class="spinner-border text-dark" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var question in game.Questions)
+                                {
+                                    <tr>
+                                        <td class="truncate-text" data-length="20">@question.QuestionDescription</td>
+                                        <td>
+                                            @if (question.HasImage)
+                                            {
+                                                <img src="@question.QuestionImage" height="26" />
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-outline-primary btn-sm" @onclick="()=>EditQuestion(question)">
+                                                <i class="fa-solid fa-square-pen fa-fw" style="width: 14px;"></i>
+                                            </button>
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-outline-danger btn-sm" @onclick="() => selectedQuestionForDeletion = question"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">
+                                                <i class="fa-solid fa-trash fa-fw" style="width: 14px;"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <!--TOAST comes here-->
+    </div>
+
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">מחיקת משחק</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    מחיקת השאלה תתבצע לצמיתות וללא יכולת שחזור, בטוחים?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="ConfirmDelete">מחיקה</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal 1 -->
+    <div class="modal fade" id=@($"modal1") tabindex="-1" aria-labelledby=@($"modalLabel1") aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id=@($"modalLabel1")>שבירת בקבוקים</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    בדוכן זה תוכלו לשבור בקבוקים ולזכות בפרסים נחמדים
+                </div>
+                <div class="text-center p-2">
+                    <img src="./assets-images/stageBottles1.png" class="img-fluid rounded mx-auto d-block" alt="Image description">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">הבנתי</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (msg != "")
+{
+    <p>@msg</p>
+}
+
+
+
 
 @code {
+    [CascadingParameter] public int UserId { get; set; }
+    [Parameter] public string gameCode { get; set; }
+    [Parameter] public GameDetails game { get; set; }
+    [Parameter] public int stage { get; set; }
+    [Parameter] public EventCallback<GameQuestions> OnQuestionAdded { get; set; }
+    [Parameter] public EventCallback<GameQuestions> OnQuestionDeleted { get; set; }
 
-}
+    private QuestionToAdd questionToAdd = new QuestionToAdd();
+    private GameAnswers answersToAdd = new GameAnswers();
+    private QuestionsAndAnswers questionsAndAnswers = new QuestionsAndAnswers();
+
+    string QuestionDescription = string.Empty;
+    string CorrectAnswer = string.Empty;
+    string WrongAnswer1 = string.Empty;
+    string WrongAnswer2 = string.Empty;
+    string WrongAnswer3 = string.Empty;
+
+    int QuestionDescriptionCount => QuestionDescription.Length;
+    int CorrectAnswerCount => CorrectAnswer.Length;
+    int WrongAnswer1Count => WrongAnswer1.Length;
+    int WrongAnswer2Count => WrongAnswer2.Length;
+    int WrongAnswer3Count => WrongAnswer3.Length;
+
+    int QuestionDescriptionMaxChars = 50;
+    int AnswersDescriptionMaxChars = 30;
+    int questionID = 0;
+
+    bool editAnswer = false;
+    bool hasimage = false;
+    private IBrowserFile questionImageFile;
+
+    private string imagePreview;
+    string myFileImage = "";
+    string CorrectImage = "empty";
+    string Wrong1Image = "empty";
+    string Wrong2Image = "empty";
+    string Wrong3Image = "empty";
+
+    long maxFileSize = 4194304;
+    private EditContext editContext;
+
+    string msg = "";
+    bool isDeleteModalOpen = false;
+    bool isLoading = true;  // State variable to track loading status
+
+    List<string> DeleteImages = new List<string>();
+
+    string questionDescriptionClass = "text-muted"; // Default class
+    private GameQuestions selectedQuestionForDeletion;
+
+    /*METHODS*/
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshGameDetails();
+    }
+
+    private async Task HandleSubmit()
+    {
+        isLoading = true;  // Start showing the spinner immediately
+        await DeleteImage();
+        StateHasChanged();
+
+        if (!editAnswer) // Adding a new question
+        {
+
+            //Validations
+            if (string.IsNullOrWhiteSpace(CorrectAnswer) || CorrectAnswer.Length < 2 || CorrectAnswer.Length > AnswersDescriptionMaxChars ||
+               string.IsNullOrWhiteSpace(WrongAnswer1) || WrongAnswer1.Length < 2 || WrongAnswer1.Length > AnswersDescriptionMaxChars ||
+               string.IsNullOrWhiteSpace(WrongAnswer2) || WrongAnswer2.Length < 2 || WrongAnswer2.Length > AnswersDescriptionMaxChars ||
+               string.IsNullOrWhiteSpace(WrongAnswer3) || WrongAnswer3.Length < 2 || WrongAnswer3.Length > AnswersDescriptionMaxChars)
+            {
+                await ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
+                isLoading = false;
+                return;
+            }
+            var newQuestion = await AddQuestion();
+            if (newQuestion != null)
+            {
+                await AddAnswers(newQuestion.ID);
+                StateHasChanged();
+                ClearFormFields(); // Clear form fields after state change
+                await ShowToast(true, "השאלה נשמרה בהצלחה!", "fa-solid fa-circle-check");
+
+            }
+            await RefreshGameDetails();
+        }
+        else // Editing an existing question
+        {
+
+            //Validations
+            if (string.IsNullOrWhiteSpace(CorrectAnswer) || CorrectAnswer.Length < 2 || CorrectAnswer.Length > AnswersDescriptionMaxChars ||
+               string.IsNullOrWhiteSpace(WrongAnswer1) || WrongAnswer1.Length < 2 || WrongAnswer1.Length > AnswersDescriptionMaxChars ||
+               string.IsNullOrWhiteSpace(WrongAnswer2) || WrongAnswer2.Length < 2 || WrongAnswer2.Length > AnswersDescriptionMaxChars ||
+               string.IsNullOrWhiteSpace(WrongAnswer3) || WrongAnswer3.Length < 2 || WrongAnswer3.Length > AnswersDescriptionMaxChars)
+            {
+                await ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
+                isLoading = false;
+                return;
+            }
+            bool hasImage = !string.IsNullOrEmpty(myFileImage) && myFileImage != "empty";
+            QuestionToAdd editedQuestion = new QuestionToAdd
+                {
+                    GameID = game.ID,
+                    HasImage = hasImage,
+                    QuestionDescription = QuestionDescription,
+                    QuestionImage = myFileImage,
+                    StageID = 1
+                };
+
+            var response = await Http.PutAsJsonAsync($"api/game/{UserId}/updateQuestion/{questionID}", editedQuestion);
+            if (response.IsSuccessStatusCode)
+            {
+                var currentAnswers = game.Questions.FirstOrDefault(q => q.ID == questionID)?.Answers;
+                if (currentAnswers != null)
+                {
+                    var updatedAnswers = new List<GameAnswers>
+                {
+                    new GameAnswers { ID = currentAnswers.ElementAtOrDefault(0)?.ID ?? 0, AnswerDescription = CorrectAnswer, IsCorrect = true, QuestionID = questionID,
+                                      HasImage = !string.IsNullOrEmpty(CorrectImage) && CorrectImage != "empty", AnswerImage = CorrectImage },
+                    new GameAnswers { ID = currentAnswers.ElementAtOrDefault(1)?.ID ?? 0, AnswerDescription = WrongAnswer1, IsCorrect = false, QuestionID = questionID,
+                                      HasImage = !string.IsNullOrEmpty(Wrong1Image) && Wrong1Image != "empty", AnswerImage = Wrong1Image },
+                    new GameAnswers { ID = currentAnswers.ElementAtOrDefault(2)?.ID ?? 0, AnswerDescription = WrongAnswer2, IsCorrect = false, QuestionID = questionID,
+                                      HasImage = !string.IsNullOrEmpty(Wrong2Image) && Wrong2Image != "empty", AnswerImage = Wrong2Image },
+                    new GameAnswers { ID = currentAnswers.ElementAtOrDefault(3)?.ID ?? 0, AnswerDescription = WrongAnswer3, IsCorrect = false, QuestionID = questionID,
+                                      HasImage = !string.IsNullOrEmpty(Wrong3Image) && Wrong3Image != "empty", AnswerImage = Wrong3Image }
+                };
+
+                    foreach (var answer in updatedAnswers)
+                    {
+                        var answerUpdate = await Http.PutAsJsonAsync($"api/game/{UserId}/updateAnswers/{answer.ID}", answer);
+                        if (!answerUpdate.IsSuccessStatusCode)
+                        {
+                            Console.WriteLine("Failed to edit answer: " + await answerUpdate.Content.ReadAsStringAsync());
+                        }
+                    }
+                    StateHasChanged();
+                    ClearFormFields();
+                    editAnswer = false;
+                    await ShowToast(true, "השאלה נשמרה בהצלחה!", "fa-solid fa-circle-check");
+
+                }
+            }
+            else
+            {
+                Console.WriteLine("Failed to edit question: " + await response.Content.ReadAsStringAsync());
+                await ShowToast(false, "פעולת העריכה נכשלה", "fa-solid fa-circle-exclamation");
+            }
+        }
+        await DeleteImage();
+        StateHasChanged(); // Update the UI
+        await RefreshGameDetails();
+    }
+
+    private async Task<GameQuestions> AddQuestion()
+    {
+
+        bool hasImage = !string.IsNullOrEmpty(myFileImage);
+        QuestionToAdd questionToAdd = new QuestionToAdd()
+            {
+                GameID = game.ID,
+                HasImage = hasImage,
+                QuestionDescription = QuestionDescription,
+                QuestionImage = myFileImage,
+                StageID = stage,
+            };
+        var response = await Http.PostAsJsonAsync($"api/game/{UserId}/addQuestion/{gameCode}", questionToAdd);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadAsStringAsync();
+            int questionId = int.Parse(result);
+            GameQuestions newQuestion = new GameQuestions
+                {
+                    ID = questionId,
+                    QuestionDescription = QuestionDescription,
+                    QuestionImage = myFileImage,
+                    HasImage = hasImage
+                };
+
+            await OnQuestionAdded.InvokeAsync(newQuestion);
+            return newQuestion;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private async Task<bool> AddAnswers(int questionId)
+    {
+        List<GameAnswers> answers = new List<GameAnswers>
+    {
+        new GameAnswers { AnswerDescription = CorrectAnswer, IsCorrect = true, QuestionID = questionId, HasImage = CorrectImage != "empty", AnswerImage = CorrectImage },
+        new GameAnswers { AnswerDescription = WrongAnswer1, IsCorrect = false, QuestionID = questionId, HasImage = Wrong1Image != "empty", AnswerImage = Wrong1Image },
+        new GameAnswers { AnswerDescription = WrongAnswer2, IsCorrect = false, QuestionID = questionId, HasImage = Wrong2Image != "empty", AnswerImage = Wrong2Image },
+        new GameAnswers { AnswerDescription = WrongAnswer3, IsCorrect = false, QuestionID = questionId, HasImage = Wrong3Image != "empty", AnswerImage = Wrong3Image }
+    };
+        var response = await Http.PostAsJsonAsync($"api/game/{UserId}/addAnswers/{questionId}", answers);
+        if (response.IsSuccessStatusCode)
+        {
+            return true; // Return true indicating successful creation
+        }
+        else
+        {
+            Console.WriteLine("Failed to add answers: " + await response.Content.ReadAsStringAsync());
+            return false; // Return false indicating failure to add answers
+        }
+    }
+
+    private void EditQuestion(GameQuestions question)
+    {
+        ClearFormFields();
+        editAnswer = true;
+        questionID = question.ID;
+        QuestionDescription = question.QuestionDescription;
+        myFileImage = question.QuestionImage;
+
+        var correctAnswer = question.Answers.FirstOrDefault(a => a.IsCorrect);
+        var wrongAnswers = question.Answers.Where(a => !a.IsCorrect).ToList();
+
+        CorrectImage = correctAnswer?.AnswerImage ?? "empty";
+        CorrectAnswer = correctAnswer?.AnswerDescription ?? "";
+
+        WrongAnswer1 = wrongAnswers.ElementAtOrDefault(0)?.AnswerDescription ?? "";
+        Wrong1Image = wrongAnswers.ElementAtOrDefault(0)?.AnswerImage ?? "empty";
+
+        WrongAnswer2 = wrongAnswers.ElementAtOrDefault(1)?.AnswerDescription ?? "";
+        Wrong2Image = wrongAnswers.ElementAtOrDefault(1)?.AnswerImage ?? "empty";
+
+        WrongAnswer3 = wrongAnswers.ElementAtOrDefault(2)?.AnswerDescription ?? "";
+        Wrong3Image = wrongAnswers.ElementAtOrDefault(2)?.AnswerImage ?? "empty";
+
+        StateHasChanged(); // Refresh UI with loaded data
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (selectedQuestionForDeletion != null)
+        {
+            // Add question image to delete list if it has one
+            if (selectedQuestionForDeletion.HasImage)
+            {
+                DeleteImages.Add(selectedQuestionForDeletion.QuestionImage);
+            }
+
+            await DeleteQuestion(selectedQuestionForDeletion);
+            selectedQuestionForDeletion = null; // Reset the selected question
+            isDeleteModalOpen = false; // Close the modal
+            await RefreshGameDetails();
+            ClearFormFields();
+            StateHasChanged(); // Refresh UI
+        }
+
+    }
+
+    private async Task DeleteQuestion(GameQuestions question)
+    {
+        isLoading = true;
+        var response = await Http.DeleteAsync($"api/game/{UserId}/deleteQuestion/{question.ID}");
+        if (response.IsSuccessStatusCode)
+        {
+            StateHasChanged(); // Call this to refresh the component if not automatically updating
+            await OnQuestionDeleted.InvokeAsync(question);
+            await ShowToast(true, "השאלה נמחקה בהצלחה.", "fa-solid fa-circle-check");
+
+
+        }
+        else
+        {
+            await ShowToast(false, "פעולת המחיקה נכשלה", "fa-solid fa-circle-exclamation");
+            Console.WriteLine("Failed to delete question: " + await response.Content.ReadAsStringAsync());
+        }
+        await RefreshGameDetails();
+
+    }
+
+    private string GetInputClass(int length, int minChars, int maxChars)
+    {
+        string resultClass;
+        if (length == 0)
+            resultClass = "text-muted"; // Neutral for zero characters
+        else if (length < minChars)
+            resultClass = "text-danger";  // Red for less than minimum characters
+        else if (length >= minChars && length < maxChars - 3)
+            resultClass = "text-good";   // Green for within the normal range
+        else if (length >= maxChars - 3 && length <= maxChars)
+            resultClass = "text-warning";  // Orange for nearing maximum length
+        else
+            resultClass = "text-muted";  // Fallback
+
+        return resultClass;
+    }
+
+    private async Task UploadFile(InputFileChangeEventArgs e, string inputId)
+    {
+        var imageFiles = e.GetMultipleFiles();
+        foreach (var file in imageFiles)
+        {
+            if (file.Size <= maxFileSize)
+            {
+                var buffer = new byte[file.Size];
+                await file.OpenReadStream(maxFileSize).ReadAsync(buffer);
+                var imageBase64 = Convert.ToBase64String(buffer);
+                var saveResponse = await Http.PostAsJsonAsync("api/media/upload", imageBase64);
+
+                if (saveResponse.IsSuccessStatusCode)
+                {
+                    string resizeUrl = await saveResponse.Content.ReadAsStringAsync();
+                    string imageUrl = "uploadedFiles/" + resizeUrl;
+                    switch (inputId)
+                    {
+                        case "FileInputID":
+                            myFileImage = imageUrl;
+                            break;
+                        case "CorrectFileInputID":
+                            CorrectImage = imageUrl;
+                            break;
+                        case "Wrong1FileInputID":
+                            Wrong1Image = imageUrl;
+                            break;
+                        case "Wrong2FileInputID":
+                            Wrong2Image = imageUrl;
+                            break;
+                        case "Wrong3FileInputID":
+                            Wrong3Image = imageUrl;
+                            break;
+                    }
+                    StateHasChanged(); // This ensures the UI updates with the new image
+                }
+            }
+        }
+    }
+
+    private void MakeDeleteList(string inputId)
+    {
+        switch (inputId)
+        {
+            case "FileInputID":
+                DeleteImages.Add(myFileImage);
+                myFileImage = "";
+                break;
+            case "CorrectFileInputID":
+                DeleteImages.Add(CorrectImage);
+                CorrectImage = "empty";
+                break;
+            case "Wrong1FileInputID":
+                DeleteImages.Add(Wrong1Image);
+                Wrong1Image = "empty";
+                break;
+            case "Wrong2FileInputID":
+                DeleteImages.Add(Wrong2Image);
+                Wrong2Image = "empty";
+                break;
+            case "Wrong3FileInputID":
+                DeleteImages.Add(Wrong3Image);
+                Wrong3Image = "empty";
+                break;
+        }
+
+        // Update the `questions` list accordingly
+        var question = game.Questions.FirstOrDefault(q => q.ID == questionID);
+        if (question != null)
+        {
+            question.QuestionImage = myFileImage;
+            question.HasImage = !string.IsNullOrEmpty(myFileImage);
+        }
+        StateHasChanged();
+
+    }
+
+    private void ClearFormFields()
+    {
+        editAnswer = false;
+        // Reset properties within the questionsAndAnswers model
+        questionsAndAnswers.Questions.QuestionDescription = string.Empty;
+        QuestionDescription = "";
+        CorrectAnswer = "";
+        WrongAnswer1 = "";
+        WrongAnswer2 = "";
+        WrongAnswer3 = "";
+        myFileImage = string.Empty; // Clear the uploaded image preview
+        CorrectImage = "empty";
+        Wrong1Image = "empty";
+        Wrong2Image = "empty";
+        Wrong3Image = "empty";
+        questionDescriptionClass = GetInputClass(0, 2, QuestionDescriptionMaxChars);
+        StateHasChanged();
+    }
+
+    private async Task DeleteImage()
+    {
+        if (DeleteImages.Count > 0)
+        {
+            var saveResponse = await Http.PostAsJsonAsync("api/Media/deleteImages", DeleteImages);
+            if (saveResponse.IsSuccessStatusCode == true)
+            {
+                DeleteImages.Clear();
+            }
+            else
+            {
+            }
+        }
+    }
+
+    private async Task RefreshGameDetails()
+    {
+        Console.WriteLine(stage.ToString());
+
+        // isLoading = true; // Start loading
+        // var response = await Http.GetFromJsonAsync<GameDetails>($"api/game/{UserId}/getGame/{gameCode}");
+        // if (response != null)
+        // {
+        //     game = response;
+        // }
+        // isLoading = false; // End loading
+        // StateHasChanged(); // This will trigger a UI update
+        isLoading = true; // Start loading
+        var response = await Http.GetFromJsonAsync<GameDetails>($"api/game/{UserId}/getGame/{gameCode}");
+        if (response != null)
+        {
+            // Assuming you have a property `int relevantStageId` that defines the relevant stage id
+            game = new GameDetails
+                {
+                    ID = response.ID,
+                    GameName = response.GameName,
+                    Questions = response.Questions.Where(q => q.StageID == stage).ToList()
+                    // Copy other properties as needed
+                };
+        }
+        isLoading = false; // End loading
+        StateHasChanged(); // This will trigger a UI update
+    }
+
+    private void failedSubmit()
+    {
+        StateHasChanged();
+    }
+
+    private void HandleInputChange(ChangeEventArgs e, string inputType)
+    {
+        var newValue = e.Value.ToString();
+        switch (inputType)
+        {
+            case "QuestionDescription":
+                QuestionDescription = newValue;
+                break;
+            case "CorrectAnswer":
+                CorrectAnswer = newValue;
+                break;
+            case "WrongAnswer1":
+                WrongAnswer1 = newValue;
+                break;
+            case "WrongAnswer2":
+                WrongAnswer2 = newValue;
+                break;
+            case "WrongAnswer3":
+                WrongAnswer3 = newValue;
+                break;
+            default:
+                break;
+        }
+        StateHasChanged();
+    }
+
+    private async Task ShowToast(bool isSuccess, string message, string icon)
+    {
+        await JS.InvokeVoidAsync("showToast", isSuccess, message, icon);
+    }
+
+
+
+}  

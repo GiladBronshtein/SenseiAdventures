@@ -46,7 +46,7 @@
                                    id="question"
                                    @bind-Value="QuestionDescription"
                                    @oninput="@(e => HandleInputChange(e, nameof(questionsAndAnswers.Questions.QuestionDescription)))"
-                                   placeholder="שאלה"
+                                   placeholder="טקסט השאלה"
                                    aria-describedby="questionDescription" required />
                     </div>
 
@@ -98,7 +98,7 @@
                                    id="correctAnswer"
                                    @bind-Value="CorrectAnswer"
                                    @oninput="@(e => HandleInputChange(e, nameof(CorrectAnswer)))"
-                                   placeholder="תשובה נכונה"
+                                   placeholder="טקסט לתשובה נכונה"
                                    aria-describedby="correctAnswer"
                                    disabled="@(!string.IsNullOrWhiteSpace(CorrectImage) && CorrectImage != "empty")"
                                    required />
@@ -130,11 +130,6 @@
                     </div>
 
 
-
-
-
-
-
                     @if (!string.IsNullOrWhiteSpace(CorrectImage) && CorrectImage != "empty")
                     {
                         <div class="col-2">
@@ -164,7 +159,7 @@
                                    class="form-control"
                                    @bind-Value="WrongAnswer1"
                                    @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer1)))"
-                                   placeholder="תשובה שגויה"
+                                   placeholder="טקסט לתשובה שגויה"
                                    aria-describedby="wrongAnswer1"
                                    disabled="@(!string.IsNullOrWhiteSpace(Wrong1Image) && Wrong1Image != "empty")"
                                    required />
@@ -216,7 +211,7 @@
                                    class="form-control"
                                    @bind-Value="WrongAnswer2"
                                    @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer2)))"
-                                   placeholder="תשובה שגויה"
+                                   placeholder="טקסט לתשובה שגויה"
                                    aria-describedby="wrongAnswer2"
                                    disabled="@(!string.IsNullOrWhiteSpace(Wrong2Image) && Wrong2Image != "empty")"
                                    required />
@@ -267,7 +262,7 @@
                                    class="form-control"
                                    @bind-Value="WrongAnswer3"
                                    @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer3)))"
-                                   placeholder="תשובה שגויה"
+                                   placeholder="טקסט לתשובה שגויה"
                                    aria-describedby="wrongAnswer3"
                                    disabled="@(!string.IsNullOrWhiteSpace(Wrong3Image) && Wrong3Image != "empty")"
                                    required />
@@ -337,27 +332,30 @@
         {
             <div class="col-md-5 mt-4">
                 <h5>רשימת שאלות</h5>
-                @if(isLoading)
-                {
-                    <div class="text-center">
-                        <div class="spinner-border text-dark" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <div class="scrollable-table-body">
-                        <table class="table shadow-sm table-striped table-responsive border border-1">
-                            <thead>
+                <div class="scrollable-table-body">
+                    <table class="table shadow-sm table-striped table-responsive border border-1">
+                        <thead>
+                            <tr>
+                                <th class="col-md-6">שאלה</th>
+                                <th class="col-md-2">תמונה</th>
+                                <th class="col-md-2 text-center">עריכה</th>
+                                <th class="col-md-2 text-center">מחיקה</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if (isLoading)
+                            {
                                 <tr>
-                                    <th class="col-md-6">שאלה</th>
-                                    <th class="col-md-2">תמונה</th>
-                                    <th class="col-md-2 text-center">עריכה</th>
-                                    <th class="col-md-2 text-center">מחיקה</th>
+                                    <td colspan="4" class="text-center">
+                                        <div class="spinner-border text-dark" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
+                            }
+                            else
+                            {
                                 @foreach (var question in game.Questions)
                                 {
                                     <tr>
@@ -381,13 +379,14 @@
                                         </td>
                                     </tr>
                                 }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
             </div>
         }
+
     </div>
 
     <div class="toast-container position-fixed top-0 end-0 p-3">
@@ -518,6 +517,7 @@
                string.IsNullOrWhiteSpace(WrongAnswer3) || WrongAnswer3.Length < 2 || WrongAnswer3.Length > AnswersDescriptionMaxChars)
             {
                 await ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
+                isLoading = false;
                 return;
             }            var newQuestion = await AddQuestion();
             if (newQuestion != null)
@@ -540,6 +540,7 @@
                string.IsNullOrWhiteSpace(WrongAnswer3) || WrongAnswer3.Length < 2 || WrongAnswer3.Length > AnswersDescriptionMaxChars)
             {
                 await ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
+                isLoading = false;
                 return;
             }
             bool hasImage = !string.IsNullOrEmpty(myFileImage) && myFileImage != "empty";
@@ -549,7 +550,7 @@
                     HasImage = hasImage,
                     QuestionDescription = QuestionDescription,
                     QuestionImage = myFileImage,
-                    StageID = 1
+                    StageID = stage
                 };
 
             var response = await Http.PutAsJsonAsync($"api/game/{UserId}/updateQuestion/{questionID}", editedQuestion);
@@ -848,11 +849,28 @@
 
     private async Task RefreshGameDetails()
     {
+        Console.WriteLine(stage.ToString());
+
+        // isLoading = true; // Start loading
+        // var response = await Http.GetFromJsonAsync<GameDetails>($"api/game/{UserId}/getGame/{gameCode}");
+        // if (response != null)
+        // {
+        //     game = response;
+        // }
+        // isLoading = false; // End loading
+        // StateHasChanged(); // This will trigger a UI update
         isLoading = true; // Start loading
         var response = await Http.GetFromJsonAsync<GameDetails>($"api/game/{UserId}/getGame/{gameCode}");
         if (response != null)
         {
-            game = response;
+            // Assuming you have a property `int relevantStageId` that defines the relevant stage id
+            game = new GameDetails
+                {
+                    ID = response.ID,
+                    GameName = response.GameName,
+                    Questions = response.Questions.Where(q => q.StageID == stage).ToList()
+                    // Copy other properties as needed
+                };
         }
         isLoading = false; // End loading
         StateHasChanged(); // This will trigger a UI update

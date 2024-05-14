@@ -1,7 +1,7 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Arimo', sans-serif;
     direction: rtl;
     text-align: right;
 }
@@ -63,4 +63,32 @@ a, .btn-link {
 
 .blazor-error-boundary::after {
     content: "An error has occurred."
+}
+
+
+
+/* Styles for input placeholder */
+::placeholder {
+    font-size: 12px; /* Adjust the size as needed */
+    font-weight: normal; /* Makes the text less bold */
+    color: #E5E4E2; /* Optional: Change the color if needed */
+}
+
+/* For better browser support */
+::-webkit-input-placeholder {
+    font-size: 12px;
+    font-weight: normal;
+    color: #E5E4E2;
+}
+
+:-ms-input-placeholder {
+    font-size: 12px;
+    font-weight: normal;
+    color: #E5E4E2;
+}
+
+::-ms-input-placeholder {
+    font-size: 12px;
+    font-weight: normal;
+    color: #E5E4E2;
 }
