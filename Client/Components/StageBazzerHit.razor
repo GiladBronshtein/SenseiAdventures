@@ -69,8 +69,8 @@
                         else
                         {
                             <div class="col-2 ps-1">
-                                <label class="btn btn-outline-dark btn-sm" for="FileInputID">
-                                    <i class="fa-solid fa-image "></i>
+                                <label class="" for="FileInputID">
+                                    <i class="fa-solid fa-image image-upload-icon"></i>
                                 </label>
                                 <InputFile id="FileInputID" OnChange="@(e => UploadFile(e, "FileInputID"))" hidden />
                             </div>
@@ -132,8 +132,8 @@
                     else
                     {
                         <div class="col-2">
-                            <label class="btn btn-outline-dark btn-sm" for="CorrectFileInputID">
-                                <i class="fa-solid fa-image"></i>
+                            <label class="" for="CorrectFileInputID">
+                                <i class="fa-solid fa-image image-upload-icon"></i>
                             </label>
                             <InputFile id="CorrectFileInputID" OnChange="@(e => UploadFile(e, "CorrectFileInputID"))" hidden />
                         </div>
@@ -180,8 +180,8 @@
                     else
                     {
                         <div class="col-2">
-                            <label class="btn btn-outline-dark btn-sm" for="Wrong1FileInputID">
-                                <i class="fa-solid fa-image "></i>
+                            <label class="" for="Wrong1FileInputID">
+                                <i class="fa-solid fa-image image-upload-icon"></i>
                             </label>
                             <InputFile id="Wrong1FileInputID" OnChange="@(e => UploadFile(e, "Wrong1FileInputID"))" hidden />
                         </div>
@@ -226,9 +226,8 @@
                     else
                     {
                         <div class="col-2">
-
-                            <label class="btn btn-outline-dark btn-sm" for="Wrong2FileInputID">
-                                <i class="fa-solid fa-image "></i>
+                            <label class="" for="Wrong2FileInputID">
+                                <i class="fa-solid fa-image image-upload-icon"></i>
                             </label>
                             <InputFile id="Wrong2FileInputID" OnChange="@(e => UploadFile(e, "Wrong2FileInputID"))" hidden />
                         </div>
@@ -274,9 +273,8 @@
                     else
                     {
                         <div class="col-2">
-
-                            <label class="btn btn-outline-dark btn-sm" for="Wrong3FileInputID">
-                                <i class="fa-solid fa-image "></i>
+                            <label class="" for="Wrong3FileInputID">
+                                <i class="fa-solid fa-image image-upload-icon"></i>
                             </label>
                             <InputFile id="Wrong3FileInputID" OnChange="@(e => UploadFile(e, "Wrong3FileInputID"))" hidden />
                         </div>
@@ -426,6 +424,7 @@
     [Parameter] public int stage { get; set; }
     [Parameter] public EventCallback<GameQuestions> OnQuestionAdded { get; set; }
     [Parameter] public EventCallback<GameQuestions> OnQuestionDeleted { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
 
     private QuestionToAdd questionToAdd = new QuestionToAdd();
     private GameAnswers answersToAdd = new GameAnswers();
@@ -526,7 +525,7 @@
                     HasImage = hasImage,
                     QuestionDescription = QuestionDescription,
                     QuestionImage = myFileImage,
-                    StageID = 1
+                    StageID = stage
                 };
 
             var response = await Http.PutAsJsonAsync($"api/game/{UserId}/updateQuestion/{questionID}", editedQuestion);
@@ -825,21 +824,11 @@
 
     private async Task RefreshGameDetails()
     {
-        Console.WriteLine(stage.ToString());
-
-        // isLoading = true; // Start loading
-        // var response = await Http.GetFromJsonAsync<GameDetails>($"api/game/{UserId}/getGame/{gameCode}");
-        // if (response != null)
-        // {
-        //     game = response;
-        // }
-        // isLoading = false; // End loading
-        // StateHasChanged(); // This will trigger a UI update
+        Console.WriteLine("Loading Stage ID: " + stage.ToString());
         isLoading = true; // Start loading
         var response = await Http.GetFromJsonAsync<GameDetails>($"api/game/{UserId}/getGame/{gameCode}");
         if (response != null)
         {
-            // Assuming you have a property `int relevantStageId` that defines the relevant stage id
             game = new GameDetails
                 {
                     ID = response.ID,

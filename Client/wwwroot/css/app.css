@@ -4,6 +4,7 @@ html, body {
     font-family: 'Arimo', sans-serif;
     direction: rtl;
     text-align: right;
+    font-size: 15px;
 }
 
 h1:focus {
@@ -69,9 +70,9 @@ a, .btn-link {
 
 /* Styles for input placeholder */
 ::placeholder {
-    font-size: 12px; /* Adjust the size as needed */
+    font-size: 12px; 
     font-weight: normal; /* Makes the text less bold */
-    color: #E5E4E2; /* Optional: Change the color if needed */
+    color: #E5E4E2; 
 }
 
 /* For better browser support */

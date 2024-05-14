@@ -69,8 +69,8 @@
                         else
                         {
                             <div class="col-2 ps-1">
-                                <label class="btn btn-outline-dark btn-sm" for="FileInputID">
-                                    <i class="fa-solid fa-image "></i>
+                                <label class="" for="FileInputID">
+                                    <i class="fa-solid fa-image image-upload-icon"></i>
                                 </label>
                                 <InputFile id="FileInputID" OnChange="@(e => UploadFile(e, "FileInputID"))" hidden />
                             </div>
@@ -108,18 +108,6 @@
                             col-2 p-0 d-flex justify-content-start">@CorrectAnswer.Length/@AnswersDescriptionMaxChars</small>
                     </div>
 
-
-                   @*  <div class="col-1">
-                        <span>
-                            או
-                        </span>
-                    </div> *@
-                    
-
-
-
-
-
                     <div class="col-1 position-relative" style="padding-top: .5rem; height: 38px;">
                         <!-- Custom Icon Toggle -->
                         <div class="form-check form-switch">
@@ -142,8 +130,8 @@
                     else
                     {
                         <div class="col-2">
-                            <label class="btn btn-outline-dark btn-sm" for="CorrectFileInputID">
-                                <i class="fa-solid fa-image"></i>
+                            <label class="" for="CorrectFileInputID">
+                                <i class="fa-solid fa-image image-upload-icon"></i>
                             </label>
                             <InputFile id="CorrectFileInputID" OnChange="@(e => UploadFile(e, "CorrectFileInputID"))" hidden />
                         </div>
@@ -168,12 +156,6 @@
                         <small id="wrongAnswer1" class="@GetInputClass(WrongAnswer1.Length, 2, @AnswersDescriptionMaxChars)
                             col-2 p-0 d-flex justify-content-start">@WrongAnswer1.Length/30</small>
                     </div>
-                   @*  <div class="col-1">
-                        <span>
-                            או
-                        </span>
-                    </div> *@
-
 
                     <div class="col-1 position-relative" style="padding-top: .5rem; height: 38px;">
                         <!-- Custom Icon Toggle -->
@@ -196,8 +178,8 @@
                     else
                     {
                         <div class="col-2">
-                            <label class="btn btn-outline-dark btn-sm" for="Wrong1FileInputID">
-                                <i class="fa-solid fa-image "></i>
+                            <label class="" for="Wrong1FileInputID">
+                                <i class="fa-solid fa-image image-upload-icon"></i>
                             </label>
                             <InputFile id="Wrong1FileInputID" OnChange="@(e => UploadFile(e, "Wrong1FileInputID"))" hidden />
                         </div>
@@ -246,9 +228,8 @@
                     else
                     {
                         <div class="col-2">
-
-                            <label class="btn btn-outline-dark btn-sm" for="Wrong2FileInputID">
-                                <i class="fa-solid fa-image "></i>
+                            <label class="" for="Wrong2FileInputID">
+                                <i class="fa-solid fa-image image-upload-icon"></i>
                             </label>
                             <InputFile id="Wrong2FileInputID" OnChange="@(e => UploadFile(e, "Wrong2FileInputID"))" hidden />
                         </div>
@@ -271,11 +252,7 @@
                         <small id="wrongAnswer3" class="@GetInputClass(WrongAnswer3.Length, 2, @AnswersDescriptionMaxChars)
                             col-2 p-0 d-flex justify-content-start">@WrongAnswer3.Length/30</small>
                     </div>
-                    @* <div class="col-1">
-                        <span>
-                            או
-                        </span>
-                    </div> *@
+
 
                     <div class="col-1 position-relative" style="padding-top: .5rem; height: 38px;">
                         <!-- Custom Icon Toggle -->
@@ -288,8 +265,7 @@
 
                     @if (Wrong3Image != "empty")
                     {
-
-                        <div class="col-2">
+                      <div class="col-2">
                             <div class="img-wrapper">
                                 <img src="@Wrong3Image" class="QuestionImage" width="30" />
                                 <i class="fa-solid fa-trash  delete-image-btn" @onclick='() => MakeDeleteList("Wrong3FileInputID")'></i>
@@ -299,13 +275,13 @@
                     else
                     {
                         <div class="col-2">
-
-                            <label class="btn btn-outline-dark btn-sm" for="Wrong3FileInputID">
-                                <i class="fa-solid fa-image "></i>
+                            <label class="" for="Wrong3FileInputID">
+                                <i class="fa-solid fa-image image-upload-icon"></i>
                             </label>
                             <InputFile id="Wrong3FileInputID" OnChange="@(e => UploadFile(e, "Wrong3FileInputID"))" hidden />
                         </div>
                     }
+
                 </div>
 
                 <!-- Submit Button -->
@@ -607,7 +583,7 @@
                 HasImage = hasImage,
                 QuestionDescription = QuestionDescription,
                 QuestionImage = myFileImage,
-                StageID = 1,
+                StageID = stage,
             };
         var response = await Http.PostAsJsonAsync($"api/game/{UserId}/addQuestion/{gameCode}", questionToAdd);
         if (response.IsSuccessStatusCode)
@@ -849,16 +825,7 @@
 
     private async Task RefreshGameDetails()
     {
-        Console.WriteLine(stage.ToString());
-
-        // isLoading = true; // Start loading
-        // var response = await Http.GetFromJsonAsync<GameDetails>($"api/game/{UserId}/getGame/{gameCode}");
-        // if (response != null)
-        // {
-        //     game = response;
-        // }
-        // isLoading = false; // End loading
-        // StateHasChanged(); // This will trigger a UI update
+        Console.WriteLine("Loading Stage ID: " + stage.ToString());     
         isLoading = true; // Start loading
         var response = await Http.GetFromJsonAsync<GameDetails>($"api/game/{UserId}/getGame/{gameCode}");
         if (response != null)

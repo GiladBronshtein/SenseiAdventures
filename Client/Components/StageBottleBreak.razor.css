@@ -124,3 +124,22 @@ input#question::placeholder {
     text-align: center;
     justify-content:center;
 }
+th
+{
+    font-size:14px;
+}
+
+
+
+
+.image-upload-icon {
+    top: 50%;
+    left: 50%;
+    font-size: 1.9rem;
+    color: #6c757d;
+    cursor: pointer;
+}
+
+.image-upload-icon:hover {
+    color: #007bff;
+}
