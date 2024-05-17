@@ -1,92 +1,11 @@
-﻿@*  @inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
 
 <div class="page d-flex flex-column" style="min-height: 100vh;">
-    <main class="flex-grow-1">
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid">
-                <!--LOGO-->
-                <a class="navbar-brand" href="#">
-                    <img src="assets-images/leafGPT.png" alt="Logo" width="24" height="24" class="d-inline-block align-text-top">
-                    Sensei Adventures
-                </a>
-                <!--Collapse Button-->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <!--NAV ITEMS-->
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link" aria-current="page" href="/maintable">עורך</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">איך משחקים</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">אודות</a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-    <footer class="mt-auto bg-dark text-white py-2">
-        <div class="container-fluid">
-            <span>Sensei Adventures</span>
-        </div>
-    </footer>
-</div>
- *@
+@*     <main class="flex-grow-1 d-flex flex-column"> *@
 
+    <main class="d-flex flex-column">
 
-
-
-
-
-@* 
-
- @inherits LayoutComponentBase
-
-<div class="page d-flex flex-column" style="min-height: 100vh;">
-    <main class="flex-grow-1 d-flex flex-column">
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid">
-                <!-- LOGO -->
-                <a class="navbar-brand" href="#">
-                    <img src="assets-images/leafGPT.png" alt="Logo" width="24" height="24" class="d-inline-block align-text-top">
-                    Sensei Adventures
-                </a>
-                <!-- Collapse Button -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <!-- NAV ITEMS -->
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link" aria-current="page" href="/maintable">עורך</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">איך משחקים</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">אודות</a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-        <article class="content flex-grow-1 d-flex flex-column justify-content-center px-4">
-            @Body
-        </article>
-    </main>
-    <footer class="mt-auto bg-dark text-white py-2">
-        <div class="container-fluid">
-            <span>Sensei Adventures</span>
-        </div>
-    </footer>
-</div>
- *@
-
-
-@inherits LayoutComponentBase
-
-<div class="page d-flex flex-column" style="min-height: 100vh;">
-    <main class="flex-grow-1 d-flex flex-column">
-        <!-- Navbar -->
+    <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
                 <!-- LOGO -->
@@ -108,10 +27,15 @@
                 </div>
             </div>
         </nav>
-        <article class="content flex-grow-1 d-flex flex-column px-4">
-            @Body
-        </article>
+
+       
     </main>
+    <!-- Content -->
+
+    <article class="content flex-grow-1 d-flex flex-column px-4">
+        @Body
+    </article>
+    <!-- Footer -->
     <footer class="mt-auto bg-dark text-white py-2">
         <div class="container-fluid">
             <span>Sensei Adventures</span>

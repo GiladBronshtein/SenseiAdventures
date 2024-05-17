@@ -75,9 +75,17 @@
                                                 }
                                                 else
                                                 {
-                                                    <div class="col-2 ps-1">
+@*                                                     <div class="col-2 ps-1">
                                                         <label class="btn btn-outline-dark btn-sm" for="FileInputID">
                                                             <i class="fa-solid fa-image "></i>
+                                                        </label>
+                                                        <InputFile id="FileInputID" OnChange="@(e => UploadFile(e, "FileInputID"))" hidden />
+                                                    </div>
+ *@
+
+                                                    <div class="col-2 ps-1">
+                                                        <label class="" for="FileInputID">
+                                                            <i class="fa-solid fa-image image-upload-icon"></i>
                                                         </label>
                                                         <InputFile id="FileInputID" OnChange="@(e => UploadFile(e, "FileInputID"))" hidden />
                                                     </div>

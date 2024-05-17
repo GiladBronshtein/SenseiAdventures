@@ -18,3 +18,7 @@
     -webkit-text-fill-color: transparent;
     animation: shine 3s infinite linear;
 }
+
+.content{
+    height:100%;
+}
