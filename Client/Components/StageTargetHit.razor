@@ -294,7 +294,7 @@
         StateHasChanged();
     }
 
-      private string GetLabelClass(bool isCorrect)
+    private string GetLabelClass(bool isCorrect)
     {
         return IsCorrect == isCorrect ? "selectable-label" : "selectable-label selected";
     }
@@ -308,8 +308,7 @@
         if (!editAnswer) // Adding a new question
         {
             // Validations
-            if ((string.IsNullOrWhiteSpace(CorrectAnswer) || CorrectAnswer.Length < 2 || CorrectAnswer.Length > AnswersDescriptionMaxChars) &&
-                (CorrectImage == "empty"))
+            if (CorrectAnswer.Length > AnswersDescriptionMaxChars)
             {
                 await ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
                 isLoading = false;
@@ -330,8 +329,7 @@
         else // Editing an existing question
         {
             // Validations
-            if ((string.IsNullOrWhiteSpace(CorrectAnswer) || CorrectAnswer.Length < 2 || CorrectAnswer.Length > AnswersDescriptionMaxChars) &&
-                (CorrectImage == "empty") )
+            if (CorrectAnswer.Length > AnswersDescriptionMaxChars)
             {
                 await ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
                 isLoading = false;
@@ -356,8 +354,8 @@
                 {
                     var updatedAnswers = new List<GameAnswers>
                 {
-                    new GameAnswers { ID = currentAnswers.ElementAtOrDefault(0)?.ID ?? 0, AnswerDescription = CorrectAnswer, IsCorrect = true, QuestionID = questionID,
-                                      HasImage = !string.IsNullOrEmpty(CorrectImage) && CorrectImage != "empty", AnswerImage = CorrectImage }
+                    new GameAnswers { ID = currentAnswers.ElementAtOrDefault(0)?.ID ?? 0, AnswerDescription = IsCorrect.ToString(), IsCorrect = IsCorrect, QuestionID = questionID,
+                                      HasImage = false, AnswerImage = "empty" }
                 };
 
                     foreach (var answer in updatedAnswers)
@@ -422,15 +420,11 @@
 
     private async Task<bool> AddAnswers(int questionId)
     {
-        // Ensure that the AnswerDescription has some text if an image is present
-        if (string.IsNullOrWhiteSpace(CorrectAnswer) && CorrectImage != "empty") CorrectAnswer = "תשובה ללא טקסט";
- 
 
         List<GameAnswers> answers = new List<GameAnswers>
         {
-            new GameAnswers { AnswerDescription = CorrectAnswer, IsCorrect = true, QuestionID = questionId, HasImage = CorrectImage != "empty", AnswerImage = CorrectImage }
+            new GameAnswers { AnswerDescription = IsCorrect.ToString(), IsCorrect = IsCorrect, QuestionID = questionId, HasImage = false, AnswerImage = "empty" }
         };
-
         var response = await Http.PostAsJsonAsync($"api/game/{UserId}/addAnswers/{questionId}", answers);
         if (response.IsSuccessStatusCode)
         {
@@ -450,14 +444,8 @@
         questionID = question.ID;
         QuestionDescription = question.QuestionDescription;
         myFileImage = question.QuestionImage;
-
-        var correctAnswer = question.Answers.FirstOrDefault(a => a.IsCorrect);
-        var wrongAnswers = question.Answers.Where(a => !a.IsCorrect).ToList();
-
-        CorrectImage = correctAnswer?.AnswerImage ?? "empty";
-        CorrectAnswer = correctAnswer?.AnswerDescription ?? "";
-
-
+        var answer = question.Answers.FirstOrDefault();
+        IsCorrect = answer.IsCorrect;
         StateHasChanged(); // Refresh UI with loaded data
     }
 
@@ -538,9 +526,6 @@
                         case "FileInputID":
                             myFileImage = imageUrl;
                             break;
-                        case "CorrectFileInputID":
-                            CorrectImage = imageUrl;
-                            break;
                     }
                     StateHasChanged(); // This ensures the UI updates with the new image
                 }
@@ -556,11 +541,6 @@
                 DeleteImages.Add(myFileImage);
                 myFileImage = "";
                 break;
-            case "CorrectFileInputID":
-                DeleteImages.Add(CorrectImage);
-                CorrectImage = "empty";
-                CorrectAnswer = "";
-                break;
         }
 
         // Update the `questions` list accordingly
@@ -571,7 +551,6 @@
             question.HasImage = !string.IsNullOrEmpty(myFileImage);
         }
         StateHasChanged();
-
     }
 
     private void ClearFormFields()
@@ -581,8 +560,8 @@
         questionsAndAnswers.Questions.QuestionDescription = string.Empty;
         QuestionDescription = "";
         CorrectAnswer = "";
+        IsCorrect = true;
         myFileImage = string.Empty; // Clear the uploaded image preview
-        CorrectImage = "empty";
         questionDescriptionClass = GetInputClass(0, 2, QuestionDescriptionMaxChars);
         StateHasChanged();
     }
