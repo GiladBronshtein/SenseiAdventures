@@ -62,11 +62,30 @@
 }
 
 
-.btn-success {
-    background-image: linear-gradient(to right, #23913B, #218838); /* Gradient for success button */
-    border: 1px solid #27A141;
-    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.9); /* Elevated shadow on hover rgba(0, 0, 0, 0.2) */
+@keyframes shiny {
+    0% {
+        background-position: -200%;
+    }
+
+    100% {
+        background-position: 200%;
+    }
 }
+
+.btn-success {
+    background: linear-gradient( to right, #23913B 25%, #28a745 50%, #23913B 75% );
+    background-size: 200% auto;
+    color: white; 
+    font-size: 16px; 
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 5px;
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.2); /* Elevated shadow */
+    animation: shiny 3s linear infinite; /* Shiny animation */
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; /* Smooth transitions for color changes */
+}
+
 
 /* Overall text and link enhancements for better readability and effect */
 a.text-white {
@@ -86,4 +105,9 @@ a.text-white:hover {
     .container-fluid {
         box-shadow: none;
     }
+}
+.btn-danger {
+    color: #fff;
+    background-color: lightcoral;
+    border-color: lightcoral;
 }

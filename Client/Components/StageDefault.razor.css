@@ -4,18 +4,22 @@
     border-radius: 3px;
     margin: 0 auto;
     height: 50px;
-
+    position: relative; /* Ensure the z-index works correctly */
+    z-index: 1; /* Initial z-index */
+    transition: transform 0.5s, z-index 0s;
 }
-.fa-trash{
+
+.fa-trash {
     padding: 5px;
 }
-.fa-trash:hover {
-    color: red;
-    cursor: pointer;
-}
-/*upon gameimageadded clicked, show image enlarged*/
+
+    .fa-trash:hover {
+        color: red;
+        cursor: pointer;
+    }
+
 #gameImageAdded:hover {
     transform: scale(3);
-    transition: transform 0.5s;
-    z-index: 1;
+    z-index: 1000; /* Ensure the image appears on top of other elements */
 }
+

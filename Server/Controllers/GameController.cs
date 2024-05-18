@@ -631,58 +631,6 @@ namespace template.Server.Controllers
             return BadRequest("User Not Found");
         }
 
-        //[HttpPut("updateAnswers/{answerId}")]
-        //public async Task<IActionResult> UpdateAnswers(int userId, int answerId, GameAnswers answerToUpdate)
-        //{
-        //    //if (answerToUpdate.AnswerImage != "") or "empty" or null assign answerimage to be "empty"
-        //    //string answerImage = string.IsNullOrEmpty(answerToUpdate.AnswerImage) ? "empty" : answerToUpdate.AnswerImage;
-
-        //    object param = new
-        //    {
-        //        UserId = userId
-        //    };
-        //    string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
-        //    var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
-        //    UserWithGames user = userRecords.FirstOrDefault();
-        //    if (user != null)
-        //    {
-        //        object param2 = new
-        //        {
-        //            AnswerId = answerId
-        //        };
-        //        string answerQuery = "SELECT AnswerDescription FROM Answers WHERE ID = @AnswerId";
-        //        var answerRecords = await _db.GetRecordsAsync<UserWithGames>(answerQuery, param2);
-        //        UserWithGames answer = answerRecords.FirstOrDefault();
-        //        if (answer != null)
-        //        {
-        //            object param3 = new
-        //            {
-        //                AnswerId = answerId,
-        //                AnswerDescription = answerToUpdate.AnswerDescription,
-        //                IsCorrect = answerToUpdate.IsCorrect,
-        //                HasImage = answerToUpdate.HasImage,
-        //                AnswerImage = answerToUpdate.AnswerImage
-        //            };
-        //            string updateAnswerQuery = "UPDATE Answers SET " +
-        //                "AnswerDescription = @AnswerDescription, " +
-        //                "IsCorrect = @IsCorrect, " +
-        //                "HasImage = @HasImage, " +
-        //                "AnswerImage = @AnswerImage " +
-        //                "WHERE ID = @AnswerId";
-        //            int isAnswerUpdate = await _db.SaveDataAsync(updateAnswerQuery, param3);
-        //            if (isAnswerUpdate > 0)
-        //            {
-        //                return Ok("Answer updated");
-        //            }
-        //            return BadRequest("Answer not updated");
-        //        }
-        //        return BadRequest("Answer Not Found");
-        //    }
-        //    return BadRequest("User Not Found");
-        //}
-
-
-
         [HttpPut("updateAnswers/{answerId}")]
         public async Task<IActionResult> UpdateAnswers(int userId, int answerId, GameAnswers answerToUpdate)
         {
@@ -732,187 +680,149 @@ namespace template.Server.Controllers
             }
         }
 
-
-
-        //NOTE: Didn't work on that yet 
-
-
-
-
-
-
-
-
-
-
-
-        [HttpPost("publishGame")]
-        public async Task<IActionResult> publishGame(int userId, PublishGame game)
+        //if num of question per gamecode is 20 or above, and stage is 2 or above, then game is ready to be published
+        [HttpPut("publishGame/{gameCode}")]
+        public async Task<IActionResult> PublishGame(int userId, int gameCode)
         {
-            int? sessionId = HttpContext.Session.GetInt32("userId");
-            if (sessionId != null)
-            {
-                if (userId == sessionId)
-                {
-                    object param = new
-                    {
-                        UserId = userId,
-                        gameID = game.ID
-                    };
-                    Console.WriteLine(param);
-
-                    string checkQuery = "SELECT GameName FROM Games WHERE UserId = @UserId and ID=@gameID";
-                    var checkRecords = await _db.GetRecordsAsync<string>(checkQuery, param);
-                    string gameName = checkRecords.FirstOrDefault();
-                    if (gameName != null)
-                    {
-
-                        if (game.IsPublished == true)
-
-                        {
-                            await CanPublishFunc(game.ID);
-
-                            object canPublishParam = new
-                            {
-                                gameID = game.ID
-                            };
-                            string canPublishQuery = "SELECT CanPublish FROM Games WHERE ID=@gameID";
-                            var canPublishRecords = await _db.GetRecordsAsync<bool>(canPublishQuery, canPublishParam);
-                            bool canPublish = canPublishRecords.FirstOrDefault();
-                            if (canPublish == false)
-                            {
-                                return BadRequest("This game cannot be published");
-                            }
-                        }
-                        string updateQuery = "UPDATE Games SET IsPublished=@IsPublished WHERE ID=@ID";
-                        int isUpdate = await _db.SaveDataAsync(updateQuery, game);
-                        if (isUpdate > 0)
-                        {
-                            return Ok();
-                        }
-                        return BadRequest("Update Failed");
-                    }
-                    return BadRequest("It's Not Your Game");
-                }
-                return BadRequest("User Not Logged In");
-            }
-            return BadRequest("No Session");
-        }
-
-        [HttpGet("canPublish/{gameId}")]
-        public async Task<IActionResult> CanPublish(int userId, int gameId)
-        {
-            int? sessionId = HttpContext.Session.GetInt32("userId");
-            if (sessionId != null)
-            {
-                if (userId == sessionId)
-                {
-                    object param = new
-                    {
-                        UserId = userId,
-                        gameID = gameId
-                    };
-
-                    string checkQuery = "SELECT GameName FROM Games WHERE UserId = @UserId and ID=@gameID";
-                    var checkRecords = await _db.GetRecordsAsync<string>(checkQuery, param);
-                    string gameName = checkRecords.FirstOrDefault();
-                    if (gameName != null)
-                    {
-                        CanPublishFunc(gameId);
-                        return Ok();
-                    }
-                    return BadRequest("It's Not Your Game");
-                }
-                return BadRequest("User Not Logged In");
-            }
-            return BadRequest("No Session");
-        }
-
-        private async Task CanPublishFunc(int gameId)
-        {
-            int minQuestions = 18;
-            bool isPublished = false;
-            bool canPublish = false;
             object param = new
             {
-                ID = gameId
+                UserId = userId
             };
-            string queryQuestionCount = "SELECT Count(ID) from Items WHERE GameID = @ID";
-            var recordQuestionCount = await _db.GetRecordsAsync<int>(queryQuestionCount, param);
-            int numberOfQuestions = recordQuestionCount.FirstOrDefault();
-
-            // Fetch the count of correct answers
-            string queryCorrectCount = "SELECT Count(ID) from Items WHERE GameID = @ID AND IsCorrect = 1"; // Assuming IsCorrect is a boolean or bit field
-            int correctAnswersCount = (await _db.GetRecordsAsync<int>(queryCorrectCount, param)).FirstOrDefault();
-
-            // Fetch the count of wrong answers
-            int wrongAnswersCount = numberOfQuestions - correctAnswersCount;
-
-            // Check the 2:1 rate condition
-            bool isRateValid = (correctAnswersCount / 2) == wrongAnswersCount;
-
-            if (numberOfQuestions >= minQuestions && isRateValid)
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
             {
-                canPublish = true;
-            }
-            if (canPublish == true)
-            {
-                string updateQuery = "UPDATE Games SET CanPublish = true WHERE ID = @ID";
-                int isUpdate = await _db.SaveDataAsync(updateQuery, param);
-                Console.WriteLine($"The update of game: {gameId} was completed successfully {isUpdate}");
-            }
-            else
-            {
-                string updateQuery = "UPDATE Games SET IsPublished = false, CanPublish = false WHERE ID = @ID";
-                int isUpdate = await _db.SaveDataAsync(updateQuery, param);
-                Console.WriteLine($"The update of game: {gameId} was completed successfully {isUpdate}");
-            }
-        }
-
-        [HttpGet("GetImageFilesForDeletion/{gameCode}")]
-        public async Task<IActionResult> GetImageFilesForDeletion(int userId, int gameCode)
-        {
-            int? sessionId = HttpContext.Session.GetInt32("userId");
-            if (sessionId != null)
-            {
-                if (userId == sessionId)
+                object param2 = new
                 {
-
-                    try
+                    GameCode = gameCode
+                };
+                string gameQuery = "SELECT GameName FROM Games WHERE GameCode = @GameCode";
+                var gameRecords = await _db.GetRecordsAsync<UserWithGames>(gameQuery, param2);
+                UserWithGames game = gameRecords.FirstOrDefault();
+                if (game != null)
+                {
+                    object param3 = new
                     {
-                        List<string> deleteImages = new List<string>();
-
-                        // Retrieve image file names from the Games table where they are not 'empty' or '-'
-                        string gameImagesQuery = "SELECT QuestionImageText FROM Games WHERE GameCode = @GameCode AND QuestionImageText <> 'empty' AND QuestionImageText <> '-'";
-                        var gameImages = await _db.GetRecordsAsync<string>(gameImagesQuery, new { GameCode = gameCode });
-                        deleteImages.AddRange(gameImages.Where(image => !string.IsNullOrEmpty(image)));
-
-                        // Retrieve image file names from the Items table where they are not 'empty' or '-'
-                        string itemImagesQuery = "SELECT AnswerImageText FROM Items JOIN Games ON Items.GameID = Games.ID WHERE Games.GameCode = @GameCode AND Items.AnswerImageText <> 'empty' AND Items.AnswerImageText <> '-'";
-                        var itemImages = await _db.GetRecordsAsync<string>(itemImagesQuery, new { GameCode = gameCode });
-                        deleteImages.AddRange(itemImages.Where(image => !string.IsNullOrEmpty(image)));
-
-                        if (!deleteImages.Any())
+                        GameCode = gameCode
+                    };
+                    string getActiveStagesQuery = "SELECT COUNT(DISTINCT StageID) FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
+                    var activeStages = await _db.GetRecordsAsync<int>(getActiveStagesQuery, param3);
+                    if (activeStages.FirstOrDefault() >= 2)
+                    {
+                        object param4 = new
                         {
-                            return NotFound("No image files found for deletion.");
+                            GameCode = gameCode
+                        };
+                        string getActiveQuestionsQuery = "SELECT Distinct ID FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
+                        var activeQuestions = await _db.GetRecordsAsync<GameQuestions>(getActiveQuestionsQuery, param4);
+                        if (activeQuestions.ToList().Count >= 20)
+                        {
+                            object param5 = new
+                            {
+                                GameCode = gameCode
+                            };
+                            string publishGameQuery = "UPDATE Games SET IsPublished = 1 WHERE GameCode = @GameCode";
+                            int isPublished = await _db.SaveDataAsync(publishGameQuery, param5);
+                            if (isPublished > 0)
+                            {
+                                return Ok("Game published");
+                            }
+                            return BadRequest("Game not published");
                         }
-
-                        // Return the list of image files to the client
-                        return Ok(deleteImages);
+                        return BadRequest("Game not ready to be published");
                     }
-                    catch (Exception ex)
-                    {
-                        // Log the exception here
-                        return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving image files for deletion.");
-                    }
-                    return BadRequest("It's Not Your Game");
+                    return BadRequest("Game not ready to be published");
                 }
-                return BadRequest("User Not Logged In");
+                return BadRequest("Game Not Found");
             }
-            return BadRequest("No Session");
-
-
+            return BadRequest("User Not Found");
         }
+
+        //unpublish game
+        [HttpPut("unpublishGame/{gameCode}")]
+        public async Task<IActionResult> UnpublishGame(int userId, int gameCode)
+        {
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    GameCode = gameCode
+                };
+                string gameQuery = "SELECT GameName FROM Games WHERE GameCode = @GameCode";
+                var gameRecords = await _db.GetRecordsAsync<UserWithGames>(gameQuery, param2);
+                UserWithGames game = gameRecords.FirstOrDefault();
+                if (game != null)
+                {
+                    object param3 = new
+                    {
+                        GameCode = gameCode
+                    };
+                    string unpublishGameQuery = "UPDATE Games SET IsPublished = 0 WHERE GameCode = @GameCode";
+                    int isUnpublished = await _db.SaveDataAsync(unpublishGameQuery, param3);
+                    if (isUnpublished > 0)
+                    {
+                        return Ok("Game unpublished");
+                    }
+                    return BadRequest("Game not unpublished");
+                }
+                return BadRequest("Game Not Found");
+            }
+            return BadRequest("User Not Found");
+        }
+
+
+
+        [HttpPut("canPublishGame/{gameCode}")]
+        public async Task<IActionResult> CanPublishGame(int userId, int gameCode)
+        {
+            // Check if the user exists
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, new { UserId = userId });
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user == null)
+            {
+                return BadRequest("User Not Found");
+            }
+
+            // Check if the game exists
+            string gameQuery = "SELECT GameName FROM Games WHERE GameCode = @GameCode";
+            var gameRecords = await _db.GetRecordsAsync<UserWithGames>(gameQuery, new { GameCode = gameCode });
+            UserWithGames game = gameRecords.FirstOrDefault();
+            if (game == null)
+            {
+                return BadRequest("Game Not Found");
+            }
+
+            // Get the count of active stages
+            string getActiveStagesQuery = "SELECT COUNT(DISTINCT StageID) FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
+            var activeStages = await _db.GetRecordsAsync<int>(getActiveStagesQuery, new { GameCode = gameCode });
+
+            // Get the count of active questions
+            string getActiveQuestionsQuery = "SELECT COUNT(DISTINCT ID) FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
+            var activeQuestions = await _db.GetRecordsAsync<int>(getActiveQuestionsQuery, new { GameCode = gameCode });
+
+            bool canPublish = activeStages.FirstOrDefault() >= 2 && activeQuestions.FirstOrDefault() >= 20;
+
+            // Update the CanPublish status
+            string canPublishGameQuery = "UPDATE Games SET CanPublish = @CanPublish WHERE GameCode = @GameCode";
+            int isCanPublished = await _db.SaveDataAsync(canPublishGameQuery, new { CanPublish = canPublish, GameCode = gameCode });
+
+            if (isCanPublished > 0)
+            {
+                return Ok(canPublish);
+            }
+
+            return BadRequest("Failed to update game publish status");
+        }
+
 
     }
 }

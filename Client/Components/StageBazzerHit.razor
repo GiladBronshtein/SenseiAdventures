@@ -90,7 +90,7 @@
                 </div>
 
                 <!-- Correct Answer -->
-                <label for="correctAnswer" class="form-label">תשובה נכונה:</label>
+                <label for="correctAnswer" class="form-label">תשובה שגויה:</label>
                 <div class="mb-3 align-items-center">
                     <div class="col-7">
                         <InputText maxlength="@AnswersDescriptionMaxChars"
@@ -98,7 +98,7 @@
                                    id="correctAnswer"
                                    @bind-Value="CorrectAnswer"
                                    @oninput="@(e => HandleInputChange(e, nameof(CorrectAnswer)))"
-                                   placeholder="טקסט לתשובה נכונה"
+                                   placeholder="טקסט לתשובה שגויה"
                                    aria-describedby="correctAnswer"
                                    disabled="@(!string.IsNullOrWhiteSpace(CorrectImage) && CorrectImage != "empty")"
                                    required />
@@ -149,7 +149,7 @@
                                    class="form-control"
                                    @bind-Value="WrongAnswer1"
                                    @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer1)))"
-                                   placeholder="טקסט לתשובה שגויה"
+                                   placeholder="טקסט לתשובה נכונה"
                                    aria-describedby="wrongAnswer1"
                                    disabled="@(!string.IsNullOrWhiteSpace(Wrong1Image) && Wrong1Image != "empty")"
                                    required />
@@ -195,7 +195,7 @@
                                    class="form-control"
                                    @bind-Value="WrongAnswer2"
                                    @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer2)))"
-                                   placeholder="טקסט לתשובה שגויה"
+                                   placeholder="טקסט לתשובה נכונה"
                                    aria-describedby="wrongAnswer2"
                                    disabled="@(!string.IsNullOrWhiteSpace(Wrong2Image) && Wrong2Image != "empty")"
                                    required />
@@ -241,7 +241,7 @@
                                    class="form-control"
                                    @bind-Value="WrongAnswer3"
                                    @oninput="@(e => HandleInputChange(e, nameof(WrongAnswer3)))"
-                                   placeholder="טקסט לתשובה שגויה"
+                                   placeholder="טקסט לתשובה נכונה"
                                    aria-describedby="wrongAnswer3"
                                    disabled="@(!string.IsNullOrWhiteSpace(Wrong3Image) && Wrong3Image != "empty")"
                                    required />

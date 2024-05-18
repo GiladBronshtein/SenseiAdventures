@@ -75,9 +75,11 @@
                                         <div class="row">
                                             <label for="gameImageAdded" class="form-label">תמונת המשחק</label>
                                         </div>
+                                        <div style="position: relative;">
+                                            <img id="gameImageAdded" src="@gameDataChild.GameImage" height="90" />
+                                            <i class="fa-solid fa-trash delete-image-btn" @onclick="QueueImageForDeletion"></i>
+                                        </div>
 
-                                        <img id="gameImageAdded" src="@gameDataChild.GameImage" height="90" />
-                                        <i class="fa-solid fa-trash delete-image-btn" @onclick="QueueImageForDeletion"></i>
                                     </div>
                                 }
                                 else

@@ -389,7 +389,6 @@
         </div>
     </div>
 
-
     <!-- Modal 1 -->
     <div class="modal fade" id=@($"modal1") tabindex="-1" aria-labelledby=@($"modalLabel1") aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -400,6 +399,7 @@
                 </div>
                 <div class="modal-body">
                     בדוכן זה תוכלו לשבור בקבוקים ולזכות בפרסים נחמדים
+
                 </div>
                 <div class="text-center p-2">
                     <img src="./assets-images/stageBottles1.png" class="img-fluid rounded mx-auto d-block" alt="Image description">
@@ -852,7 +852,7 @@
         var response = await Http.GetFromJsonAsync<GameDetails>($"api/game/{UserId}/getGame/{gameCode}");
         if (response != null)
         {
-            // Assuming you have a property `int relevantStageId` that defines the relevant stage id
+            // Taking property `StageId` that defines the relevant stage id
             game = new GameDetails
                 {
                     ID = response.ID,
