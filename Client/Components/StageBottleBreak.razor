@@ -427,6 +427,7 @@
     [Parameter] public int stage { get; set; }
     [Parameter] public EventCallback<GameQuestions> OnQuestionAdded { get; set; }
     [Parameter] public EventCallback<GameQuestions> OnQuestionDeleted { get; set; }
+    [Parameter] public bool isLoading { get; set; }  // State variable to track loading status
 
     private QuestionToAdd questionToAdd = new QuestionToAdd();
     private GameAnswers answersToAdd = new GameAnswers();
@@ -464,7 +465,6 @@
 
     string msg = "";
     bool isDeleteModalOpen = false;
-    bool isLoading = true;  // State variable to track loading status
 
     List<string> DeleteImages = new List<string>();
 

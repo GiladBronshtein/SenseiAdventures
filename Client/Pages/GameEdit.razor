@@ -222,7 +222,9 @@
                 <!-- Sidebar Footer -->
                 <div class="sidebar-footer text-center">
                     <button type="button" class="btn @(gameData?.IsPublished == true ? "btn-danger" : CanPublish ? "btn-success" : "btn-secondary") w-100" @onclick="PublishOrUnpublishGame" disabled="@(gameData?.IsPublished == false && !CanPublish)">
+                       <span class="button-text">
                         @(gameData?.IsPublished == true ? "הסרת פרסום" : "פרסום")
+                        </span>
                     </button>
                 </div>
             </div>
@@ -236,13 +238,13 @@
                         @switch (currentStage)
                         {
                             case StageEnum.Stage.StageA:
-                                <StageBottleBreak gameCode="@gameCode" game="@gameData" stage=1 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" />
+                                <StageBottleBreak gameCode="@gameCode" game="@gameData" stage=1 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" isLoading="@isLoading" />
                                 break;
                             case StageEnum.Stage.StageB:
-                                <StageTargetHit gameCode="@gameCode" game="@gameData" stage=2 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" />
+                                <StageTargetHit gameCode="@gameCode" game="@gameData" stage=2 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" isLoading="@isLoading" />
                                 break;
                             case StageEnum.Stage.StageC:
-                                <StageBazzerHit gameCode="@gameCode" game="@gameData" stage=3 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" />
+                                <StageBazzerHit gameCode="@gameCode" game="@gameData" stage=3 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" isLoading="@isLoading" />
                                 break;
                             case StageEnum.Stage.StageD:
                                 <StageSlashing />
@@ -263,22 +265,22 @@
     [Parameter] public string gameCode { get; set; }
     GameDetails gameData;
     UserWithGames user;
-    
+
     private int activeStages;
     private int activeQuestions;
     private StageEnum.Stage currentStage = StageEnum.Stage.None;
     private bool CanPublish => gameData?.CanPublish == true;
+    bool isLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
+        isLoading = true;
         await LoadGameData();
     }
 
-
-
     private async Task LoadGameData()
     {
-
+        isLoading = true;
         gameData = await Http.GetFromJsonAsync<GameDetails>($"api/Game/{UserId}/getGame/{gameCode}");
         await UpdateActiveStagesAndQuestions();
         await CheckCanPublishGame(); // Check if the game can be published
@@ -288,6 +290,8 @@
 
     private async Task UpdateActiveStagesAndQuestions()
     {
+        isLoading = true;
+
         activeStages = await Http.GetFromJsonAsync<int>($"api/Game/{UserId}/getActiveStages/{gameCode}");
         activeQuestions = await Http.GetFromJsonAsync<int>($"api/Game/{UserId}/getActiveQuestions/{gameCode}");
         await CheckCanPublishGame(); // Check if the game can be published after updating
@@ -296,6 +300,7 @@
 
     private async Task CheckCanPublishGame()
     {
+        isLoading = true;
         var response = await Http.PutAsync($"api/Game/{UserId}/canPublishGame/{gameCode}", null);
         if (response.IsSuccessStatusCode)
         {
@@ -313,29 +318,38 @@
 
     private void SetStage(StageEnum.Stage stage)
     {
+        isLoading = true;
         currentStage = stage;
         StateHasChanged(); // Update the UI
     }
 
     private async Task HandleQuestionAdded(GameQuestions question)
     {
+        isLoading = true;
+
         await UpdateActiveStagesAndQuestions();
         StateHasChanged(); // Force a re-render of the component
     }
 
     private async Task HandleQuestionDeleted(GameQuestions question)
     {
+        isLoading = true;
+
         await UpdateActiveStagesAndQuestions();
         StateHasChanged(); // Optionally force re-render
     }
 
     private void SetStageToDefault()
     {
+        isLoading = true;
+
         SetStage(StageEnum.Stage.None); // Assuming StageDefault is defined in your StageEnum
     }
 
     private async Task PublishOrUnpublishGame()
     {
+        isLoading = true;
+
         if (gameData.IsPublished)
         {
             await UnpublishGame();
@@ -344,10 +358,14 @@
         {
             await PublishGame();
         }
+        await RefreshGameDetails();
+
     }
 
     private async Task PublishGame()
     {
+        isLoading = true;
+
         var response = await Http.PutAsync($"api/Game/{UserId}/publishGame/{gameCode}", null);
         if (response.IsSuccessStatusCode)
         {
@@ -362,11 +380,12 @@
 
     private async Task UnpublishGame()
     {
+        isLoading = true;
+
         var response = await Http.PutAsync($"api/Game/{UserId}/unpublishGame/{gameCode}", null);
         if (response.IsSuccessStatusCode)
         {
             gameData.IsPublished = false;
-
             StateHasChanged(); // Trigger a re-render to update the button state
         }
         else
@@ -374,6 +393,28 @@
             // Handle failure - show an error message, log, etc.
         }
     }
+    
+    private async Task RefreshGameDetails()
+    {
+        isLoading = true; // Start loading
+        var response = await Http.GetFromJsonAsync<GameDetails>($"api/game/{UserId}/getGame/{gameCode}");
+        if (response != null)
+        {
+            gameData = new GameDetails
+                {
+                    ID = response.ID,
+                    GameName = response.GameName,
+                    Questions = response.Questions.Where(q => q.StageID == ((int)currentStage)).ToList(),
+                    IsPublished = response.IsPublished,
+                    CanPublish = response.CanPublish,
+                    GameCode = response.GameCode,
+                    EndingMessage = response.EndingMessage,
+                    GameHasImage = response.GameHasImage,
+                    GameImage = response.GameImage
+                };
+        }
+        isLoading = false; // End loading
+        StateHasChanged(); // This will trigger a UI update
+    }
 
-   
 }

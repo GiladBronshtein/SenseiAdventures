@@ -73,10 +73,10 @@
 }
 
 .btn-success {
-    background: linear-gradient( to right, #23913B 25%, #28a745 50%, #23913B 75% );
+    background: linear-gradient(to right, #23913B 25%, #28a745 50%, #23913B 75%);
     background-size: 200% auto;
-    color: white; 
-    font-size: 16px; 
+    color: white;
+    font-size: 16px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -84,8 +84,32 @@
     box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.2); /* Elevated shadow */
     animation: shiny 3s linear infinite; /* Shiny animation */
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; /* Smooth transitions for color changes */
+    position: relative;
+    overflow: hidden;
 }
 
+    /* Happy smiley face for .btn-success */
+    .btn-success::after {
+        content: "☺";
+        font-size: 26px;
+        color: white;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        transition: opacity 0.5s;
+    }
+
+    /* Hide original text and show happy smiley on hover */
+    .btn-success:hover::after {
+        opacity: 1;
+    }
+
+    .btn-success:hover .button-text {
+        opacity: 0;
+        transition: opacity 0.5s;
+    }
 
 /* Overall text and link enhancements for better readability and effect */
 a.text-white {
@@ -106,8 +130,40 @@ a.text-white:hover {
         box-shadow: none;
     }
 }
+
+
+
+
+
+
+
+/* Existing class */
 .btn-danger {
-    color: #fff;
-    background-color: lightcoral;
-    border-color: lightcoral;
+    color: #880808;
+    background-color: #CCB7B7;
+    border-color: #CCB7B7;
+    position: relative;
+    overflow: hidden;
 }
+
+    /* Create a span inside the button for the sad smiley */
+    .btn-danger::after {
+        content: "☹";
+        color: #880808;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        transition: opacity 0.5s;
+    }
+
+    /* Hide original text and show sad smiley on hover */
+    .btn-danger:hover::after {
+        opacity: 1;
+    }
+
+    .btn-danger:hover .button-text {
+        opacity: 0;
+        transition: opacity 0.5s;
+    }
