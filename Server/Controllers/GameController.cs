@@ -176,6 +176,7 @@ namespace template.Server.Controllers
 
             // Retrieve and return the detailed list of games associated with the user
             var detailedGames = await GetUserDetailedGames(userId);
+            // Return the detailed list of games
             return Ok(detailedGames);
         }
 
@@ -198,6 +199,7 @@ namespace template.Server.Controllers
 
             // Calculate the game code, update it, and retrieve game details
             int gameCode = newGameId + 100;
+            // Update the game code
             bool isUpdateSuccessful = await UpdateGameCode(newGameId, gameCode);
             if (!isUpdateSuccessful)
             {
@@ -215,6 +217,7 @@ namespace template.Server.Controllers
             {
                 UserId = userId
             };
+            // Check if the user exists
             string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
             var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
             UserWithGames user = userRecords.FirstOrDefault();
@@ -245,6 +248,7 @@ namespace template.Server.Controllers
                     GameID = gameDetails.ID
                 };
                 string getQuestionsQuery = "select * from questions q where GameID = @GameID";
+                //get questions of game
                 var getQuestionsRecords = await _db.GetRecordsAsync<GameQuestions>(getQuestionsQuery, getQuestionsParam);
                 gameDetails.Questions = getQuestionsRecords.ToList();
 

@@ -247,7 +247,7 @@
                                 <StageBazzerHit gameCode="@gameCode" game="@gameData" stage=3 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" isLoading="@isLoading" />
                                 break;
                             case StageEnum.Stage.StageD:
-                                <StageSlashing />
+                                <StageSlashing gameCode="@gameCode" game="@gameData" stage=4 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" isLoading="@isLoading" />
                                 break;
                             default:
                                 <StageDefault gameDataChild="@gameData" userID="@UserId" />
