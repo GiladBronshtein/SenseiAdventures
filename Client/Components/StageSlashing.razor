@@ -21,6 +21,8 @@
         </div>
 
         <div class="col-md-5 text-end">
+            <button type="button" class="btn btn-secondary">מחיקת דוכן</button>
+
             <button type="button" class="btn btn-secondary">כיבוי דוכן</button>
         </div>
     </div>
@@ -84,7 +86,7 @@
 
                 <div class="mb-5 mt-3 col-9">
                     <button type="submit" id="liveToastBtn" class="btn btn-primary shadow-sm me-1">שמירת שאלה</button>
-                    <button type="button" class="btn btn-secondary shadow-sm" @onclick="ClearFormFields">ביטול</button>
+                    @* <button type="button" class="btn btn-secondary shadow-sm" @onclick="ClearFormFields">ביטול</button> *@
                 </div>
             </EditForm>
 
@@ -174,8 +176,9 @@
         </div>
 
         <!--QUESTIONS LIST -->
-        @if (game.Questions.Count > 0)
+        @if (countAnswers > 0)
         {
+
             <div class="col-md-5 mt-4">
                 <h5>רשימת מסיחים</h5>
                 <div class="scrollable-table-body">
@@ -216,7 +219,7 @@
                                             </td>
 
                                             <td class="text-center">
-                                                <button class="btn btn-outline-primary btn-sm" @onclick="()=>EditQuestion(question)"> @*FIXXXXXx*@
+                                                <button class="btn btn-outline-primary btn-sm" @onclick="()=>EditAnswer(answer)"> 
                                                     <i class="fa-solid fa-square-pen fa-fw" style="width: 14px;"></i>
                                                 </button>
                                             </td>
@@ -321,6 +324,7 @@
     int QuestionDescriptionMaxChars = 50;
     int AnswersDescriptionMaxChars = 30;
     int questionID = 0;
+    int countAnswers = 0;
 
     bool editAnswer = false;
     bool hasimage = false;
@@ -599,7 +603,16 @@
         StateHasChanged(); // Refresh UI with loaded data
     }
 
-
+    //editanswer
+    private void EditAnswer(GameAnswers answer)
+    {
+        ClearFormFields();
+        editAnswer = true;
+        CorrectAnswer = answer.AnswerDescription;
+        CorrectImage = answer.AnswerImage;
+        IsCorrect = answer.IsCorrect;
+        StateHasChanged(); // Refresh UI with loaded data
+    }
 
 
 
@@ -697,6 +710,8 @@
                     StateHasChanged(); // This ensures the UI updates with the new image
                 }
             }
+            //else resize to make sure file size is 300kb or less
+
         }
     }
 
@@ -767,6 +782,7 @@
                 QuestionDescription = game.Questions.FirstOrDefault()?.QuestionDescription;
                 questionID = game.Questions.FirstOrDefault()?.ID ?? 0;
                 myFileImage = game.Questions.FirstOrDefault()?.QuestionImage;
+                countAnswers = game.Questions.FirstOrDefault()?.Answers.Count ?? 0;
             }
         }
         Console.WriteLine(QuestionDescription);
