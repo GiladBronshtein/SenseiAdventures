@@ -34,7 +34,7 @@ namespace template.Server.Helpers
                      .Resize(new ResizeOptions
                      {
                          Mode = ResizeMode.Max,
-                         Size = new Size(600, 600)
+                         Size = new Size(400, 400)
                      }));
 
                 var fileName = $"{Guid.NewGuid()}.{extension}";
