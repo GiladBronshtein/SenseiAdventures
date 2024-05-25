@@ -5,7 +5,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>C:\Users\gbronshtein\Desktop\HIT_FinalProject\FinalProject\SenseiAdventures\Server\bin\Release\net6.0\publish\</_PublishTargetUrl>
-    <History>True|2024-04-28T19:30:53.7990784Z;</History>
+    <History>True|2024-05-25T16:51:06.8635339Z;True|2024-05-25T19:33:54.3985273+03:00;True|2024-05-25T19:31:35.7266316+03:00;True|2024-05-25T19:24:00.9838624+03:00;True|2024-05-25T19:01:01.4981423+03:00;True|2024-05-25T16:47:38.8536890+03:00;True|2024-04-28T22:30:53.7990784+03:00;</History>
     <LastFailureDetails />
   </PropertyGroup>
 </Project>
