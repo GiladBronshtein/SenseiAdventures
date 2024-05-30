@@ -30,6 +30,7 @@ namespace template.Server.Controllers
             var countFalseTry = 0;
             foreach (string img in images)
             {
+                Console.WriteLine(img);
                 if (_filesmanage.DeleteFile(img, "") == false)
                 {
                     countFalseTry++;

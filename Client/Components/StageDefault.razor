@@ -25,7 +25,7 @@
 
                     <div class="nested">
                         <!-- Game Name -->
-                        <div class="row mt-3">
+                        <div class="row mt-5">
                             <label for="gameName" class="form-label"> שם המשחק (2-30 תווים)</label>
                         </div>
 
@@ -66,14 +66,17 @@
                     </div>
 
                     <!-- GAME IMAGE -->
-                    <div class="row mt-3">
+                    <div class="row mt-5">
                         <div class="col-md-6">
                             <div class="mb-2">
                                 @if (gameDataChild.GameHasImage)
                                 {
                                     <div class="mb-2">
                                         <div class="row">
-                                            <label for="gameImageAdded" class="form-label">תמונת המשחק</label>
+                                            <label for="gameImageAdded" class="form-label">תמונת המשחק
+                                                <Tooltip Text="תמונת המשחק תופיע במקומות מגוונים בתוך המשחק"><i class="fa-solid fa-circle-info"></i></Tooltip>
+
+                                            </label>
                                         </div>
                                         <div style="position: relative;">
                                             <img id="gameImageAdded" src="@gameDataChild.GameImage" height="90" />
@@ -85,20 +88,34 @@
                                 else
                                 {
                                     <div class="mb-2">
-                                        <label for="gameImage" class="form-label">תמונת המשחק</label>
+                                        <label for="gameImage" class="form-label">תמונת המשחק
+                                            <Tooltip Text="תמונת המשחק תופיע במקומות מגוונים בתוך המשחק"><i class="fa-solid fa-circle-info"></i></Tooltip>
+
+                                        </label>
                                         <InputFile id="gameImage" class="form-control" OnChange="UploadFile" accept="image/*" />
                                     </div>
                                 }
                             </div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-12 col-md-6 py-2">
-                            <button type="submit" value="send" class="btn btn-primary w-100">שמירה</button>
+                    @if (isLoading)
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center">
+                                <div class="spinner-border text-dark" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <div class="row">
+                            <div class="col-12 col-md-6 py-2">
+                                <button type="submit" value="send" class="btn btn-primary w-100">שמירה</button>
+                            </div>
                         </div>
-                    </div>
-
+                    }
                 </EditForm>
             }
             else
@@ -143,6 +160,7 @@
     bool hasimage = false;
     string myFileImage = "";
     private List<string> imagesToDelete = new List<string>();
+    private bool isLoading { get; set; } 
 
     void failedSubmit()
     {
@@ -150,6 +168,7 @@
 
     async Task EditSettings()
     {
+        isLoading = true;
         bool hasImage = !string.IsNullOrEmpty(myFileImage);
         if (hasImage)
         {
@@ -175,6 +194,8 @@
             await ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
             return;
         }
+        isLoading = false;
+
     }
 
     private async Task ShowToast(bool isSuccess, string message, string icon)
@@ -213,7 +234,10 @@
 
     private async Task UploadFile(InputFileChangeEventArgs e)
     {
+        isLoading = true;
+
         var imageFiles = e.GetMultipleFiles();
+
         foreach (var file in imageFiles)
         {
             if (file.Size <= maxFileSize)
@@ -232,19 +256,29 @@
                 }
             }
         }
+        isLoading = false;
+
     }
 
     private async Task DeleteImages(List<string> imagesToDelete)
     {
+        isLoading = true;
         var response = await Http.PostAsJsonAsync("api/media/deleteImages", imagesToDelete);
         if (response.IsSuccessStatusCode)
         {
             Console.WriteLine("Images deleted successfully");
+            foreach (var image in imagesToDelete)
+            {
+                Console.WriteLine(image);
+            }
+            imagesToDelete.Clear();
         }
         else
         {
             Console.WriteLine("Image deletion failed");
         }
+        isLoading = false;
+
     }
 
     private void QueueImageForDeletion()
@@ -255,6 +289,8 @@
         }
         gameDataChild.GameImage = "empty";
         gameDataChild.GameHasImage = false;
+        myFileImage = "";
+        imagesToDelete.Clear();
     }
 
     private string GetBackgroundImageStyle()

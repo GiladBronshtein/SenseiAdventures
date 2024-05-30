@@ -16,7 +16,7 @@ namespace template.Shared.Models.Games
         [Required(ErrorMessage = "יש להזין הודעת סיום")]
         [StringLength(30, MinimumLength = 2, ErrorMessage = "הודעת הסיום חייבת להכיל 2 תווים לפחות")]
         public string EndingMessage { get; set; }
-
+        public bool GameHasImage { get; set; }
         public string GameImage { get; set; }
 
     }

@@ -42,25 +42,14 @@ namespace template.Server.Controllers
 
         private async Task<int> CreateGame(GameToAdd gameToAdd, int userId)
         {
-            bool hasImage = false;
-            string gameImage = gameToAdd.GameImage;
-            if (gameToAdd.GameImage != "")
-            {
-                hasImage = true;
-                gameImage = gameToAdd.GameImage;
-            }
-            else
-            {
-                gameImage = "empty";
-            }
             var newGameParam = new
             {
                 CanPublish = false, // Assuming all new games cannot be published initially
                 DifficultLevel = 1, // Default difficulty level
                 EndingMessage = gameToAdd.EndingMessage, // Default empty ending message
                 GameCode = 0, // Initial game code, will be updated later
-                GameHasImage = hasImage,
-                GameImage = gameImage, // Handle image information
+                GameHasImage = gameToAdd.GameHasImage,
+                GameImage = gameToAdd.GameImage, // Handle image information
                 GameName = gameToAdd.GameName,
                 IsPublished = false, // New games are not published initially
                 UserID = userId
@@ -684,7 +673,6 @@ namespace template.Server.Controllers
             }
         }
 
-        //if num of question per gamecode is 20 or above, and stage is 2 or above, then game is ready to be published
         [HttpPut("publishGame/{gameCode}")]
         public async Task<IActionResult> PublishGame(int userId, int gameCode)
         {
@@ -782,8 +770,6 @@ namespace template.Server.Controllers
             return BadRequest("User Not Found");
         }
 
-
-
         [HttpPut("canPublishGame/{gameCode}")]
         public async Task<IActionResult> CanPublishGame(int userId, int gameCode)
         {
@@ -826,7 +812,5 @@ namespace template.Server.Controllers
 
             return BadRequest("Failed to update game publish status");
         }
-
-
     }
 }

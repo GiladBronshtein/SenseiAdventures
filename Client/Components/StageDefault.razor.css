@@ -7,6 +7,7 @@
     position: relative; /* Ensure the z-index works correctly */
     z-index: 1; /* Initial z-index */
     transition: transform 0.5s, z-index 0s;
+    background: white;
 }
 
 .fa-trash {
@@ -21,5 +22,6 @@
 #gameImageAdded:hover {
     transform: scale(3);
     z-index: 1000; /* Ensure the image appears on top of other elements */
+    background: white;
 }
 

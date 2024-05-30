@@ -65,8 +65,10 @@
 
                                             <!-- Image upload input -->
                                             <div class="mb-3">
-                                                <label for="gameImage" class="form-label">תמונת המשחק</label>
-                                                @if (myFileImage != "")
+                                                <label for="gameImage" class="form-label">תמונת המשחק
+                                                    <Tooltip Text="תמונת המשחק תופיע במקומות מגוונים בתוך המשחק"><i class="fa-solid fa-circle-info"></i></Tooltip>
+                                                </label>
+                                                @if (myFileImage != "empty") //Delete Image
                                                 {
                                                     <div class="img-wrapper">
                                                         <img src="@myFileImage" class="QuestionImage" width="30" />
@@ -75,14 +77,6 @@
                                                 }
                                                 else
                                                 {
-@*                                                     <div class="col-2 ps-1">
-                                                        <label class="btn btn-outline-dark btn-sm" for="FileInputID">
-                                                            <i class="fa-solid fa-image "></i>
-                                                        </label>
-                                                        <InputFile id="FileInputID" OnChange="@(e => UploadFile(e, "FileInputID"))" hidden />
-                                                    </div>
- *@
-
                                                     <div class="col-2 ps-1">
                                                         <label class="" for="FileInputID">
                                                             <i class="fa-solid fa-image image-upload-icon"></i>
@@ -243,7 +237,7 @@
     private bool submitSuccess = false;
 
     long maxFileSize = 4194304; //4MB
-    string myFileImage = "";
+    string myFileImage = "empty";
 
     protected override async Task OnInitializedAsync()
     {
@@ -266,6 +260,13 @@
 
     async Task CreateGame()
     {
+        if (myFileImage == "empty")
+        {
+            gameToAdd.GameImage = myFileImage;
+            gameToAdd.GameHasImage = false;
+
+        }
+
         var userRes = await Http.PostAsJsonAsync("api/game/" + UserId + "/addGame/", gameToAdd);
         if (userRes.IsSuccessStatusCode)
         {
@@ -388,6 +389,7 @@
                     string resizeUrl = await saveResponse.Content.ReadAsStringAsync();
                     myFileImage = "uploadedFiles/" + resizeUrl;
                     gameToAdd.GameImage = myFileImage;
+                    gameToAdd.GameHasImage = true;
                 }
                 else
                 {
