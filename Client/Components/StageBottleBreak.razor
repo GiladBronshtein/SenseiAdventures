@@ -309,7 +309,7 @@
             <div class="col-md-5 mt-4">
                 <h5>רשימת שאלות</h5>
                 <div class="scrollable-table-body">
-                    <table class="table shadow-sm table-striped table-responsive border border-1">
+                    <table class="table shadow-sm table-striped table-responsive border border-2">
                         <thead>
                             <tr>
                                 <th class="col-md-6">שאלה</th>
@@ -651,6 +651,11 @@
         questionID = question.ID;
         QuestionDescription = question.QuestionDescription;
         myFileImage = question.QuestionImage;
+        // Ensure that the AnswerDescription has some text if an image is present
+        if (string.IsNullOrWhiteSpace(CorrectAnswer) && CorrectImage != "empty") CorrectAnswer = "תשובה ללא טקסט";
+        if (string.IsNullOrWhiteSpace(WrongAnswer1) && Wrong1Image != "empty") WrongAnswer1 = "תשובה ללא טקסט";
+        if (string.IsNullOrWhiteSpace(WrongAnswer2) && Wrong2Image != "empty") WrongAnswer2 = "תשובה ללא טקסט";
+        if (string.IsNullOrWhiteSpace(WrongAnswer3) && Wrong3Image != "empty") WrongAnswer3 = "תשובה ללא טקסט";
 
         var correctAnswer = question.Answers.FirstOrDefault(a => a.IsCorrect);
         var wrongAnswers = question.Answers.Where(a => !a.IsCorrect).ToList();
@@ -666,6 +671,8 @@
 
         WrongAnswer3 = wrongAnswers.ElementAtOrDefault(2)?.AnswerDescription ?? "";
         Wrong3Image = wrongAnswers.ElementAtOrDefault(2)?.AnswerImage ?? "empty";
+
+
 
         StateHasChanged(); // Refresh UI with loaded data
     }

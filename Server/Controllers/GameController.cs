@@ -731,7 +731,45 @@ namespace template.Server.Controllers
             return BadRequest("User Not Found");
         }
 
-        //unpublish game
+        //deleteAnswer
+        [HttpDelete("deleteAnswer/{answerId}")]
+        public async Task<IActionResult> DeleteAnswer(int userId, int answerId)
+        {
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    AnswerId = answerId
+                };
+                string answerQuery = "SELECT AnswerDescription FROM Answers WHERE ID = @AnswerId";
+                var answerRecords = await _db.GetRecordsAsync<UserWithGames>(answerQuery, param2);
+                UserWithGames answer = answerRecords.FirstOrDefault();
+                if (answer != null)
+                {
+                    object param3 = new
+                    {
+                        AnswerId = answerId
+                    };
+                    string deleteAnswerQuery = "DELETE FROM Answers WHERE ID = @AnswerId";
+                    int isDelete = await _db.SaveDataAsync(deleteAnswerQuery, param3);
+                    if (isDelete > 0)
+                    {
+                        return Ok("Answer deleted");
+                    }
+                    return BadRequest("Answer not deleted");
+                }
+                return BadRequest("Answer Not Found");
+            }
+            return BadRequest("User Not Found");
+        }
+
         [HttpPut("unpublishGame/{gameCode}")]
         public async Task<IActionResult> UnpublishGame(int userId, int gameCode)
         {

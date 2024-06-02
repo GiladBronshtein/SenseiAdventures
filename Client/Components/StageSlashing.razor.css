@@ -148,8 +148,25 @@ th {
 
 
 
+.btn-outline-danger {
+    background: white;
+}
+
+.btn-outline-danger:hover {
+    color:white;
+    background: red;
+}
 
 
+
+.btn-outline-primary {
+    background: white;
+}
+
+    .btn-outline-primary:hover {
+        color: white;
+        background: blue;
+    }
 
 
 .checkbox-wrapper-26 * {

@@ -124,7 +124,7 @@
             <div class="col-md-5 mt-4">
                 <h5>רשימת שאלות</h5>
                 <div class="scrollable-table-body">
-                    <table class="table shadow-sm table-striped table-responsive border border-1">
+                    <table class="table shadow-sm table-responsive border border-2">
                         <thead>
                             <tr>
                                 <th class="col-md-6">שאלה</th>
@@ -149,26 +149,31 @@
                             {
                                 @foreach (var question in game.Questions)
                                 {
-                                    <tr>
-                                        <td class="truncate-text" data-length="20">@question.QuestionDescription</td>
-                                        <td>
-                                            @if (question.HasImage)
-                                            {
-                                                <img src="@question.QuestionImage" height="26" />
-                                            }
-                                        </td>
-                                        <td class="text-center">
-                                            <button class="btn btn-outline-primary btn-sm" @onclick="()=>EditQuestion(question)">
-                                                <i class="fa-solid fa-square-pen fa-fw" style="width: 14px;"></i>
-                                            </button>
-                                        </td>
-                                        <td class="text-center">
-                                            <button class="btn btn-outline-danger btn-sm" @onclick="() => selectedQuestionForDeletion = question"
-                                                    data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">
-                                                <i class="fa-solid fa-trash fa-fw" style="width: 14px;"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
+                                    foreach(var answer in question.Answers)
+                                    {
+                                            <tr class="@(answer.IsCorrect ? "table-success" : "table-danger")">
+
+                                            <td class="truncate-text" data-length="20">@question.QuestionDescription</td>
+                                            <td>
+                                                @if (question.HasImage)
+                                                {
+                                                    <img src="@question.QuestionImage" height="26" />
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-outline-primary btn-sm" @onclick="()=>EditQuestion(question)">
+                                                    <i class="fa-solid fa-square-pen fa-fw" style="width: 14px;"></i>
+                                                </button>
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-outline-danger btn-sm" @onclick="() => selectedQuestionForDeletion = question"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">
+                                                    <i class="fa-solid fa-trash fa-fw" style="width: 14px;"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                   
                                 }
                             }
                         </tbody>

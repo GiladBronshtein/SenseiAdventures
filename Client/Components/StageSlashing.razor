@@ -21,13 +21,24 @@
         </div>
 
         <div class="col-md-5 text-end">
-             @foreach (var question in game.Questions)
+            @if(isLoading)
+            {
+                <div class="spinner-border text-dark" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            }
+            else
+            {
+                @foreach (var question in game.Questions)
                 {
-                <button type="button" class="btn btn-secondary me-1" @onclick="() => selectedQuestionForDeletion = question" 
-                    data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">מחיקת דוכן
-                </button>
+                    <button type="button" class="btn btn-secondary me-1" @onclick="() => selectedQuestionForDeletion = question"
+                            data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">
+                        מחיקת דוכן
+                    </button>
                 }
-            <button type="button" class="btn btn-secondary">כיבוי דוכן</button>
+                <button type="button" class="btn btn-secondary">כיבוי דוכן</button>
+            }
+           
         </div>
     </div>
 
@@ -88,10 +99,19 @@
 
                 </div>
 
-                <div class="mb-5 mt-3 col-9">
-                    <button type="submit" id="liveToastBtn" class="btn btn-primary shadow-sm me-1">שמירת שאלה</button>
-                    @* <button type="button" class="btn btn-secondary shadow-sm" @onclick="ClearFormFields">ביטול</button> *@
-                </div>
+                    @if (isLoading)
+                    {
+                        <div class="spinner-border text-dark" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                    </div>
+                    }
+                    else
+                    {
+                        <div class="mb-5 mt-3 col-9">
+                            <button type="submit" id="liveToastBtn" class="btn btn-primary shadow-sm me-1">שמירת שאלה</button>
+                        </div>
+                    }
+               
             </EditForm>
 
             <EditForm Model="questionsAndAnswers" OnValidSubmit="HandleAnswerSubmit" OnInvalidSubmit="failedSubmit">
@@ -165,7 +185,17 @@
                     <div class="mt-3 mb-2">
                         @if (!editAnswer)
                         {
-                            <button type="submit" id="liveToastBtn" class="btn btn-primary shadow-sm">הוספת מסיח</button>
+                            @if (isLoading)
+                            {
+                                <div class="spinner-border text-dark" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <button type="submit" id="liveToastBtn" class="btn btn-primary shadow-sm">הוספת מסיח</button>
+
+                            }
                         }
                         else
                         {
@@ -187,7 +217,7 @@
             <div class="col-md-5 mt-4">
                 <h5>רשימת מסיחים</h5>
                 <div class="scrollable-table-body">
-                    <table class="table shadow-sm table-striped table-responsive border border-1">
+                    <table class="table shadow-sm table-responsive border border-2">
                         <thead>
                             <tr>
                                 <th class="col-md-6">מסיח</th>
@@ -214,11 +244,14 @@
                                 {
                                     foreach (var answer in question.Answers)
                                     {
-                                        <tr>
+
+                                        <tr class="@(answer.IsCorrect ? "table-success" : "table-danger")">
                                             <td class="truncate-text" data-length="20">@answer.AnswerDescription</td>
                                             <td>
                                                 @if (answer.HasImage)
                                                 {
+                                                    Console.WriteLine(answer.AnswerImage);
+
                                                     <img src="@answer.AnswerImage" height="26" />
                                                 }
                                             </td>
@@ -230,8 +263,8 @@
                                             </td>
 
                                             <td class="text-center">
-                                                <button class="btn btn-outline-danger btn-sm" @onclick="() => selectedQuestionForDeletion = question"
-                                                        data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">
+                                                <button class="btn btn-outline-danger btn-sm" @onclick="() => selectedAnswerForDelete = answer"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteAnswerConfirmationModal">
                                                     <i class="fa-solid fa-trash fa-fw" style="width: 14px;"></i>
                                                 </button>
                                             </td>
@@ -254,7 +287,7 @@
     </div>
 
 
-    <!-- Delete Confirmation Modal -->
+    <!-- Delete QUESTION Confirmation Modal -->
     <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -272,6 +305,29 @@
             </div>
         </div>
     </div>
+
+
+    <!-- Delete ANSWER Confirmation Modal -->
+    <div class="modal fade" id="deleteAnswerConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">מחיקת מסיח</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    מחיקת המסיח תתבצע לצמיתות וללא יכולת שחזור, בטוחים?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="ConfirmDeleteAnswer">מחיקה</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 
 
     <!-- Modal 1 -->
@@ -329,6 +385,8 @@
     int QuestionDescriptionMaxChars = 50;
     int AnswersDescriptionMaxChars = 30;
     int questionID = 0;
+    int answerID = 0;
+
     int countAnswers = 0;
 
     bool editAnswer = false;
@@ -350,6 +408,9 @@
 
     string questionDescriptionClass = "text-muted"; // Default class
     private GameQuestions selectedQuestionForDeletion;
+    private GameAnswers selectedAnswerForDelete;
+
+
 
     /*METHODS*/
 
@@ -424,25 +485,6 @@
             var response = await Http.PutAsJsonAsync($"api/game/{UserId}/updateQuestion/{questionID}", editedQuestion);
             if (response.IsSuccessStatusCode)
             {
-                // var currentAnswers = game.Questions.FirstOrDefault(q => q.ID == questionID)?.Answers;
-                // if (currentAnswers != null)
-                // {
-                //     var updatedAnswers = new List<GameAnswers>
-                // {
-                //     new GameAnswers { ID = currentAnswers.ElementAtOrDefault(0)?.ID ?? 0, AnswerDescription = IsCorrect.ToString(), IsCorrect = IsCorrect, QuestionID = questionID,
-                //                       HasImage = false, AnswerImage = "empty" }
-                // };
-
-                //     foreach (var answer in updatedAnswers)
-                //     {
-                //         var answerUpdate = await Http.PutAsJsonAsync($"api/game/{UserId}/updateAnswers/{answer.ID}", answer);
-                //         if (!answerUpdate.IsSuccessStatusCode)
-                //         {
-                //             Console.WriteLine("Failed to edit answer: " + await answerUpdate.Content.ReadAsStringAsync());
-                //         }
-                //     }
-
-
                 StateHasChanged();
                 ClearFormFields();
                 editAnswer = false;
@@ -465,11 +507,12 @@
         isLoading = true;  // Start showing the spinner immediately
         await DeleteImage();
         StateHasChanged();
-
+        // Ensure that the AnswerDescription has some text if an image is present
+        if (string.IsNullOrWhiteSpace(CorrectAnswer) && CorrectImage != "empty") CorrectAnswer = "תשובה ללא טקסט";
         if (!editAnswer) // Adding a new answer
         {
             // Question Validation
-            if (CorrectAnswer.Length > AnswersDescriptionMaxChars)
+            if (CorrectAnswer.Length > AnswersDescriptionMaxChars || CorrectAnswer.Length < 2)
             {
                 await ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
                 isLoading = false;
@@ -486,20 +529,23 @@
         }
         else // Editing an existing answer
         {
+            // Ensure that the AnswerDescription has some text if an image is present
+            if (string.IsNullOrWhiteSpace(CorrectAnswer) && CorrectImage != "empty") CorrectAnswer = "תשובה ללא טקסט";
             // Question Validations
-            if (CorrectAnswer.Length > AnswersDescriptionMaxChars)
+            if (CorrectAnswer.Length > AnswersDescriptionMaxChars || CorrectAnswer.Length < 2)
             {
                 await ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
                 isLoading = false;
                 return;
             }
 
-            bool hasImage = !string.IsNullOrEmpty(myFileImage) && myFileImage != "empty";
-            var currentAnswers = game.Questions.FirstOrDefault(q => q.ID == questionID)?.Answers;
+            bool hasImage = !string.IsNullOrEmpty(CorrectImage) && CorrectImage != "empty";
+            Console.WriteLine("Has Image? " + hasImage);
+            var currentAnswer = game.Questions.FirstOrDefault()?.Answers.Where(a => a.ID == answerID);
 
             GameAnswers answer = new GameAnswers
                 {
-                    ID = currentAnswers.ElementAtOrDefault(0)?.ID ?? 0,
+                    ID = currentAnswer.ElementAtOrDefault(0)?.ID ?? 0,
                     AnswerDescription = CorrectAnswer.ToString(),
                     IsCorrect = IsCorrect,
                     QuestionID = questionID,
@@ -565,7 +611,11 @@
 
         List<GameAnswers> answers = new List<GameAnswers>
         {
-            new GameAnswers { AnswerDescription = CorrectAnswer, IsCorrect = IsCorrect, QuestionID = questionId, HasImage = false, AnswerImage = CorrectImage }
+            new GameAnswers { AnswerDescription = CorrectAnswer, 
+                IsCorrect = IsCorrect, 
+                QuestionID = questionId, 
+                HasImage = !string.IsNullOrEmpty(CorrectImage) && CorrectImage != "empty",
+                AnswerImage = CorrectImage }
         };
         var response = await Http.PostAsJsonAsync($"api/game/{UserId}/addAnswers/{questionId}", answers);
         if (response.IsSuccessStatusCode)
@@ -596,24 +646,12 @@
     {
         ClearFormFields();
         editAnswer = true;
+        answerID = answer.ID;
         CorrectAnswer = answer.AnswerDescription;
         CorrectImage = answer.AnswerImage;
         IsCorrect = answer.IsCorrect;
         StateHasChanged(); // Refresh UI with loaded data
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -639,6 +677,49 @@
         }
 
     }
+
+
+    //ConfirmDeleteAnswer
+    private async Task ConfirmDeleteAnswer()
+    {
+        if (selectedAnswerForDelete != null)
+        {
+            // Add answer image to delete list if it has one
+            if (selectedAnswerForDelete.HasImage)
+            {
+                DeleteImages.Add(selectedAnswerForDelete.AnswerImage);
+            }
+
+            await DeleteAnswer(selectedAnswerForDelete);
+            selectedAnswerForDelete = null; // Reset the selected answer
+            isDeleteModalOpen = false; // Close the modal
+            await RefreshGameDetails();
+            ClearFormFields();
+            CorrectImage = "empty";
+            CorrectAnswer = string.Empty;
+            StateHasChanged(); // Refresh UI
+        }
+    }
+
+
+    //DeleteAnswer
+    private async Task DeleteAnswer(GameAnswers answer)
+    {
+        isLoading = true;
+        var response = await Http.DeleteAsync($"api/game/{UserId}/deleteAnswer/{answer.ID}");
+        if (response.IsSuccessStatusCode)
+        {
+            StateHasChanged(); // Call this to refresh the component if not automatically updating
+            await ShowToast(true, "המסיח נמחק בהצלחה.", "fa-solid fa-circle-check");
+        }
+        else
+        {
+            await ShowToast(false, "פעולת המחיקה נכשלה", "fa-solid fa-circle-exclamation");
+            Console.WriteLine("Failed to delete answer: " + await response.Content.ReadAsStringAsync());
+        }
+        await RefreshGameDetails();
+    }
+
 
     private async Task DeleteQuestion(GameQuestions question)
     {
@@ -678,6 +759,7 @@
 
     private async Task UploadFile(InputFileChangeEventArgs e, string inputId)
     {
+        isLoading = true;
         var imageFiles = e.GetMultipleFiles();
         foreach (var file in imageFiles)
         {
@@ -707,6 +789,8 @@
             //else resize to make sure file size is 300kb or less
 
         }
+        isLoading = false;
+
     }
 
     private void MakeDeleteList(string inputId)
