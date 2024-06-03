@@ -319,7 +319,7 @@ th {
     .table th {
         /*background-color: #007bff;*/
         /*color: white;*/
-        font-size: 13px;
+        font-size: 14px;
         position: sticky;
         /*top: 0;*/
         z-index: 2;
@@ -328,6 +328,7 @@ th {
     .table td {
         background-color: #ffffff;
         border-bottom: 1px solid #dee2e6;
+        padding: 7px;
     }
 
     .table tr:nth-child(even) td {

@@ -315,15 +315,18 @@ th {
     .table th {
         /*background-color: #007bff;*/
         /*color: white;*/
-        font-size: 13px;
+        font-size: 14px;
         position: sticky;
         /*top: 0;*/
         z-index: 2;
     }
 
     .table td {
-/*        background-color: #ffffff;
-*/    }
+        /*        background-color: #ffffff;
+
+*/
+        padding: 7px;
+    }
 
 
 
