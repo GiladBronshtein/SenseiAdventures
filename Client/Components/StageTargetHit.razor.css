@@ -1,7 +1,8 @@
-﻿.scrollable-table-body {
+﻿/*.scrollable-table-body {
     display: block;
-    max-height: 380px; /* Adjust based on the height needed to show 10 rows */
-    overflow-y: auto;
+    height: 390px;
+    max-height: 230px;*/ /* Adjust based on the height needed to show 10 rows */
+    /*overflow-y: auto;
     overflow-x: hidden;
 }
 
@@ -15,30 +16,30 @@ table {
 }
 
 .input-group-append {
-    margin-left: 0.5rem; /* Adjust as needed for spacing */
-}
+    margin-left: 0.5rem;*/ /* Adjust as needed for spacing */
+/*}
 
 .input-group-text {
-    background-color: transparent; /* or any color that fits your design */
-    border: none; /* Adjust or remove as per your design */
-    color: #495057; /* Match the color with your design */
-    padding-left: 0.5rem; /* Spacing inside the span */
-    padding-right: 0.5rem; /* Spacing inside the span */
-}
+    background-color: transparent;*/ /* or any color that fits your design */
+    /*border: none;*/ /* Adjust or remove as per your design */
+    /*color: #495057;*/ /* Match the color with your design */
+    /*padding-left: 0.5rem;*/ /* Spacing inside the span */
+    /*padding-right: 0.5rem;*/ /* Spacing inside the span */
+/*}
 
 .mb-3 {
-    display: flex; /* This will put the input and counter side by side */
-    align-items: center; /* This will vertically center them */
-    gap: 0.5rem; /* This provides some space between the input and the counter */
-}
+    display: flex;*/ /* This will put the input and counter side by side */
+    /*align-items: center;*/ /* This will vertically center them */
+    /*gap: 0.5rem;*/ /* This provides some space between the input and the counter */
+/*}
 
     .mb-3 .form-control {
-        flex-grow: 1; /* This will make the input take up the available space */
-    }
+        flex-grow: 1;*/ /* This will make the input take up the available space */
+    /*}
 
     .mb-3 span {
-        white-space: nowrap; /* This prevents the counter from wrapping */
-    }
+        white-space: nowrap;*/ /* This prevents the counter from wrapping */
+    /*}
 
 .text-good {
     color: green;
@@ -53,13 +54,13 @@ table {
 }
 
 .text-muted {
-    color: #6c757d; /* Default color, change as needed */
-}
+    color: #6c757d;*/ /* Default color, change as needed */
+/*}
 
 input#question::placeholder {
-    color: #ced4da !important; /* Use !important to override other styles if necessary */
-    font-size: 0.875rem !important; /* Use !important to override other styles if necessary */
-}
+    color: #ced4da !important;*/ /* Use !important to override other styles if necessary */
+    /*font-size: 0.875rem !important;*/ /* Use !important to override other styles if necessary */
+/*}
 
 .delete-image-btn {
     padding: 5px;
@@ -109,8 +110,8 @@ input#question::placeholder {
     }
 
 .truncate-text {
-    width: 100%; /* Ensure text fits the width */
-    overflow: hidden;
+    width: 100%;*/ /* Ensure text fits the width */
+    /*overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
@@ -283,4 +284,330 @@ th {
     .btn-outline-primary:hover {
         color: white;
         background: blue;
+    }*/
+
+/* Scrollable Table Body */
+.scrollable-table-body {
+    display: block;
+    height: 390px;
+    max-height: 440px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /*border-radius: 10px;*/
+    /*box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);*/
+    /*background: #f8f9fa;*/
+    direction: rtl; /* Add RTL direction */
+}
+
+/* Table */
+.table {
+    width: 100%;
+    table-layout: fixed;
+    /*border-collapse: separate;
+    border-spacing: 0;*/
+    direction: rtl; /* Add RTL direction */
+}
+
+    .table th, .table td {
+        padding: 10px;
+        text-align: right; /* Align text to the right */
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .table th {
+        /*background-color: #007bff;*/
+        /*color: white;*/
+        font-size: 13px;
+        position: sticky;
+        /*top: 0;*/
+        z-index: 2;
+    }
+
+    .table td {
+        background-color: #ffffff;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .table tr:nth-child(even) td {
+        background-color: #f2f2f2;
+    }
+
+.table-hover tbody tr:hover td {
+    background-color: #e9ecef;
+}
+
+/* Truncated Text */
+.truncate-text {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* Buttons */
+.btn-outline-primary, .btn-outline-danger {
+    padding: 3px 6px;
+    text-align: center;
+    justify-content: center;
+    border-radius: 5px;
+}
+
+.btn-outline-primary {
+    border: 1px solid #007bff;
+    color: #007bff;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+    .btn-outline-primary:hover {
+        color: white;
+        background: #007bff;
+    }
+
+.btn-outline-danger {
+    border: 1px solid #dc3545;
+    color: #dc3545;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+    .btn-outline-danger:hover {
+        color: white;
+        background: #dc3545;
+    }
+
+/* Scrollbar Styles */
+.scrollable-table-body::-webkit-scrollbar {
+    width: 12px;
+}
+
+.scrollable-table-body::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+
+.scrollable-table-body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+    .scrollable-table-body::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+/* Checkbox Styling */
+.checkbox-wrapper-26 * {
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+
+.checkbox-wrapper-26 input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox-wrapper-26 label {
+    --size: 50px;
+    --shadow: calc(var(--size) * .07) calc(var(--size) * .1);
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: var(--size);
+    height: var(--size);
+    background-color: #f72414;
+    border-radius: 50%;
+    box-shadow: 0 var(--shadow) #ffbeb8;
+    cursor: pointer;
+    transition: 0.2s ease transform, 0.2s ease background-color, 0.2s ease box-shadow;
+    overflow: hidden;
+    z-index: 1;
+}
+
+    .checkbox-wrapper-26 label:before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 0;
+        left: 0;
+        width: calc(var(--size) * .7);
+        height: calc(var(--size) * .7);
+        margin: 0 auto;
+        background-color: #fff;
+        transform: translateY(-50%);
+        border-radius: 50%;
+        box-shadow: inset 0 var(--shadow) #ffbeb8;
+        transition: 0.2s ease width, 0.2s ease height;
+    }
+
+    .checkbox-wrapper-26 label:hover:before {
+        width: calc(var(--size) * .55);
+        height: calc(var(--size) * .55);
+        box-shadow: inset 0 var(--shadow) #ff9d96;
+    }
+
+    .checkbox-wrapper-26 label:active {
+        transform: scale(0.9);
+    }
+
+.checkbox-wrapper-26 .tick_mark {
+    position: absolute;
+    top: -1px;
+    right: 0;
+    left: calc(var(--size) * -.05);
+    width: calc(var(--size) * .6);
+    height: calc(var(--size) * .6);
+    margin: 0 auto;
+    margin-left: calc(var(--size) * .14);
+    transform: rotateZ(-40deg);
+}
+
+    .checkbox-wrapper-26 .tick_mark:before,
+    .checkbox-wrapper-26 .tick_mark:after {
+        content: "";
+        position: absolute;
+        background-color: #fff;
+        border-radius: 2px;
+        opacity: 0;
+        transition: 0.2s ease transform, 0.2s ease opacity;
+    }
+
+    .checkbox-wrapper-26 .tick_mark:before {
+        left: 0;
+        bottom: 0;
+        width: calc(var(--size) * .1);
+        height: calc(var(--size) * .3);
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.23);
+        transform: translateY(calc(var(--size) * -.68));
+    }
+
+    .checkbox-wrapper-26 .tick_mark:after {
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: calc(var(--size) * .1);
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.23);
+        transform: translateX(calc(var(--size) * .78));
+    }
+
+.checkbox-wrapper-26 input[type="checkbox"]:checked + label {
+    background-color: #07d410;
+    box-shadow: 0 var(--shadow) #92ff97;
+}
+
+    .checkbox-wrapper-26 input[type="checkbox"]:checked + label:before {
+        width: 0;
+        height: 0;
+    }
+
+    .checkbox-wrapper-26 input[type="checkbox"]:checked + label .tick_mark:before,
+    .checkbox-wrapper-26 input[type="checkbox"]:checked + label .tick_mark:after {
+        transform: translate(0);
+        opacity: 1;
+    }
+
+.answer-text {
+    font-size: 1.2rem;
+    color: black;
+}
+
+/* Input Styling */
+input#question::placeholder {
+    color: #ced4da !important;
+    font-size: 0.875rem !important;
+}
+
+/* Delete Image Button */
+.delete-image-btn {
+    padding: 5px;
+}
+
+    .delete-image-btn:hover {
+        color: red;
+        cursor: pointer;
+    }
+
+/* Question Image */
+.QuestionImage {
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+    border: 1px solid #f8f9fa;
+    border-radius: 3px;
+    margin: 0 auto;
+    transition: transform 0.3s ease;
+}
+
+    .QuestionImage:hover {
+        transform: scale(3);
+        z-index: 1;
+    }
+
+/* Info Button */
+.info {
+    color: black;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+    .info:hover {
+        color: blue;
+    }
+
+/* Miscellaneous */
+.input-group {
+    display: flex;
+    align-items: center;
+}
+
+.input-group-append {
+    margin-left: 0.5rem;
+}
+
+.input-group-text {
+    background-color: transparent;
+    border: none;
+    color: #495057;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.mb-3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+    .mb-3 .form-control {
+        flex-grow: 1;
+    }
+
+    .mb-3 span {
+        white-space: nowrap;
+    }
+
+.text-good {
+    color: green;
+}
+
+.text-warning {
+    color: orange;
+}
+
+.text-danger {
+    color: red;
+}
+
+.text-muted {
+    color: #6c757d;
+}
+
+.image-upload-icon {
+    top: 50%;
+    left: 50%;
+    font-size: 1.9rem;
+    color: #6c757d;
+    cursor: pointer;
+}
+
+    .image-upload-icon:hover {
+        color: #007bff;
     }
