@@ -98,3 +98,19 @@
     .scrollable-table-body::-webkit-scrollbar-thumb:hover {
         background: #555;
     }
+
+
+    .form-check-input {
+        border: 2px orange solid;
+    }
+
+
+        .form-check-input:disabled {
+            background-color: #e9ecef;
+            border: 1px gray solid;
+        }
+
+        .form-check-input:checked {
+            background-color: green;
+            border: 1px green solid;
+        }
