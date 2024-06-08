@@ -155,7 +155,7 @@
                                                 </td>
 
                                                 <td class="col-auto text-center">
-                                                    <i class="fa-solid fa-chart-simple icon link-primary"></i>
+                                                    <i class="fa-solid fa-chart-simple icon link-primary" @onclick="() => NavigateToStatistics(game.ID, game.GameName, game.GameCode)"></i>
                                                 </td>
 
                                                 <td class="col-auto text-center">
@@ -263,6 +263,11 @@
         {
             error = userRes.Content.ReadAsStringAsync().Result;
         }
+    }
+
+    private void NavigateToStatistics(int gameId, string gameName, string gameCode)
+    {
+        Nav.NavigateTo($"/statistics/{gameId}?gameName={Uri.EscapeDataString(gameName)}&gameCode={gameCode}");
     }
 
     async Task CreateGame()

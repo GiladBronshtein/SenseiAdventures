@@ -1,0 +1,64 @@
+﻿@using template.Shared.Models.Games
+
+@inject IJSRuntime JSRuntime;
+
+<canvas id="@ChartId" width="400" height="200"></canvas>
+
+@code {
+    [Parameter]
+    public List<StatisticsStages> StageStatistics { get; set; }
+
+    [Parameter]
+    public string ChartId { get; set; }
+
+    [Parameter]
+    public string ChartLabel { get; set; }
+
+    [Parameter]
+    public double? YAxisMax { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await RenderChart();
+        }
+    }
+
+    private async Task RenderChart()
+    {
+        var groupedStats = StageStatistics.GroupBy(s => s.StageID)
+                                          .Select(g => new
+                                          {
+                                              StageID = g.Key,
+                                              AverageGrade = g.Average(s => s.StageGrade),
+                                              AverageTime = g.Average(s => ConvertTimeToMinutes(s.StageTime)) // Convert time to minutes
+                                          })
+                                          .ToList();
+
+        var dataLabels = groupedStats.Select(g => g.StageID.ToString()).ToArray();
+        var dataValues = ChartLabel.Contains("זמנים") ? groupedStats.Select(g => g.AverageTime).ToArray() : groupedStats.Select(g => g.AverageGrade).ToArray();
+        var backgroundColors = groupedStats.Select(_ => GetRandomColor()).ToArray();
+
+        await JSRuntime.InvokeVoidAsync("renderBarChart", ChartId, dataLabels, dataValues, backgroundColors, ChartLabel, YAxisMax);
+    }
+
+    private double ConvertTimeToMinutes(string time)
+    {
+        var parts = time.Split(':');
+        if (parts.Length == 2 && int.TryParse(parts[0], out int minutes) && int.TryParse(parts[1], out int seconds))
+        {
+            return minutes + (seconds / 60.0);
+        }
+        return 0;
+    }
+
+    private string GetRandomColor()
+    {
+        Random random = new Random();
+        int r = random.Next(256);
+        int g = random.Next(256);
+        int b = random.Next(256);
+        return $"rgba({r}, {g}, {b}, 0.2)";
+    }
+}

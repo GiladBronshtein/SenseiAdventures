@@ -731,7 +731,6 @@ namespace template.Server.Controllers
             return BadRequest("User Not Found");
         }
 
-        //deleteAnswer
         [HttpDelete("deleteAnswer/{answerId}")]
         public async Task<IActionResult> DeleteAnswer(int userId, int answerId)
         {
@@ -849,6 +848,41 @@ namespace template.Server.Controllers
             }
 
             return BadRequest("Failed to update game publish status");
+        }
+
+        // method to get stage statistics
+        [HttpGet("getStageStatistics/{gameid}")]
+        public async Task<IActionResult> GetStageStatistics(int userId, int gameid)
+        {
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    GameId = gameid
+                };
+                string gameQuery = "SELECT GameName FROM Games WHERE ID = @GameId";
+                var gameRecords = await _db.GetRecordsAsync<UserWithGames>(gameQuery, param2);
+                UserWithGames game = gameRecords.FirstOrDefault();
+                if (game != null)
+                {
+                    object param3 = new
+                    {
+                        GameId = gameid
+                    };
+                    string getStageStatisticsQuery = "SELECT * FROM StatisticsStages WHERE GameID = @GameId";
+                    var stageStatistics = await _db.GetRecordsAsync<StatisticsStages>(getStageStatisticsQuery, param3);
+                    return Ok(stageStatistics.ToList());
+                }
+                return BadRequest("Game Not Found");
+            }
+            return BadRequest("User Not Found");
         }
     }
 }

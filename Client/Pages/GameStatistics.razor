@@ -1,0 +1,110 @@
+﻿@page "/statistics/{GameID:int}"
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject IJSRuntime JSRuntime;
+@using template.Shared.Models.Games
+@using template.Shared.Models.Users
+@using template.Client.Components
+
+<h2 class="text-center my-2">סטטיסטיקות</h2>
+<h5 class="text-center my-2">שם המשחק: "@GameName" (קוד: @GameCode)</h5>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">סטטיסטיקות דוכנים</h5>
+                </div>
+                <div class="card-body">
+                    @if (stageStatistics == null)
+                    {
+                        <p>בטעינה...</p>
+                    }
+                    else
+                    {
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="text-center">ממוצע ציונים</h5>
+                                <StatisticsChart StageStatistics="stageStatistics" ChartId="gradesChart" ChartLabel="ממוצע ציונים" YAxisMax="100" />
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="text-center">ממוצע זמנים (דקות)</h5> <!-- Update label to show minutes -->
+                                <StatisticsChart StageStatistics="stageStatistics" ChartId="timesChart" ChartLabel="ממוצע זמנים (דקות)" />
+                            </div>
+                        </div>
+
+                        <table class="table table-striped mt-4">
+                            <thead>
+                                <tr>
+                                    <th>דוכן</th>
+                                    <th>גביע</th>
+                                    <th>ציון</th>
+                                    <th>זמן</th>
+                                    <th>שאלות/תשובות שגויות</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var stat in stageStatistics)
+                                {
+                                    <tr>
+                                        <td>@stat.StageID</td>
+                                        <td>@stat.Trophy</td>
+                                        <td>@stat.StageGrade</td>
+                                        <td>@stat.StageTime</td>
+                                        <td>@stat.WrongAnsweredIDs</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    public int UserId { get; set; }
+
+    [Parameter]
+    public int GameID { get; set; }
+
+    [Parameter]
+    public string GameName { get; set; }
+
+    [Parameter]
+    public string GameCode { get; set; }
+
+    private List<StatisticsStages> stageStatistics;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        GameName = query["gameName"];
+        GameCode = query["gameCode"];
+
+        await LoadStageStatistics();
+    }
+
+    private async Task LoadStageStatistics()
+    {
+        try
+        {
+            var response = await Http.GetAsync($"api/game/{UserId}/getStageStatistics/{GameID}");
+            if (response.IsSuccessStatusCode)
+            {
+                stageStatistics = await response.Content.ReadFromJsonAsync<List<StatisticsStages>>();
+            }
+            else
+            {
+                // Handle error
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exception
+        }
+    }
+}

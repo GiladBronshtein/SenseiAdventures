@@ -1,0 +1,42 @@
+﻿.card {
+    border-radius: 6px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #212529;
+    color: white;
+    border-bottom: none;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.card-title {
+    margin-bottom: 0;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 122, 255, 0.05);
+}
+
+.table-striped tbody tr:hover {
+    background-color: rgba(0, 122, 255, 0.15);
+}
+@media (max-width: 767px) {
+    .row > .col-md-6 {
+        margin-bottom: 20px;
+    }
+
+        .row > .col-md-6 canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+}
