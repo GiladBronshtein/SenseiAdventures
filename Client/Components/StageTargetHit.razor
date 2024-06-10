@@ -20,7 +20,14 @@
             </h3>
         </div>
         <div class="col-md-5 text-end">
-            <button type="button" class="btn btn-secondary">כיבוי דוכן</button>
+            @if (isLoading)
+            {
+                @*SHOW NOTHING*@
+            }
+            else
+            {
+                <button type="button" class="@toggleButtonClass" data-bs-toggle="modal" data-bs-target="#toggleModal">@toggleButtonText</button>
+            }
         </div>
     </div>
 
@@ -241,6 +248,27 @@
             </div>
         </div>
     </div>
+
+
+    <!-- Toggle Confirmation Modal -->
+    <div class="modal fade" id="toggleModal" tabindex="-1" aria-labelledby="toggleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="toggleModalLabel">@modalTitle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @modalMessage
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="ToggleStage">אישור</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @if (msg != "")
@@ -258,6 +286,8 @@
     [Parameter] public int stage { get; set; }
     [Parameter] public EventCallback<GameQuestions> OnQuestionAdded { get; set; }
     [Parameter] public EventCallback<GameQuestions> OnQuestionDeleted { get; set; }
+    [Parameter] public EventCallback<GameQuestions> OnStageStatusChange { get; set; }
+
     [Parameter] public bool isLoading { get; set; }  // State variable to track loading status
 
     private QuestionToAdd questionToAdd = new QuestionToAdd();
@@ -297,12 +327,49 @@
     string questionDescriptionClass = "text-muted"; // Default class
     private GameQuestions selectedQuestionForDeletion;
 
+
+    private bool isStageActive = true;
+    private string toggleButtonText => isStageActive ? "כיבוי דוכן" : "הפעלת דוכן";
+    private string toggleButtonClass => isStageActive ? "btn btn-secondary" : "btn btn-primary";
+    private string modalTitle => isStageActive ? "כיבוי דוכן" : "הפעלת דוכן";
+    private string modalMessage => isStageActive ? "האם אתה בטוח שברצונך לכבות את הדוכן?" : "האם אתה בטוח שברצונך להפעיל את הדוכן?";
+
+
     /*METHODS*/
+
     protected override async Task OnInitializedAsync()
     {
         await RefreshGameDetails();
     }
     
+    private async Task ToggleStage()
+    {
+        if (isStageActive)
+        {
+            var response = await Http.PutAsync($"api/game/{UserId}/makeStageInactive/{game.ID}/{stage}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                isStageActive = false;
+                await OnStageStatusChange.InvokeAsync(game.Questions.FirstOrDefault(q => q.StageID == stage));
+            }
+
+        }
+        else
+        {
+            var response = await Http.PutAsync($"api/game/{UserId}/makeStageActive/{game.ID}/{stage}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                isStageActive = true;
+                await OnStageStatusChange.InvokeAsync(game.Questions.FirstOrDefault(q => q.StageID == stage));
+
+            }
+
+        }
+        await RefreshGameDetails();
+
+
+    }
+
     private bool IsCorrectAnswer { get; set; }
 
     private void SetAnswerType(bool isCorrect)
@@ -611,6 +678,11 @@
                     Questions = response.Questions.Where(q => q.StageID == stage).ToList()
                     // Copy other properties as needed
                 };
+            //if questions isactive=0 set toggle accordingly
+            if (game.Questions.Count > 0)
+            {
+                isStageActive = game.Questions.FirstOrDefault(q => q.StageID == stage).isActive; ////////////////////////////////////////// IMPORTANT
+            }
         }
         isLoading = false; // End loading
         StateHasChanged(); // This will trigger a UI update

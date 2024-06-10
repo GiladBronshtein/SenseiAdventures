@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using template.Server.Data;
 using template.Shared.Models.Games;
 using template.Shared.Models.Users;
@@ -289,7 +288,7 @@ namespace template.Server.Controllers
                 QuestionDescription = questionToAdd.QuestionDescription,
                 QuestionImage = questionToAdd.QuestionImage,
                 StageID = questionToAdd.StageID,
-                isActive = questionToAdd.isActive
+                isActive = 1
             };
             string insertQuestionQuery = @"INSERT INTO Questions (GameID, HasImage, QuestionDescription, QuestionImage, StageID, isActive) 
                                     VALUES (@GameID, @HasImage, @QuestionDescription, @QuestionImage, @StageID, @isActive);";
@@ -436,7 +435,7 @@ namespace template.Server.Controllers
                     {
                         GameCode = gameCode
                     };
-                    string getActiveStagesQuery = "SELECT COUNT(DISTINCT StageID) FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
+                    string getActiveStagesQuery = "SELECT COUNT(DISTINCT StageID) FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode) and isActive = 1";
                     var activeStages = await _db.GetRecordsAsync<int>(getActiveStagesQuery, param3);
                     return Ok(activeStages.FirstOrDefault());
                 }
@@ -470,7 +469,7 @@ namespace template.Server.Controllers
                     {
                         GameCode = gameCode
                     };
-                    string getActiveQuestionsQuery = "SELECT Distinct ID FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
+                    string getActiveQuestionsQuery = "SELECT Distinct ID FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)  and isActive = 1";
                     var activeQuestions = await _db.GetRecordsAsync<GameQuestions>(getActiveQuestionsQuery, param3);
                     return Ok(activeQuestions.ToList().Count);
                 }
@@ -698,7 +697,7 @@ namespace template.Server.Controllers
                     {
                         GameCode = gameCode
                     };
-                    string getActiveStagesQuery = "SELECT COUNT(DISTINCT StageID) FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
+                    string getActiveStagesQuery = "SELECT COUNT(DISTINCT StageID) FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)  AND isActive = 1";
                     var activeStages = await _db.GetRecordsAsync<int>(getActiveStagesQuery, param3);
                     if (activeStages.FirstOrDefault() >= 2)
                     {
@@ -706,7 +705,7 @@ namespace template.Server.Controllers
                         {
                             GameCode = gameCode
                         };
-                        string getActiveQuestionsQuery = "SELECT Distinct ID FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
+                        string getActiveQuestionsQuery = "SELECT Distinct ID FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)  AND isActive = 1";
                         var activeQuestions = await _db.GetRecordsAsync<GameQuestions>(getActiveQuestionsQuery, param4);
                         if (activeQuestions.ToList().Count >= 20)
                         {
@@ -829,11 +828,11 @@ namespace template.Server.Controllers
             }
 
             // Get the count of active stages
-            string getActiveStagesQuery = "SELECT COUNT(DISTINCT StageID) FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
+            string getActiveStagesQuery = "SELECT COUNT(DISTINCT StageID) FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode) AND isActive = 1";
             var activeStages = await _db.GetRecordsAsync<int>(getActiveStagesQuery, new { GameCode = gameCode });
 
             // Get the count of active questions
-            string getActiveQuestionsQuery = "SELECT COUNT(DISTINCT ID) FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)";
+            string getActiveQuestionsQuery = "SELECT COUNT(DISTINCT ID) FROM Questions WHERE GameID = (SELECT ID FROM Games WHERE GameCode = @GameCode)  AND isActive = 1";
             var activeQuestions = await _db.GetRecordsAsync<int>(getActiveQuestionsQuery, new { GameCode = gameCode });
 
             bool canPublish = activeStages.FirstOrDefault() >= 2 && activeQuestions.FirstOrDefault() >= 20;
@@ -879,6 +878,124 @@ namespace template.Server.Controllers
                     string getStageStatisticsQuery = "SELECT * FROM StatisticsStages WHERE GameID = @GameId";
                     var stageStatistics = await _db.GetRecordsAsync<StatisticsStages>(getStageStatisticsQuery, param3);
                     return Ok(stageStatistics.ToList());
+                }
+                return BadRequest("Game Not Found");
+            }
+            return BadRequest("User Not Found");
+        }
+
+        // metho to post statistics (will be used by client on VR Game) 
+        [HttpPost("postStatistics")]
+        public async Task<IActionResult> PostStatistics(int userId, StatisticsStages statistics)
+        {
+            // Verify User
+            object userParam = new { UserId = userId };
+            string userQuery = "SELECT ID FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, userParam);
+            if (userRecords.FirstOrDefault() == null)
+            {
+                return BadRequest("User Not Found");
+            }
+
+            // Insert statistics
+            object statisticsParam = new
+            {
+                GameID = statistics.GameID,
+                StageID = statistics.StageID,
+                Trophy = statistics.Trophy,
+                StageGrade = statistics.StageGrade,
+                StageTime = statistics.StageTime,
+                WrongAnsweredIDs = statistics.WrongAnsweredIDs
+                //TimeSpent = statistics.TimeSpent,
+                //CorrectAnswers = statistics.CorrectAnswers,
+                //WrongAnswers = statistics.WrongAnswers,
+                //TotalQuestions = statistics.TotalQuestions,
+                //TotalScore = statistics.TotalScore
+            };
+            string insertStatisticsQuery = @"INSERT INTO StatisticsStages (GameID, StageID, Trophy, StageGrade, StageTime, WrongAnsweredIDs) 
+                                    VALUES (@GameID, @StageID, @Trophy, @StageGrade, @StageTime, @WrongAnsweredIDs);";
+            int statisticsId = await _db.InsertReturnIdAsync(insertStatisticsQuery, statisticsParam);
+            if (statisticsId > 0)
+            {
+                return Ok(statisticsId); // Return the ID of the newly added statistics
+            }
+            return BadRequest("Statistics not added");
+        }
+
+        // method to make stage inactive - all question related will have isactive = 0
+        [HttpPut("makeStageInactive/{gameid}/{stageid}")]
+        public async Task<IActionResult> MakeStageInactive(int userId, int gameid, int stageid)
+        {
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    GameId = gameid
+                };
+                string gameQuery = "SELECT GameName FROM Games WHERE ID = @GameId";
+                var gameRecords = await _db.GetRecordsAsync<UserWithGames>(gameQuery, param2);
+                UserWithGames game = gameRecords.FirstOrDefault();
+                if (game != null)
+                {
+                    object param3 = new
+                    {
+                        GameId = gameid,
+                        StageId = stageid
+                    };
+                    string makeStageInactiveQuery = "UPDATE Questions SET isActive = 0 WHERE GameID = @GameId AND StageID = @StageId";
+                    int isInactive = await _db.SaveDataAsync(makeStageInactiveQuery, param3);
+                    if (isInactive > 0)
+                    {
+                        return Ok("Stage made inactive");
+                    }
+                    return BadRequest("Stage not made inactive");
+                }
+                return BadRequest("Game Not Found");
+            }
+            return BadRequest("User Not Found");
+        }
+
+        // method to make stage active - all question related will have isactive = 1
+        [HttpPut("makeStageActive/{gameid}/{stageid}")]
+        public async Task<IActionResult> MakeStageActive(int userId, int gameid, int stageid)
+        {
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    GameId = gameid
+                };
+                string gameQuery = "SELECT GameName FROM Games WHERE ID = @GameId";
+                var gameRecords = await _db.GetRecordsAsync<UserWithGames>(gameQuery, param2);
+                UserWithGames game = gameRecords.FirstOrDefault();
+                if (game != null)
+                {
+                    object param3 = new
+                    {
+                        GameId = gameid,
+                        StageId = stageid
+                    };
+                    string makeStageActiveQuery = "UPDATE Questions SET isActive = 1 WHERE GameID = @GameId AND StageID = @StageId";
+                    int isActive = await _db.SaveDataAsync(makeStageActiveQuery, param3);
+                    if (isActive > 0)
+                    {
+                        return Ok("Stage made active");
+                    }
+                    return BadRequest("Stage not made active");
                 }
                 return BadRequest("Game Not Found");
             }

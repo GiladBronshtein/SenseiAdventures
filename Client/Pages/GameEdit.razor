@@ -184,8 +184,8 @@
             <!-- Stages -->
             <div class="sidebar-panel nav nav-pills flex-column">
                 <span style="color:black;" class="enterExitText text-center">סיום הפסטיבל</span>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageD)" disabled="@(currentStage == StageEnum.Stage.StageD)">לחתוך תשובות</button>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageC)" disabled="@(currentStage == StageEnum.Stage.StageC)">פגיעה בתשובה</button>
+                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageD)" disabled="@(currentStage == StageEnum.Stage.StageD)">חותכים תשובות</button>
+                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageC)" disabled="@(currentStage == StageEnum.Stage.StageC)">הכו בבזר</button>
                 <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageB)" disabled="@(currentStage == StageEnum.Stage.StageB)">פגיעה במטרה</button>
                 <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageA)" disabled="@(currentStage == StageEnum.Stage.StageA)">שבירת בקבוקים</button>
                 <span style="color:black;" class="enterExitText text-center">כניסה לפסטיבל</span>
@@ -238,16 +238,16 @@
                         @switch (currentStage)
                         {
                             case StageEnum.Stage.StageA:
-                                <StageBottleBreak gameCode="@gameCode" game="@gameData" stage=1 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" isLoading="@isLoading" />
+                                <StageBottleBreak gameCode="@gameCode" game="@gameData" stage=1 OnQuestionAdded="HandleQuestionAdded" OnStageStatusChange="UpdateActiveStagesAndQuestions" OnQuestionDeleted="HandleQuestionDeleted" isLoading="@isLoading" />
                                 break;
                             case StageEnum.Stage.StageB:
-                                <StageTargetHit gameCode="@gameCode" game="@gameData" stage=2 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" isLoading="@isLoading" />
+                                <StageTargetHit gameCode="@gameCode" game="@gameData" stage=2 OnQuestionAdded="HandleQuestionAdded" OnStageStatusChange="UpdateActiveStagesAndQuestions" OnQuestionDeleted="HandleQuestionDeleted" isLoading="@isLoading" />
                                 break;
                             case StageEnum.Stage.StageC:
-                                <StageBazzerHit gameCode="@gameCode" game="@gameData" stage=3 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" isLoading="@isLoading" />
+                                <StageBazzerHit gameCode="@gameCode" game="@gameData" stage=3 OnQuestionAdded="HandleQuestionAdded" OnStageStatusChange="UpdateActiveStagesAndQuestions" OnQuestionDeleted="HandleQuestionDeleted" isLoading="@isLoading" />
                                 break;
                             case StageEnum.Stage.StageD:
-                                <StageSlashing gameCode="@gameCode" game="@gameData" stage=4 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" isLoading="@isLoading" />
+                                <StageSlashing gameCode="@gameCode" game="@gameData" stage=4 OnQuestionAdded="HandleQuestionAdded" OnStageStatusChange="UpdateActiveStagesAndQuestions" OnQuestionDeleted="HandleQuestionDeleted" isLoading="@isLoading" />
                                 break;
                             default:
                                 <StageDefault gameDataChild="@gameData" userID="@UserId" />
@@ -291,9 +291,9 @@
     private async Task UpdateActiveStagesAndQuestions()
     {
         isLoading = true;
-
         activeStages = await Http.GetFromJsonAsync<int>($"api/Game/{UserId}/getActiveStages/{gameCode}");
         activeQuestions = await Http.GetFromJsonAsync<int>($"api/Game/{UserId}/getActiveQuestions/{gameCode}");
+
         await CheckCanPublishGame(); // Check if the game can be published after updating
         StateHasChanged(); // Trigger a re-render to update the button state
     }

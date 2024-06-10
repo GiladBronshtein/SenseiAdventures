@@ -11,7 +11,7 @@
     <div class="row mb-4">
         <div class="col-md-7">
             <h3>
-                דוכן חותכים תשובות (חרב)
+                דוכן חותכים תשובות
                 <button type="button" class="btn bg-primary-subtle" data-bs-toggle="modal" data-bs-target=@($"#modal1")
                         style=" --bs-btn-padding-y: .25rem;  --bs-btn-padding-x: .5rem;  --bs-btn-font-size: .75rem;">
                     הסבר
@@ -24,7 +24,7 @@
             @if(isLoading)
             {
                 <div class="spinner-border text-dark" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden">טוען...</span>
                 </div>
             }
             else
@@ -36,7 +36,14 @@
                         מחיקת דוכן
                     </button>
                 }
-                <button type="button" class="btn btn-secondary">כיבוי דוכן</button>
+                @if (isLoading)
+                {
+                    @*SHOW NOTHING*@
+                }
+                else
+                {
+                    <button type="button" class="@toggleButtonClass" data-bs-toggle="modal" data-bs-target="#toggleModal">@toggleButtonText</button>
+                }
             }
            
         </div>
@@ -365,6 +372,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Toggle Confirmation Modal -->
+    <div class="modal fade" id="toggleModal" tabindex="-1" aria-labelledby="toggleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="toggleModalLabel">@modalTitle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @modalMessage
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="ToggleStage">אישור</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @if (msg != "")
@@ -382,6 +409,8 @@
     [Parameter] public int stage { get; set; }
     [Parameter] public EventCallback<GameQuestions> OnQuestionAdded { get; set; }
     [Parameter] public EventCallback<GameQuestions> OnQuestionDeleted { get; set; }
+    [Parameter] public EventCallback<GameQuestions> OnStageStatusChange { get; set; }
+
     [Parameter] public bool isLoading { get; set; }  // State variable to track loading status
 
     private QuestionToAdd questionToAdd = new QuestionToAdd();
@@ -426,6 +455,12 @@
     private GameAnswers selectedAnswerForDelete;
 
 
+    private bool isStageActive = true;
+    private string toggleButtonText => isStageActive ? "כיבוי דוכן" : "הפעלת דוכן";
+    private string toggleButtonClass => isStageActive ? "btn btn-secondary" : "btn btn-primary";
+    private string modalTitle => isStageActive ? "כיבוי דוכן" : "הפעלת דוכן";
+    private string modalMessage => isStageActive ? "האם לכבות את הדוכן? עדיין תוכלו לערוך אך שאלות בדוכן זה לא יהיו פעילות ולא ייחשבו בעת פרסום" : "האם להפעיל את הדוכן?";
+
 
     /*METHODS*/
 
@@ -436,6 +471,35 @@
         //load game detailes
         QuestionDescription = game.Questions.FirstOrDefault()?.QuestionDescription;
         questionID = game.Questions.FirstOrDefault()?.ID ?? 0;
+
+    }
+
+
+    private async Task ToggleStage()
+    {
+        if (isStageActive)
+        {
+            var response = await Http.PutAsync($"api/game/{UserId}/makeStageInactive/{game.ID}/{stage}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                isStageActive = false;
+                await OnStageStatusChange.InvokeAsync(game.Questions.FirstOrDefault(q => q.StageID == stage));
+            }
+
+        }
+        else
+        {
+            var response = await Http.PutAsync($"api/game/{UserId}/makeStageActive/{game.ID}/{stage}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                isStageActive = true;
+                await OnStageStatusChange.InvokeAsync(game.Questions.FirstOrDefault(q => q.StageID == stage));
+
+            }
+
+        }
+        await RefreshGameDetails();
+
 
     }
 
@@ -883,18 +947,15 @@
                 myFileImage = game.Questions.FirstOrDefault()?.QuestionImage;
                 countAnswers = game.Questions.FirstOrDefault()?.Answers.Count ?? 0;
             }
+            //if questions isactive=0 set toggle accordingly
+            if (game.Questions.Count > 0)
+            {
+                isStageActive = game.Questions.FirstOrDefault(q => q.StageID == stage).isActive; ////////////////////////////////////////// IMPORTANT
+            }
         }
         Console.WriteLine(QuestionDescription);
         Console.WriteLine(QuestionDescriptionCount.ToString());
-        @*
-           string QuestionDescription = string.Empty;
-    string CorrectAnswer = string.Empty;
-
-
-    bool IsCorrect = true; // Default to true for correct answer
-
-    int QuestionDescriptionCount => QuestionDescription.Length;
-        *@
+       
         isLoading = false; // End loading
         StateHasChanged(); // This will trigger a UI update
     }
