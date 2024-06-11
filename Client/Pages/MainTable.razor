@@ -129,49 +129,69 @@
 
                                 <!--Table TBODY-->
                                 <tbody class="scrollbar-tbody custom-scrollable-tbody">
-                                    @if (GamesList != null && GamesList.Count > 0)
-                                    {
-                                        @foreach (var game in GamesList)
-                                        {
-                                            <tr>
-                                                <td><b>@game.GameCode</b></td>
-                                                <td>@game.GameName</td>
-                                                <td class="col-auto text-center"><i class="fa-solid fa-file-pen icon link-success" @onclick="()=>EditGame(game)"></i></td>
-                                                <td class="col-auto text-center">
-                                                    @if (game.CanPublish == false)
-                                                    {
-                                                        <div>
-                                                            <input class="form-check-input" type="checkbox" id="@game.ID" value="" aria-label="..." disabled>
-                                                            <label for="@game.ID" />
-                                                        </div>
-                                                    }
-                                                    else
-                                                    {
-                                                        <div>
-                                                            <input class="form-check-input" type="checkbox" id="@game.ID" checked="@game.IsPublished" @onchange="()=>changePublish(game)" />
-                                                            <label for="@game.ID"></label>
-                                                        </div>
-                                                    }
-                                                </td>
 
-                                                <td class="col-auto text-center">
-                                                    <i class="fa-solid fa-chart-simple icon link-primary" @onclick="() => NavigateToStatistics(game.ID, game.GameName, game.GameCode)"></i>
-                                                </td>
-
-                                                <td class="col-auto text-center">
-                                                    <i class="fa-solid fa-trash icon link-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" @onclick="() => PromptDelete(game)"></i>
-                                                </td>
-                                            </tr>
-                                        }
-                                    }
-                                    else
+                                    @if (isLoading)
                                     {
                                         <tr>
-                                            <td colspan="5" class="text-center" style="font-weight:bold;">
-                                                בטבלה זו יופיעו כלל המשחקים, טרם הוזנו משחקים - לחצו על "משחק חדש"
+                                            <td colspan="6" class="text-center">
+                                                <div class="spinner-border text-dark text-center" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
                                             </td>
                                         </tr>
                                     }
+                                    else
+                                    {
+
+                                        @if (GamesList != null && GamesList.Count > 0)
+                                        {
+                                            @foreach (var game in GamesList)
+                                            {
+                                                <tr>
+                                                    <td><b>@game.GameCode</b></td>
+                                                    <td>@game.GameName</td>
+                                                    <td class="col-auto text-center"><i class="fa-solid fa-file-pen icon link-success" @onclick="()=>EditGame(game)"></i></td>
+                                                    <td class="col-auto text-center">
+                                                        @if (game.CanPublish == false)
+                                                        {
+                                                            <div>
+                                                                <input class="form-check-input" type="checkbox" id="@game.ID" value="" aria-label="..." disabled>
+                                                                <label for="@game.ID" />
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div>
+                                                                <input class="form-check-input" type="checkbox" id="@game.ID" checked="@game.IsPublished" @onchange="()=>changePublish(game)" />
+                                                                <label for="@game.ID"></label>
+                                                            </div>
+                                                        }
+                                                    </td>
+
+                                                    <td class="col-auto text-center">
+                                                        <i class="fa-solid fa-chart-simple icon link-primary" @onclick="() => NavigateToStatistics(game.ID, game.GameName, game.GameCode)"></i>
+                                                    </td>
+
+                                                    <td class="col-auto text-center">
+                                                        <i class="fa-solid fa-trash icon link-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" @onclick="() => PromptDelete(game)"></i>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="5" class="text-center" style="font-weight:bold;">
+                                                    בטבלה זו יופיעו כלל המשחקים, טרם הוזנו משחקים - לחצו על "משחק חדש"
+                                                </td>
+                                            </tr>
+                                        }
+
+
+                                    }
+
+
+                                
                                 </tbody>
                             </table>
                         </div>
@@ -221,14 +241,10 @@
 </div>
 
 @code {
-    [CascadingParameter]
-    public int UserId { get; set; }
-
-    [Parameter]
-    public List<Games> GamesList { get; set; }
-
-    [Parameter]
-    public EventCallback<Games> OnDeleteClicked { get; set; }
+    [CascadingParameter]  public int UserId { get; set; }
+    [Parameter] public List<Games> GamesList { get; set; }
+    [Parameter] public EventCallback<Games> OnDeleteClicked { get; set; }
+    [Parameter] public bool isLoading { get; set; }  // State variable to track loading status
 
     UserWithGames user;
     GameToAdd gameToAdd = new GameToAdd();
@@ -248,6 +264,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        isLoading = true;
         var userRes = await Http.GetAsync("api/game/" + UserId);
         string error = userRes.Content.ReadAsStringAsync().Result;
         if (userRes.IsSuccessStatusCode == true)
@@ -263,6 +280,7 @@
         {
             error = userRes.Content.ReadAsStringAsync().Result;
         }
+        isLoading = false;
     }
 
     private void NavigateToStatistics(int gameId, string gameName, string gameCode)
