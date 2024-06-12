@@ -34,4 +34,3 @@ function dismissModal(modalId) {
     const modalInstance = bootstrap.Modal.getInstance(modal);
     modalInstance.hide();
 }
-

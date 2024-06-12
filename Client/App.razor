@@ -18,13 +18,17 @@
         }
 
     </Found>
-    <NotFound>
+   @*  <NotFound>
         <PageTitle>Not found</PageTitle>
         <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
+
+           <p role="alert">Sorry, there's nothing at this address.</p>
         </LayoutView>
+            </NotFound> *@
+    <NotFound>
+        @BadRequestFragment
     </NotFound>
-</Router>
+        </Router>
 
 @code {
     int UserId = 0;
@@ -54,5 +58,9 @@
         }
         StateHasChanged();
     }
+    private RenderFragment BadRequestFragment => builder =>
+       {
+       _nav.NavigateTo("/badrequest");
+       };
 }
 

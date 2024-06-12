@@ -1,157 +1,4 @@
-﻿@* @page "/GameEdit/{gameCode}"
-@inject HttpClient Http
-@inject NavigationManager Nav
-@inject IJSRuntime JS
-@using template.Shared.Models.Games
-@using template.Shared.Models.Users
-@using template.Client.Components
-
-<div class="container-fluid full-height">
-    <div class="row full-height">
-        <!-- Sidebar -->
-        <div class="col-md-2 d-flex flex-column bg-dark text-white p-3 sidebar">
-            <!-- Sidebar Header -->
-            <div class="sidebar-heading d-flex justify-content-center align-items-center text-center mt-2 mb-2">
-                <a class="icon-link icon-link-hover text-white text-decoration-none" href="./maintable">
-                    <svg class="bi" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M1 8a.75.75 0 0 1 .75-.75h10.793l-4.147-4.146a.75.75 0 0 1 1.06-1.06l5.5 5.5a.75.75 0 0 1 0 1.06l-5.5 5.5a.75.75 0 1 1-1.06-1.06L12.543 8.75H1.75A.75.75 0 0 1 1 8z" />
-                    </svg>
-                    חזרה למשחקים
-                </a>
-            </div>
-
-            <!-- Game Settings -->
-            <div class="d-flex flex-column align-items-center justify-content-center">
-                <button type="button" class="btn btn-light w-100 settingsButton" @onclick="SetStageToDefault">
-                    הגדרות המשחק
-                    <i class="fa-solid fa-gear" aria-hidden="true"></i>
-                </button>
-            </div>
-
-            <!-- Stages -->
-            <div class="sidebar-panel nav nav-pills flex-column">
-                <span style="color:black;" class="enterExitText text-center">סיום הפסטיבל</span>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageD)" disabled="@(currentStage == StageEnum.Stage.StageD)">לחתוך תשובות</button>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageC)" disabled="@(currentStage == StageEnum.Stage.StageC)">פגיעה בתשובה</button>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageB)" disabled="@(currentStage == StageEnum.Stage.StageB)">פגיעה במטרה</button>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageA)" disabled="@(currentStage == StageEnum.Stage.StageA)">שבירת בקבוקים</button>
-                <span style="color:black;" class="enterExitText text-center">כניסה לפסטיבל</span>
-            </div>
-
-            <div class="d-flex flex-column align-items-center justify-content-center mt-4">
-                <div class="text-center stagesAndQuestions">
-                    <!-- Example text or other content -->
-                    @if (gameData != null && gameData.Questions != null && activeQuestions > 0)
-                    {
-                        <p>
-                            <span>
-                                שאלות
-                            </span>
-                            <span class="badge rounded-pill @(activeQuestions < 20 ? "bg-danger" : "bg-success")">
-                                @activeQuestions
-                                <span class="visually-hidden">unread messages</span>
-                            </span>
-                        </p>
-                        <p>
-                            <span>
-                                דוכנים
-                            </span>
-                            <span class="badge rounded-pill @(activeStages < 2 ? "bg-danger" : "bg-success")">
-                                @activeStages
-                                <span class="visually-hidden">unread messages</span>
-                            </span>
-                        </p>
-                    }
-                </div>
-            </div>
-            <div class="mt-auto">
-                <hr class="bg-white">
-                <!-- Sidebar Footer -->
-                <div class="sidebar-footer text-center">
-                    <button type="button" class="btn btn-secondary w-100" value="publish">
-                        פרסום
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="col-md-10 main-content">
-            <div class="row">
-                <div class="col-12 mt-3 ps-4">
-                    <CascadingValue Value="currentStage">
-                        @switch (currentStage)
-                        {
-                            case StageEnum.Stage.StageA:
-                                <StageBottleBreak gameCode="@gameCode" game="@gameData" stage=1 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" />
-                                break;
-                            case StageEnum.Stage.StageB:
-                                <StageTargetHit gameCode="@gameCode" game="@gameData" stage=2 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" />
-                                break;
-                            case StageEnum.Stage.StageC:
-                                <StageBazzerHit gameCode="@gameCode" game="@gameData" stage=3 OnQuestionAdded="HandleQuestionAdded" OnQuestionDeleted="HandleQuestionDeleted" />
-                                break;
-                            case StageEnum.Stage.StageD:
-                                <StageSlashing />
-                                break;
-                            default:
-                                <StageDefault gameDataChild="@gameData" userID="@UserId" />
-                                break;
-                        }
-                    </CascadingValue>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@code {
-    [CascadingParameter] public int UserId { get; set; }
-    [Parameter] public string gameCode { get; set; }
-    GameDetails gameData;
-    UserWithGames user;
-
-    private int activeStages;
-    private int activeQuestions;
-    private StageEnum.Stage currentStage = StageEnum.Stage.None;
-
-    protected override async Task OnInitializedAsync()
-    {
-        gameData = await Http.GetFromJsonAsync<GameDetails>($"api/Game/{UserId}/getGame/{gameCode}");
-        activeStages = await Http.GetFromJsonAsync<int>($"api/Game/{UserId}/getActiveStages/{gameCode}");
-        activeQuestions = await Http.GetFromJsonAsync<int>($"api/Game/{UserId}/getActiveQuestions/{gameCode}");
-    }
-
-    private async Task UpdateActiveStagesAndQuestions()
-    {
-        activeStages = await Http.GetFromJsonAsync<int>($"api/Game/{UserId}/getActiveStages/{gameCode}");
-        activeQuestions = await Http.GetFromJsonAsync<int>($"api/Game/{UserId}/getActiveQuestions/{gameCode}");
-    }
-
-    private void SetStage(StageEnum.Stage stage)
-    {
-        currentStage = stage;
-        StateHasChanged(); // Update the UI
-    }
-
-    private async Task HandleQuestionAdded(GameQuestions question)
-    {
-        await UpdateActiveStagesAndQuestions();
-        StateHasChanged(); // Force a re-render of the component
-    }
-
-    private async Task HandleQuestionDeleted(GameQuestions question)
-    {
-        await UpdateActiveStagesAndQuestions();
-        StateHasChanged(); // Optionally force re-render
-    }
-
-    private void SetStageToDefault()
-    {
-        SetStage(StageEnum.Stage.None); // Assuming StageDefault is defined in your StageEnum
-    }
-} *@
-@page "/GameEdit/{gameCode}"
+﻿@page "/GameEdit/{gameCode}"
 @inject HttpClient Http
 @inject NavigationManager Nav
 @inject IJSRuntime JS
@@ -258,6 +105,10 @@
             </div>
         </div>
     </div>
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <!--TOAST comes here-->
+    </div>
+
 </div>
 
 @code {
@@ -274,18 +125,33 @@
 
     protected override async Task OnInitializedAsync()
     {
-        isLoading = true;
+        // isLoading = true;
         await LoadGameData();
     }
 
     private async Task LoadGameData()
     {
-        isLoading = true;
-        gameData = await Http.GetFromJsonAsync<GameDetails>($"api/Game/{UserId}/getGame/{gameCode}");
-        await UpdateActiveStagesAndQuestions();
-        await CheckCanPublishGame(); // Check if the game can be published
-        StateHasChanged(); // Trigger a re-render to update the button state
 
+        try
+        {
+            var response = await Http.GetAsync($"api/game/{UserId}/getGame/{gameCode}");
+            if (!response.IsSuccessStatusCode)
+            {
+                Nav.NavigateTo("/badrequest");
+            }
+            else
+            {
+                isLoading = true;
+                gameData = await Http.GetFromJsonAsync<GameDetails>($"api/game/{UserId}/getGame/{gameCode}");
+                await UpdateActiveStagesAndQuestions();
+                await CheckCanPublishGame(); // Check if the game can be published
+                StateHasChanged(); // Trigger a re-render to update the button state
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 
     private async Task UpdateActiveStagesAndQuestions()
@@ -370,11 +236,13 @@
         if (response.IsSuccessStatusCode)
         {
             gameData.IsPublished = true;
+            await ShowToast(true, "סטאטוס הפרסום השתנה בהצלחה!", "fa-solid fa-circle-check");
+
             StateHasChanged(); // Trigger a re-render to update the button state
         }
         else
         {
-            // Handle failure - show an error message, log, etc.
+            await ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
         }
     }
 
@@ -386,11 +254,13 @@
         if (response.IsSuccessStatusCode)
         {
             gameData.IsPublished = false;
+            await ShowToast(true, "סטאטוס הפרסום השתנה בהצלחה!", "fa-solid fa-circle-check");
+
             StateHasChanged(); // Trigger a re-render to update the button state
         }
         else
         {
-            // Handle failure - show an error message, log, etc.
+            await ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
         }
     }
     
@@ -415,6 +285,11 @@
         }
         isLoading = false; // End loading
         StateHasChanged(); // This will trigger a UI update
+    }
+    
+    private async Task ShowToast(bool isSuccess, string message, string icon)
+    {
+        await JS.InvokeVoidAsync("showToast", isSuccess, message, icon);
     }
 
 }
