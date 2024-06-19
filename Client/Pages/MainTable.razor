@@ -2,6 +2,8 @@
 @inject HttpClient Http
 @inject NavigationManager Nav
 @inject IJSRuntime JSRuntime;
+
+
 @using template.Shared.Models.Games
 @using template.Shared.Models.Users
 @using template.Client.Components
@@ -12,13 +14,15 @@
             <div class="row">
                 <div class="col-12 col-sm-12">
                     <div class="row">
+
                         <!-- Button - Create New Game -->
-                        <button type="button" class="shadow-sm btn btn-primary btn-lg mb-5" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="height: 60px; width: 240px;">
-                            <span style="vertical-align: middle;">יצירת משחק חדש</span>
-                            <span style="vertical-align: middle;">
-                                <i class="fa-solid fa-square-plus" style="font-size: 36px; vertical-align: middle;"></i>
+                        <button type="button" class="create-game-btn mb-4" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                            <span class="btn-text">יצירת משחק חדש</span>
+                            <span class="btn-icon">
+                                <i class="fa-solid fa-square-plus"></i>
                             </span>
                         </button>
+
 
                         <!-- Create NEW GAME Modal -->
                         <div class="modal fade @(isModalOpen ? "show" : "")" style="display: @(isModalOpen ? "block" : "none");" id="staticBackdrop"
@@ -238,6 +242,12 @@
             </div>
         </div>
     </div>
+
+
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <!--TOAST comes here-->
+    </div>
+
 </div>
 
 @code {
@@ -285,7 +295,7 @@
 
     private void NavigateToStatistics(int gameId, string gameName, string gameCode)
     {
-        Nav.NavigateTo($"/statistics/{gameId}?gameName={Uri.EscapeDataString(gameName)}&gameCode={gameCode}");
+        Nav.NavigateTo($"./statistics/{gameId}?gameName={Uri.EscapeDataString(gameName)}&gameCode={gameCode}");
     }
 
     async Task CreateGame()
@@ -320,6 +330,45 @@
 
     protected async Task changePublish(Games game)
     {
+        switch (game.IsPublished)
+        {
+            case true:
+                game.IsPublished = false;
+                var response = await Http.PutAsync($"api/game/{UserId}/unpublishGame/{game.GameCode}", null);
+                if (response.IsSuccessStatusCode)
+                {
+                    if (!game.IsPublished)
+                    {
+                        await ShowToast(true, "המשחק הוסר מהפרסום בהצלחה", "fa-solid fa-circle-check");
+                    }
+                }
+                else
+                {
+                    await ShowToast(false, "הפעולה נכשלה", "fa-solid fa-circle-x");
+                }
+                break;
+            case false:
+                game.IsPublished = true;
+                var response2 = await Http.PutAsync($"api/game/{UserId}/publishGame/{game.GameCode}", null);
+                if (response2.IsSuccessStatusCode)
+                {
+                    if (game.IsPublished)
+                    {
+                        await ShowToast(true, "המשחק פורסם בהצלחה", "fa-solid fa-circle-check");
+
+                    }
+                }
+                else
+                {
+                    await ShowToast(false, "הפעולה נכשלה", "fa-solid fa-circle-x");
+                }
+                break;
+        }
+
+
+        
+
+      
     }
 
     void PromptDelete(Games game)
@@ -435,7 +484,7 @@
         if (!string.IsNullOrEmpty(imageToDelete))
         {
             imagesToDelete.Add(imageToDelete);
-            myFileImage = ""; // Assuming you want to clear the current image variable
+            myFileImage = "empty"; // Assuming you want to clear the current image variable
             StateHasChanged(); // Update the UI to reflect changes
         }
     }
@@ -474,7 +523,7 @@
 
         // Clear input fields
         gameToAdd = new GameToAdd();
-        myFileImage = "";
+        myFileImage = "empty";
         StateHasChanged();
     }
 
@@ -489,5 +538,10 @@
         {
             Console.WriteLine("Image deletion failed");
         }
+    }
+
+    private async Task ShowToast(bool isSuccess, string message, string icon)
+    {
+        await JSRuntime.InvokeVoidAsync("showToast", isSuccess, message, icon);
     }
 }

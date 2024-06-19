@@ -31,7 +31,7 @@
                                           .Select(g => new
                                           {
                                               StageID = g.Key,
-                                              AverageGrade = g.Average(s => s.StageGrade),
+                                              AverageGrade = g.Average(s => ConvertGradeToDouble(s.StageGrade)),
                                               AverageTime = g.Average(s => ConvertTimeToMinutes(s.StageTime)) // Convert time to minutes
                                           })
                                           .ToList();
@@ -41,6 +41,15 @@
         var backgroundColors = groupedStats.Select(_ => GetRandomColor()).ToArray();
 
         await JSRuntime.InvokeVoidAsync("renderBarChart", ChartId, dataLabels, dataValues, backgroundColors, ChartLabel, YAxisMax);
+    }
+
+    private double ConvertGradeToDouble(string grade)
+    {
+        if (double.TryParse(grade, out double result))
+        {
+            return result;
+        }
+        return 0;
     }
 
     private double ConvertTimeToMinutes(string time)

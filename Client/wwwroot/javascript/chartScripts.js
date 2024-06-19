@@ -19,12 +19,28 @@ window.renderBarChart = (canvasId, labels, data, backgroundColors, chartLabel, y
             }]
         },
         options: {
+            plugins: {
+                datalabels: {
+                    color: 'black',
+                    font: {
+                        weight: 'normal',
+                        size: 14
+                    },
+                    formatter: function (value, context) {
+                        return value.toFixed(2); // Adjust the format as needed
+                    }
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
                     max: yAxisMax
                 }
             }
-        }
+        },
+        plugins: [ChartDataLabels]
     });
 };
+
+// Register ChartDataLabels globally
+Chart.register(ChartDataLabels);

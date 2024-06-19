@@ -114,3 +114,51 @@
             background-color: green;
             border: 1px green solid;
         }
+
+
+
+
+
+
+
+
+.create-game-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    width: 260px;
+    background: linear-gradient(135deg, #007aff, #00c6ff);
+    border: none;
+    border-radius: 7px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+    .create-game-btn:hover {
+        background: linear-gradient(135deg, #005bb5, #00a1d4);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5);
+        transform: translateY(-2px);
+    }
+
+    .create-game-btn:active {
+        background: linear-gradient(135deg, #004080, #0082a3);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        transform: translateY(1px);
+    }
+
+.btn-text {
+    margin-left: 20px;
+}
+
+.btn-icon i {
+    font-size: 46px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}

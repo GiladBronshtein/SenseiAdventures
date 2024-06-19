@@ -886,18 +886,8 @@ namespace template.Server.Controllers
 
         // metho to post statistics (will be used by client on VR Game) 
         [HttpPost("postStatistics")]
-        public async Task<IActionResult> PostStatistics(int userId, StatisticsStages statistics)
+        public async Task<IActionResult> PostStatistics(StatisticsStages statistics)
         {
-            // Verify User
-            object userParam = new { UserId = userId };
-            string userQuery = "SELECT ID FROM Users WHERE ID = @UserId";
-            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, userParam);
-            if (userRecords.FirstOrDefault() == null)
-            {
-                return BadRequest("User Not Found");
-            }
-
-            // Insert statistics
             object statisticsParam = new
             {
                 GameID = statistics.GameID,
@@ -906,11 +896,7 @@ namespace template.Server.Controllers
                 StageGrade = statistics.StageGrade,
                 StageTime = statistics.StageTime,
                 WrongAnsweredIDs = statistics.WrongAnsweredIDs
-                //TimeSpent = statistics.TimeSpent,
-                //CorrectAnswers = statistics.CorrectAnswers,
-                //WrongAnswers = statistics.WrongAnswers,
-                //TotalQuestions = statistics.TotalQuestions,
-                //TotalScore = statistics.TotalScore
+
             };
             string insertStatisticsQuery = @"INSERT INTO StatisticsStages (GameID, StageID, Trophy, StageGrade, StageTime, WrongAnsweredIDs) 
                                     VALUES (@GameID, @StageID, @Trophy, @StageGrade, @StageTime, @WrongAnsweredIDs);";
