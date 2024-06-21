@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Mvc;
 using template.Server.Data;
 using template.Shared.Models.Games;
 using template.Shared.Models.Users;
@@ -894,12 +895,13 @@ namespace template.Server.Controllers
                 StageID = statistics.StageID,
                 Trophy = statistics.Trophy,
                 StageGrade = statistics.StageGrade,
-                StageTime = statistics.StageTime,
-                WrongAnsweredIDs = statistics.WrongAnsweredIDs
+                StageTime = statistics.StageTime
 
             };
-            string insertStatisticsQuery = @"INSERT INTO StatisticsStages (GameID, StageID, Trophy, StageGrade, StageTime, WrongAnsweredIDs) 
-                                    VALUES (@GameID, @StageID, @Trophy, @StageGrade, @StageTime, @WrongAnsweredIDs);";
+            string insertStatisticsQuery = @"INSERT INTO StatisticsStages (GameID, StageID, Trophy, StageGrade, StageTime) 
+                                    VALUES (@GameID, @StageID, @Trophy, @StageGrade, @StageTime);";
+            //print all params to console in 1 line
+            Console.WriteLine("GameID: " + statistics.GameID + " StageID: " + statistics.StageID + " Trophy: " + statistics.Trophy + " StageGrade: " + statistics.StageGrade + " StageTime: " + statistics.StageTime);
             int statisticsId = await _db.InsertReturnIdAsync(insertStatisticsQuery, statisticsParam);
             if (statisticsId > 0)
             {
@@ -987,5 +989,162 @@ namespace template.Server.Controllers
             }
             return BadRequest("User Not Found");
         }
+
+        ////method to export game statistics to excel
+        //[HttpGet("exportStatistics/{gameid}")]
+        //public async Task<IActionResult> ExportStatistics(int userId, int gameid)
+        //{
+        //    object param = new
+        //    {
+        //        UserId = userId
+        //    };
+        //    string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+        //    var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+        //    UserWithGames user = userRecords.FirstOrDefault();
+        //    if (user != null)
+        //    {
+        //        object param2 = new
+        //        {
+        //            GameId = gameid
+        //        };
+        //        string gameQuery = "SELECT GameName FROM Games WHERE ID = @GameId";
+        //        var gameRecords = await _db.GetRecordsAsync<UserWithGames>(gameQuery, param2);
+        //        UserWithGames game = gameRecords.FirstOrDefault();
+        //        if (game != null)
+        //        {
+        //            object param3 = new
+        //            {
+        //                GameId = gameid
+        //            };
+        //            string getStageStatisticsQuery = "SELECT * FROM StatisticsStages WHERE GameID = @GameId";
+        //            var stageStatistics = await _db.GetRecordsAsync<StatisticsStages>(getStageStatisticsQuery, param3);
+
+        //            // Create a new Excel workbook
+        //            var workbook = new XLWorkbook();
+        //            var worksheet = workbook.Worksheets.Add("Statistics");
+
+        //            // Set the header row
+        //            worksheet.Cell(1, 1).Value = "GameID";
+        //            worksheet.Cell(1, 2).Value = "StageID";
+        //            worksheet.Cell(1, 3).Value = "Trophy";
+        //            worksheet.Cell(1, 4).Value = "StageGrade";
+        //            worksheet.Cell(1, 5).Value = "StageTime";
+        //            worksheet.Cell(1, 6).Value = "WrongAnsweredIDs";
+
+        //            // Set the data rows
+        //            int row = 2;
+        //            foreach (var stat in stageStatistics)
+        //            {
+        //                worksheet.Cell(row, 1).Value = stat.GameID;
+        //                worksheet.Cell(row, 2).Value = stat.StageID;
+        //                worksheet.Cell(row, 3).Value = stat.Trophy;
+        //                worksheet.Cell(row, 4).Value = stat.StageGrade;
+        //                worksheet.Cell(row, 5).Value = stat.StageTime;
+        //                worksheet.Cell(row, 6).Value = stat.WrongAnsweredIDs;
+        //                row++;
+        //            }
+
+        //            // Save the workbook
+        //            var stream = new MemoryStream();
+        //            workbook.SaveAs(stream);
+        //            var content = stream.ToArray();
+
+        //            // Return the Excel file
+        //            return File(content, "application/vnd.openxmlformats-officed");
+        //        }
+        //        return BadRequest("Game Not Found");
+        //    }
+        //    return BadRequest("User Not Found");
+        //}
+        //method to export game statistics to excel
+        [HttpGet("exportStatistics/{gameid}")]
+        public async Task<IActionResult> ExportStatistics(int userId, int gameid)
+        {
+            object param = new
+            {
+                UserId = userId
+            };
+            string userQuery = "SELECT FirstName FROM Users WHERE ID = @UserId";
+            var userRecords = await _db.GetRecordsAsync<UserWithGames>(userQuery, param);
+            UserWithGames user = userRecords.FirstOrDefault();
+            if (user != null)
+            {
+                object param2 = new
+                {
+                    GameId = gameid
+                };
+                string gameQuery = "SELECT GameName FROM Games WHERE ID = @GameId";
+                var gameRecords = await _db.GetRecordsAsync<UserWithGames>(gameQuery, param2);
+                UserWithGames game = gameRecords.FirstOrDefault();
+                if (game != null)
+                {
+                    object param3 = new
+                    {
+                        GameId = gameid
+                    };
+                    string getStageStatisticsQuery = "SELECT * FROM StatisticsStages WHERE GameID = @GameId";
+                    var stageStatistics = await _db.GetRecordsAsync<StatisticsStages>(getStageStatisticsQuery, param3);
+
+                    // Mapping of stage IDs to names
+                    var stageNames = new Dictionary<int, string>
+            {
+                { 1, "שבירת בקבוקים" },
+                { 2, "פגיעה במטרה" },
+                { 3, "הכו בבזר" },
+                { 4, "חותכים תשובות" }
+                // Add other stages as needed
+            };
+
+                    // Mapping of trophy names to translations (normalized to lowercase)
+                    var trophyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "gold", "זהב" },
+                { "silver", "כסף" },
+                { "bronze", "ארד" }
+                // Add other trophy translations as needed
+            };
+
+                    // Create a new Excel workbook
+                    var workbook = new XLWorkbook();
+                    var worksheet = workbook.Worksheets.Add("Statistics");
+
+                    // Set the header row
+                    worksheet.Cell(1, 1).Value = "GameID";
+                    worksheet.Cell(1, 2).Value = "Stage Name";
+                    worksheet.Cell(1, 3).Value = "Trophy";
+                    worksheet.Cell(1, 4).Value = "StageGrade";
+                    worksheet.Cell(1, 5).Value = "StageTime";
+
+                    // Set the data rows
+                    int row = 2;
+                    foreach (var stat in stageStatistics)
+                    {
+                        string stageName = stageNames.ContainsKey(stat.StageID) ? stageNames[stat.StageID] : "Unknown Stage";
+                        string trophyName = trophyNames.ContainsKey(stat.Trophy.ToLower()) ? trophyNames[stat.Trophy.ToLower()] : stat.Trophy;
+
+
+                        worksheet.Cell(row, 1).Value = stat.GameID;
+                        worksheet.Cell(row, 2).Value = stageName;
+                        worksheet.Cell(row, 3).Value = trophyName;
+                        worksheet.Cell(row, 4).Value = stat.StageGrade;
+                        worksheet.Cell(row, 5).Value = stat.StageTime;
+                        row++;
+                    }
+
+                    // Save the workbook
+                    var stream = new MemoryStream();
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+
+                    // Return the Excel file
+                    return File(content, "application/vnd.openxmlformats-officed");
+                }
+                return BadRequest("Game Not Found");
+            }
+            return BadRequest("User Not Found");
+        }
+
+
+
     }
 }

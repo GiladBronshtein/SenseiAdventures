@@ -14,6 +14,5 @@ namespace template.Shared.Models.Games
         public string Trophy { get; set; }
         public string StageGrade { get; set; }
         public string StageTime { get; set; }
-        public string WrongAnsweredIDs { get; set; }
     }
 }

@@ -1,3 +1,5 @@
+// wwwroot/js/chart-functions.js
+
 window.chartInstances = {};
 
 window.renderBarChart = (canvasId, labels, data, backgroundColors, chartLabel, yAxisMax) => {
@@ -20,11 +22,14 @@ window.renderBarChart = (canvasId, labels, data, backgroundColors, chartLabel, y
         },
         options: {
             plugins: {
+                legend: {
+                    display: false // Disable the legend
+                },
                 datalabels: {
                     color: 'black',
                     font: {
                         weight: 'normal',
-                        size: 14
+                        size: 0
                     },
                     formatter: function (value, context) {
                         return value.toFixed(2); // Adjust the format as needed
@@ -44,3 +49,13 @@ window.renderBarChart = (canvasId, labels, data, backgroundColors, chartLabel, y
 
 // Register ChartDataLabels globally
 Chart.register(ChartDataLabels);
+
+window.saveAsFile = (fileName, byteBase64) => {
+    console.log("Downloading file:", fileName);
+    const link = document.createElement('a');
+    link.download = fileName;
+    link.href = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${byteBase64}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};

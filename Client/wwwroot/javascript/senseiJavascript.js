@@ -34,3 +34,11 @@ function dismissModal(modalId) {
     const modalInstance = bootstrap.Modal.getInstance(modal);
     modalInstance.hide();
 }
+
+// In your Blazor component or in a separate JS file used in Blazor
+window.initTooltips = () => {
+    var tooltips = document.querySelectorAll('.tooltip-wrapper');
+    tooltips.forEach(function (tooltip) {
+        new bootstrap.Tooltip(tooltip);
+    });
+};

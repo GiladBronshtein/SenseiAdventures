@@ -94,7 +94,21 @@
                                             <!-- Submit / Cancel Buttons -->
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="ClearGameInputFields">חזרה</button>
+                                                @if (isLoading)
+                                                {
+                                                <tr>
+                                                    <td colspan="6" class="text-center">
+                                                        <div class="spinner-border text-dark text-center" role="status">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                        </div>
+                                                    </td>
+                                                    </tr>
+                                                }
+                                                else
+                                                {
                                                 <button type="submit" value="send" class="btn btn-primary">שמירה</button>
+
+                                                }
                                             </div>
                                         </EditForm>
                                     </div>
@@ -114,19 +128,19 @@
                                             קוד<Tooltip Text="באמצעות הקוד מתחילים משחק"><i class="fa-solid fa-circle-info"></i></Tooltip>
                                         </th>
                                         <th scope="col">
-                                            שם המשחק<Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
+                                            שם המשחק<Tooltip Text="שם המשחק יופיע גם בתוכו"><i class="fa-solid fa-circle-info"></i></Tooltip>
                                         </th>
                                         <th scope="col" class="col-auto text-center">
-                                            עריכה<Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
+                                            עריכה<Tooltip Text="לעריכת המשחק <br/>לחצו על כפתור העריכה"><i class="fa-solid fa-circle-info"></i></Tooltip>
                                         </th>
                                         <th scope="col" class="col-auto text-center">
-                                            פרסום<Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i> </Tooltip>
+                                            פרסום<Tooltip Text="לפרסום המשחק <br/>הגיעו למינימום הנדרש"><i class="fa-solid fa-circle-info"></i> </Tooltip>
                                         </th>
                                         <th scope="col" class="col-auto text-center">
-                                            סטטיסטיקה<Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i> </Tooltip>
+                                            סטטיסטיקה<Tooltip Text="לסטטיסטיקת המשחק <br/>לחצו על כפתור הסטטיסטיקה"><i class="fa-solid fa-circle-info"></i> </Tooltip>
                                         </th>
                                         <th scope="col" class="col-auto text-center">
-                                            מחיקה<Tooltip Text="דוגמא בלבד - פה יהיה הסבר"><i class="fa-solid fa-circle-info"></i></Tooltip>
+                                            מחיקה <Tooltip Text="למחיקת המשחק <br/> לחצו על כפתור המחיקה"><i class="fa-solid fa-circle-info"></i></Tooltip>
                                         </th>
                                     </tr>
                                 </thead>
@@ -300,6 +314,7 @@
 
     async Task CreateGame()
     {
+        isLoading = true;
         if (myFileImage == "empty")
         {
             gameToAdd.GameImage = myFileImage;
@@ -321,6 +336,8 @@
             string error = await userRes.Content.ReadAsStringAsync();
             Console.WriteLine($"Error creating game: {error}");
         }
+        isLoading = false;
+
     }
 
     private void EditGame(Games game)

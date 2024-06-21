@@ -1,5 +1,4 @@
 ﻿@using template.Shared.Models.Games
-
 @inject IJSRuntime JSRuntime;
 
 <canvas id="@ChartId" width="400" height="200"></canvas>
@@ -16,6 +15,9 @@
 
     [Parameter]
     public double? YAxisMax { get; set; }
+
+    [Parameter]
+    public Dictionary<int, string> StageNames { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -36,9 +38,9 @@
                                           })
                                           .ToList();
 
-        var dataLabels = groupedStats.Select(g => g.StageID.ToString()).ToArray();
+        var dataLabels = groupedStats.Select(g => StageNames.ContainsKey(g.StageID) ? StageNames[g.StageID] : g.StageID.ToString()).ToArray();
         var dataValues = ChartLabel.Contains("זמנים") ? groupedStats.Select(g => g.AverageTime).ToArray() : groupedStats.Select(g => g.AverageGrade).ToArray();
-        var backgroundColors = groupedStats.Select(_ => GetRandomColor()).ToArray();
+        var backgroundColors = GetConstantColors(groupedStats.Count); // Use a method to get constant colors
 
         await JSRuntime.InvokeVoidAsync("renderBarChart", ChartId, dataLabels, dataValues, backgroundColors, ChartLabel, YAxisMax);
     }
@@ -62,12 +64,19 @@
         return 0;
     }
 
-    private string GetRandomColor()
+    private string[] GetConstantColors(int count)
     {
-        Random random = new Random();
-        int r = random.Next(256);
-        int g = random.Next(256);
-        int b = random.Next(256);
-        return $"rgba({r}, {g}, {b}, 0.2)";
+        // Example constant colors (adjust as needed)
+        string[] colors = new string[]
+        {
+            "rgba(255, 99, 132, 0.2)", // Red
+            "rgba(54, 162, 235, 0.2)", // Blue
+            "rgba(255, 206, 86, 0.2)", // Yellow
+            "rgba(75, 192, 192, 0.2)", // Green
+            "rgba(153, 102, 255, 0.2)" // Purple
+        };
+
+        // Ensure enough colors for the number of data points
+        return colors.Take(count).ToArray();
     }
 }

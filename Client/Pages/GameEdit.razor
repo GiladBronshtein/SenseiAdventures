@@ -68,11 +68,15 @@
                 <hr class="bg-white">
                 <!-- Sidebar Footer -->
                 <div class="sidebar-footer text-center">
-                    <button type="button" class="btn @(gameData?.IsPublished == true ? "btn-danger" : CanPublish ? "btn-success" : "btn-secondary") w-100" @onclick="PublishOrUnpublishGame" disabled="@(gameData?.IsPublished == false && !CanPublish)">
+                    <button type="button" 
+                        class="btn @(gameData?.IsPublished == true ? "btn-danger" : CanPublish ? "btn-success" : "btn-secondary") w-100" 
+                        @onclick="PublishOrUnpublishGame" 
+                        disabled="@(gameData?.IsPublished == false && !CanPublish)">
                        <span class="button-text">
                         @(gameData?.IsPublished == true ? "הסרת פרסום" : "פרסום")
                         </span>
-                    </button>
+                    </button> 
+
                 </div>
             </div>
         </div>
@@ -220,10 +224,15 @@
         if (gameData.IsPublished)
         {
             await UnpublishGame();
+            await ShowToast(true, "סטאטוס הפרסום השתנה בהצלחה!", "fa-solid fa-circle-check");
+
+
         }
         else if (CanPublish)
         {
             await PublishGame();
+            await ShowToast(true, "סטאטוס הפרסום השתנה בהצלחה!", "fa-solid fa-circle-check");
+
         }
         await RefreshGameDetails();
 
@@ -237,8 +246,6 @@
         if (response.IsSuccessStatusCode)
         {
             gameData.IsPublished = true;
-            await ShowToast(true, "סטאטוס הפרסום השתנה בהצלחה!", "fa-solid fa-circle-check");
-
             StateHasChanged(); // Trigger a re-render to update the button state
         }
         else
@@ -255,8 +262,6 @@
         if (response.IsSuccessStatusCode)
         {
             gameData.IsPublished = false;
-            await ShowToast(true, "סטאטוס הפרסום השתנה בהצלחה!", "fa-solid fa-circle-check");
-
             StateHasChanged(); // Trigger a re-render to update the button state
         }
         else
@@ -293,4 +298,4 @@
         await JS.InvokeVoidAsync("showToast", isSuccess, message, icon);
     }
 
-}
+} 

@@ -6,14 +6,26 @@
 @using template.Shared.Models.Users
 @using template.Client.Components
 
-<h2 class="text-center my-2">סטטיסטיקות</h2>
+<div class="d-flex justify-content-center align-items-center my-2">
+    <h2 class="text-center w-100">סטטיסטיקות</h2>
+</div>
+
 <h5 class="text-center my-2">שם המשחק: "@GameName" (קוד: @GameCode)</h5>
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">סטטיסטיקות דוכנים</h5>
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title m-0">סטטיסטיקות הדוכנים</h5>
+                    <div>
+                        <select @onchange="FilterChanged" class="form-select">
+                            <option value="">כל הדוכנים</option>
+                            @foreach (var stage in stageNames)
+                            {
+                                <option value="@stage.Key">@stage.Value</option>
+                            }
+                        </select>
+                    </div>
                 </div>
                 <div class="card-body">
                     @if (stageStatistics == null)
@@ -25,11 +37,11 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <h5 class="text-center">ממוצע ציונים</h5>
-                                <StatisticsChart StageStatistics="stageStatistics" ChartId="gradesChart" ChartLabel="ממוצע ציונים" YAxisMax="100" />
+                                <StatisticsChart StageStatistics="filteredStatistics" ChartId="gradesChart" ChartLabel="ממוצע ציונים" YAxisMax="100" StageNames="stageNames" />
                             </div>
                             <div class="col-md-6">
-                                <h5 class="text-center">ממוצע זמנים (דקות)</h5> <!-- Update label to show minutes -->
-                                <StatisticsChart StageStatistics="stageStatistics" ChartId="timesChart" ChartLabel="ממוצע זמנים (דקות)" />
+                                <h5 class="text-center">ממוצע זמנים (דקות)</h5>
+                                <StatisticsChart StageStatistics="filteredStatistics" ChartId="timesChart" ChartLabel="ממוצע זמנים (דקות)" StageNames="stageNames" />
                             </div>
                         </div>
 
@@ -40,23 +52,38 @@
                                     <th>גביע</th>
                                     <th>ציון</th>
                                     <th>זמן</th>
-                                    <th>שאלות/תשובות שגויות</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var stat in stageStatistics)
+                                @foreach (var stat in filteredStatistics)
                                 {
                                     <tr>
-                                        <td>@stat.StageID</td>
-                                        <td>@stat.Trophy</td>
+                                        <td>@GetStageName(stat.StageID)</td>
+                                        <td>
+                                            @GetTrophyIcon(stat.Trophy)
+                                            @GetTrophyName(stat.Trophy)
+                                        </td>
                                         <td>@stat.StageGrade</td>
                                         <td>@stat.StageTime</td>
-                                        <td>@stat.WrongAnsweredIDs</td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                     }
+                    <div class="d-flex justify-content-between mt-4">
+                        <!-- Back to Main Table button -->
+                        <a class="btn btn-secondary" href="./maintable">
+                            <svg class="bi" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1 8a.75.75 0 0 1 .75-.75h10.793l-4.147-4.146a.75.75 0 0 1 1.06-1.06l5.5 5.5a.75.75 0 0 1 0 1.06l-5.5 5.5a.75.75 0 1 1-1.06-1.06L12.543 8.75H1.75A.75.75 0 0 1 1 8z" />
+                            </svg>
+                            חזרה למשחקים
+                        </a>
+                        <!-- Export to Excel button -->
+                        <button class="btn btn-outline-secondary" @onclick="ExportToExcel">
+                            <i class="fas fa-file-excel"></i> ייצוא לאקסל
+                        </button>
+                      
+                    </div>
                 </div>
             </div>
         </div>
@@ -77,6 +104,22 @@
     public string GameCode { get; set; }
 
     private List<StatisticsStages> stageStatistics;
+    private List<StatisticsStages> filteredStatistics;
+
+    private Dictionary<int, string> stageNames = new Dictionary<int, string>
+    {
+        { 1, "שבירת בקבוקים" },
+        { 2, "פגיעה במטרה" },
+        { 3, "הכו בבזר" },
+        { 4, "חותכים תשובות" }
+    };
+
+    private Dictionary<string, string> trophyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        { "gold", "זהב" },
+        { "silver", "כסף" },
+        { "bronze", "ארד" }
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,6 +139,7 @@
             if (response.IsSuccessStatusCode)
             {
                 stageStatistics = await response.Content.ReadFromJsonAsync<List<StatisticsStages>>();
+                filteredStatistics = stageStatistics;
             }
             else
             {
@@ -105,6 +149,87 @@
         catch (Exception ex)
         {
             // Handle exception
+        }
+    }
+
+    private void FilterChanged(ChangeEventArgs e)
+    {
+        var selectedStage = e.Value.ToString();
+        if (string.IsNullOrEmpty(selectedStage))
+        {
+            filteredStatistics = stageStatistics;
+        }
+        else
+        {
+            int stageId = int.Parse(selectedStage);
+            filteredStatistics = stageStatistics.Where(s => s.StageID == stageId).ToList();
+        }
+    }
+
+    private string GetStageName(int stageId)
+    {
+        if (stageNames.TryGetValue(stageId, out var name))
+        {
+            return name;
+        }
+        return "Unknown Stage";
+    }
+
+    private string GetTrophyName(string trophy)
+    {
+        if (trophyNames.TryGetValue(trophy.ToLower(), out var name))
+        {
+            return name;
+        }
+        else
+        {
+            // Handle missing trophy
+        }
+        return trophy;
+    }
+
+    private MarkupString GetTrophyIcon(string trophy)
+    {
+        string icon = "";
+        switch (trophy.ToLower())
+        {
+            case "gold":
+                icon = "<i class='pe-2 fas fa-trophy' style='color: gold'></i>";
+                break;
+            case "silver":
+                icon = "<i class='pe-2 fas fa-trophy' style='color: silver'></i>";
+                break;
+            case "bronze":
+                icon = "<i class='pe-2 fas fa-trophy' style='color: #cd7f32'></i>";
+                break;
+            default:
+                // Handle other cases or errors
+                break;
+        }
+        return new MarkupString(icon);
+    }
+
+
+    private async Task ExportToExcel()
+    {
+        try
+        {
+            var response = await Http.GetAsync($"api/game/{UserId}/exportStatistics/{GameID}");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsByteArrayAsync();
+                var base64Content = Convert.ToBase64String(content);
+                await JSRuntime.InvokeVoidAsync("saveAsFile", $"{GameName} - Sensei Adventures - סטטיסטיקות.xlsx", base64Content);
+                Console.WriteLine("Export successful");
+            }
+            else
+            {
+                Console.WriteLine("Error exporting statistics: " + response.ReasonPhrase);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception exporting statistics: " + ex.Message);
         }
     }
 }
