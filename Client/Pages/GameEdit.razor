@@ -30,12 +30,12 @@
 
             <!-- Stages -->
             <div class="sidebar-panel nav nav-pills flex-column">
-                <span style="color:black;" class="enterExitText text-center">סיום הפסטיבל</span>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageD)" disabled="@(currentStage == StageEnum.Stage.StageD)">חותכים תשובות</button>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageC)" disabled="@(currentStage == StageEnum.Stage.StageC)">הכו בבזר</button>
-                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageB)" disabled="@(currentStage == StageEnum.Stage.StageB)">פגיעה במטרה</button>
+                <span style="color:black;" class="enterExitText text-center">בחרו דוכן</span>
                 <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageA)" disabled="@(currentStage == StageEnum.Stage.StageA)">שבירת בקבוקים</button>
-                <span style="color:black;" class="enterExitText text-center">כניסה לפסטיבל</span>
+                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageB)" disabled="@(currentStage == StageEnum.Stage.StageB)">פגיעה במטרה</button>
+                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageC)" disabled="@(currentStage == StageEnum.Stage.StageC)">הכו בבזר</button>
+                <button type="button" class="btn btn-secondary sidebar-button" @onclick="() => SetStage(StageEnum.Stage.StageD)" disabled="@(currentStage == StageEnum.Stage.StageD)">חותכים תשובות</button>
+                <span style="color:black;" class="enterExitText text-center"> </span>
             </div>
 
             <div class="d-flex flex-column align-items-center justify-content-center mt-4">
@@ -66,18 +66,25 @@
             </div>
             <div class="mt-auto">
                 <hr class="bg-white">
-                <!-- Sidebar Footer -->
-                <div class="sidebar-footer text-center">
-                    <button type="button" 
-                        class="btn @(gameData?.IsPublished == true ? "btn-danger" : CanPublish ? "btn-success" : "btn-secondary") w-100" 
-                        @onclick="PublishOrUnpublishGame" 
-                        disabled="@(gameData?.IsPublished == false && !CanPublish)">
-                       <span class="button-text">
-                        @(gameData?.IsPublished == true ? "הסרת פרסום" : "פרסום")
-                        </span>
-                    </button> 
 
-                </div>
+
+
+                    <!-- Sidebar Footer -->
+                    <div class="sidebar-footer text-center">
+                        <button type="button"
+                                class="btn @(gameData?.IsPublished == true ? "btn-danger" : CanPublish ? "btn-success" : "btn-secondary") w-100"
+                                @onclick="() => ButtonClickHandler(gameData?.IsPublished == false && !CanPublish)">
+                            <span class="button-text">
+                                @(gameData?.IsPublished == true ? "הסרת פרסום" : "פרסום")
+                            </span>
+                        </button>
+                    </div>
+             
+               
+
+
+
+
             </div>
         </div>
 
@@ -116,6 +123,8 @@
 
 </div>
 
+
+
 @code {
     [CascadingParameter] public int UserId { get; set; }
     [Parameter] public string gameCode { get; set; }
@@ -136,9 +145,9 @@
 
     private async Task LoadGameData()
     {
-
         try
         {
+            isLoading = true;
             var response = await Http.GetAsync($"api/game/{UserId}/getGame/{gameCode}");
             if (!response.IsSuccessStatusCode)
             {
@@ -152,11 +161,30 @@
                 await CheckCanPublishGame(); // Check if the game can be published
                 StateHasChanged(); // Trigger a re-render to update the button state
             }
+            isLoading = false;
         }
         catch (Exception e)
         {
             Console.WriteLine(e.Message);
         }
+    }
+
+    private async Task ButtonClickHandler(bool isDisabled)
+    {
+        if (isDisabled)
+        {
+            await HandleDisabledButtonClick();
+        }
+        else
+        {
+            await PublishOrUnpublishGame();
+        }
+    }
+
+    private async Task HandleDisabledButtonClick()
+    {
+        // Your logic for the alternative action when the button is disabled
+        await ShowToast(false, "פרסום המשחק דורש מינימום 2 דוכנים ו-20 שאלות", "fa-solid fa-circle-exclamation");
     }
 
     private async Task UpdateActiveStagesAndQuestions()
@@ -197,7 +225,6 @@
     private async Task HandleQuestionAdded(GameQuestions question)
     {
         isLoading = true;
-
         await UpdateActiveStagesAndQuestions();
         StateHasChanged(); // Force a re-render of the component
     }
@@ -205,7 +232,6 @@
     private async Task HandleQuestionDeleted(GameQuestions question)
     {
         isLoading = true;
-
         await UpdateActiveStagesAndQuestions();
         StateHasChanged(); // Optionally force re-render
     }
@@ -213,7 +239,6 @@
     private void SetStageToDefault()
     {
         isLoading = true;
-
         SetStage(StageEnum.Stage.None); // Assuming StageDefault is defined in your StageEnum
     }
 
@@ -225,17 +250,13 @@
         {
             await UnpublishGame();
             await ShowToast(true, "סטאטוס הפרסום השתנה בהצלחה!", "fa-solid fa-circle-check");
-
-
         }
         else if (CanPublish)
         {
             await PublishGame();
             await ShowToast(true, "סטאטוס הפרסום השתנה בהצלחה!", "fa-solid fa-circle-check");
-
         }
         await RefreshGameDetails();
-
     }
 
     private async Task PublishGame()
@@ -269,7 +290,7 @@
             await ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
         }
     }
-    
+
     private async Task RefreshGameDetails()
     {
         isLoading = true; // Start loading
@@ -292,10 +313,9 @@
         isLoading = false; // End loading
         StateHasChanged(); // This will trigger a UI update
     }
-    
+
     private async Task ShowToast(bool isSuccess, string message, string icon)
     {
         await JS.InvokeVoidAsync("showToast", isSuccess, message, icon);
     }
-
-} 
+}

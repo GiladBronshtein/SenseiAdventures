@@ -163,3 +163,14 @@ a.text-white:hover {
         opacity: 0;
         transition: opacity 0.5s;
     }
+
+
+
+
+
+
+
+.disabled-look {
+    pointer-events: none;
+    opacity: 0.65;
+}

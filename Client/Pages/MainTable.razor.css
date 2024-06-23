@@ -46,11 +46,12 @@
 /* Scrollable Table Body */
 .scrollable-table-body {
     display: block;
-    height: 390px;
-    max-height: 440px; /* Adjust based on the height needed to show 10 rows */
+    /*    height: 390px;
+*/ max-height: 440px; /* Adjust based on the height needed to show 10 rows */
     overflow-y: auto;
     overflow-x: hidden;
     direction: rtl; /* Add RTL direction */
+    padding-left: 0px;
 }
 
 /* Table */
@@ -58,6 +59,7 @@
     width: 100%;
     table-layout: fixed;
     direction: rtl; /* Add RTL direction */
+    border-radius: 4px;
 }
 
     .table th, .table td {
@@ -91,7 +93,7 @@
 }
 
 .scrollable-table-body::-webkit-scrollbar-thumb {
-    background: #888;
+    background: #a6a6a6;
     border-radius: 10px;
 }
 
@@ -130,7 +132,7 @@
     width: 260px;
     background: linear-gradient(135deg, #007aff, #00c6ff);
     border: none;
-    border-radius: 7px;
+    border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     color: #fff;
     font-size: 20px;
@@ -162,3 +164,27 @@
     justify-content: center;
     display: flex;
 }
+
+.publish-instructions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border: 0px solid #e0e0e0;
+    padding: 2px;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    height: auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.instruction-icon {
+    font-size: 40px;
+    color: #007aff;
+    margin: 10px;
+}
+
+.instruction-text {
+    font-size: 16px;
+}
+

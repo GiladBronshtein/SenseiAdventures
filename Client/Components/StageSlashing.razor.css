@@ -106,7 +106,7 @@
 }
 
 .scrollable-table-body::-webkit-scrollbar-thumb {
-    background: #888;
+    background: #a6a6a6;
     border-radius: 10px;
 }
 

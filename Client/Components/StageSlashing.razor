@@ -127,7 +127,7 @@
                 {
 
                     <!-- Correct Answer -->
-                    <label for="correctAnswer" class="form-label mt-3">מסיחים</label>
+                    <label for="correctAnswer" class="form-label mt-3">תשובה</label>
                     <div class="mb-3 align-items-center">
                         <div class="col-7">
                             <InputText maxlength="@AnswersDescriptionMaxChars"
@@ -141,7 +141,7 @@
                                        required />
                         </div>
                         <div class="col-1 p-0">
-                            <small id="correctAnswer" class="@GetInputClass(CorrectAnswer.Length, 2, @AnswersDescriptionMaxChars)
+                            <small id="correctAnswer" class="@GetInputClass(CorrectAnswer.Length, 1, @AnswersDescriptionMaxChars)
                             col-2 p-0 d-flex justify-content-start">@CorrectAnswer.Length/@AnswersDescriptionMaxChars</small>
                         </div>
 
@@ -200,7 +200,7 @@
                             }
                             else
                             {
-                                <button type="submit" id="liveToastBtn" class="btn btn-primary shadow-sm">הוספת מסיח</button>
+                                <button type="submit" id="liveToastBtn" class="btn btn-primary shadow-sm">הוספת תשובה</button>
 
                             }
                         }
@@ -222,7 +222,7 @@
         {
 
             <div class="col-md-5 mt-4">
-                <h5>רשימת מסיחים</h5>
+                <h5>רשימת תשובות</h5>
                 <div class="scrollable-table-body">
                     <table class="table shadow-sm table-responsive border border-2">
                         <thead>
@@ -427,7 +427,7 @@
     int CorrectAnswerCount => CorrectAnswer.Length;
 
     int QuestionDescriptionMaxChars = 50;
-    int AnswersDescriptionMaxChars = 30;
+    int AnswersDescriptionMaxChars = 20;
     int questionID = 0;
     int answerID = 0;
 
@@ -591,7 +591,7 @@
         if (!editAnswer) // Adding a new answer
         {
             // Question Validation
-            if (CorrectAnswer.Length > AnswersDescriptionMaxChars || CorrectAnswer.Length < 2)
+            if (CorrectAnswer.Length > AnswersDescriptionMaxChars || CorrectAnswer.Length < 1)
             {
                 await ShowToast(false, "יש להזין את השדות במבנה המתאים", "fa-solid fa-circle-exclamation");
                 isLoading = false;

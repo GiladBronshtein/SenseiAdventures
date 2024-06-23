@@ -12,7 +12,7 @@ namespace template.Shared.Models.Games
         public int ID { get; set; }
 
         [Required(ErrorMessage = "זהו שדה חובה")]
-        [StringLength(30, MinimumLength = 2, ErrorMessage = "יש להזין תשובה בין 2 ל-30 תווים")]
+        [StringLength(30, MinimumLength = 1, ErrorMessage = "יש להזין תשובה בין 2 ל-30 תווים")]
         public string AnswerDescription { get; set; }
         public string AnswerImage { get; set; }
         public int QuestionID { get; set; }
