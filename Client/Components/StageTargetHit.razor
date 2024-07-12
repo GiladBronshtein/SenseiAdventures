@@ -26,7 +26,10 @@
             }
             else
             {
-                <button type="button" class="@toggleButtonClass" data-bs-toggle="modal" data-bs-target="#toggleModal">@toggleButtonText</button>
+                if (game.Questions.Count > 0)
+                {
+                    <button type="button" class="@toggleButtonClass" data-bs-toggle="modal" data-bs-target="#toggleModal">@toggleButtonText</button>
+                }
             }
         </div>
     </div>

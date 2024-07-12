@@ -124,22 +124,22 @@
                                 <!--Table HEADER-->
                                 <thead class="table-light">
                                     <tr>
-                                        <th scope="col">
+                                        <th scope="col" class="col-1">
                                             קוד<Tooltip Text="באמצעות הקוד מתחילים משחק"><i class="fa-solid fa-circle-info"></i></Tooltip>
                                         </th>
-                                        <th scope="col">
+                                    <th scope="col" class="col-3">
                                             שם המשחק<Tooltip Text="שם המשחק יופיע גם בתוכו"><i class="fa-solid fa-circle-info"></i></Tooltip>
                                         </th>
-                                        <th scope="col" class="col-auto text-center">
+                                        <th scope="col" class="col-2 col-auto text-center">
                                             עריכה<Tooltip Text="לעריכת המשחק <br/>לחצו על כפתור העריכה"><i class="fa-solid fa-circle-info"></i></Tooltip>
                                         </th>
-                                        <th scope="col" class="col-auto text-center">
+                                        <th scope="col" class="col-2 col-auto text-center">
                                             פרסום<Tooltip Text="לפרסום המשחק <br/>הגיעו למינימום הנדרש"><i class="fa-solid fa-circle-info"></i> </Tooltip>
                                         </th>
-                                        <th scope="col" class="col-auto text-center">
+                                        <th scope="col" class="col-2 col-auto text-center">
                                             סטטיסטיקה<Tooltip Text="לסטטיסטיקת המשחק <br/>לחצו על כפתור הסטטיסטיקה"><i class="fa-solid fa-circle-info"></i> </Tooltip>
                                         </th>
-                                        <th scope="col" class="col-auto text-center">
+                                        <th scope="col" class="col-2 col-auto text-center">
                                             מחיקה <Tooltip Text="למחיקת המשחק <br/> לחצו על כפתור המחיקה"><i class="fa-solid fa-circle-info"></i></Tooltip>
                                         </th>
                                     </tr>
@@ -165,10 +165,10 @@
                                             @foreach (var game in GamesList)
                                             {
                                                 <tr>
-                                                    <td><b>@game.GameCode</b></td>
-                                                    <td>@game.GameName</td>
-                                                    <td class="col-auto text-center"><i class="fa-solid fa-file-pen icon link-success" @onclick="()=>EditGame(game)"></i></td>
-                                                    <td class="col-auto text-center">
+                                                <td class="col-1"><b>@game.GameCode</b></td>
+                                                <td class="col-3">@game.GameName</td>
+                                                <td class="col-2 col-auto text-center"><i class="fa-solid fa-file-pen icon link-success" @onclick="()=>EditGame(game)"></i></td>
+                                                <td class=" col-2 col-auto text-center">
                                                         @if (game.CanPublish == false)
                                                         {
                                                             <div>
@@ -185,11 +185,11 @@
                                                         }
                                                     </td>
 
-                                                    <td class="col-auto text-center">
+                                                    <td class="col-2 col-auto text-center">
                                                         <i class="fa-solid fa-chart-simple icon link-primary" @onclick="() => NavigateToStatistics(game.ID, game.GameName, game.GameCode)"></i>
                                                     </td>
 
-                                                    <td class="col-auto text-center">
+                                                <td class="col-2 col-auto text-center">
                                                         <i class="fa-solid fa-trash icon link-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" @onclick="() => PromptDelete(game)"></i>
                                                     </td>
                                                 </tr>

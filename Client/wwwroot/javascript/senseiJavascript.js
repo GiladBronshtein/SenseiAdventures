@@ -1,13 +1,13 @@
-document.addEventListener("DOMContentLoaded", function (event)
-{
+document.addEventListener("DOMContentLoaded", function (event) {
+
 
 
 });
 
 
 function showToast(isSuccess, message, icon) {
-     // Prepare the toast HTML with dynamic values
-     const toastHtml = `
+    // Prepare the toast HTML with dynamic values
+    const toastHtml = `
          <div class="toast shadow align-items-center text-bg-${isSuccess ? 'success' : 'danger'} border-0" style="--bs-bg-opacity: .97;" id="liveToast" role="alert" aria-live="assertive" aria-atomic="true">
              <div class="d-flex">
                  <div class="toast-body">
@@ -17,14 +17,14 @@ function showToast(isSuccess, message, icon) {
              </div>
          </div>`;
 
-     // Insert toast HTML into the toast container
-     const toastContainer = document.querySelector('.toast-container');
-     toastContainer.innerHTML = toastHtml;
+    // Insert toast HTML into the toast container
+    const toastContainer = document.querySelector('.toast-container');
+    toastContainer.innerHTML = toastHtml;
 
-     // Get the toast element and show it using Bootstrap's API
-      const toastElement = document.getElementById('liveToast');
-      const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastElement);
-      toastBootstrap.show();
+    // Get the toast element and show it using Bootstrap's API
+    const toastElement = document.getElementById('liveToast');
+    const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastElement);
+    toastBootstrap.show();
 }
 
 

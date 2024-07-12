@@ -42,7 +42,10 @@
                 }
                 else
                 {
-                    <button type="button" class="@toggleButtonClass" data-bs-toggle="modal" data-bs-target="#toggleModal">@toggleButtonText</button>
+                    if (game.Questions.Count > 0)
+                    {
+                        <button type="button" class="@toggleButtonClass" data-bs-toggle="modal" data-bs-target="#toggleModal">@toggleButtonText</button>
+                    }
                 }
             }
            
@@ -257,8 +260,6 @@
                                             <td>
                                                 @if (answer.HasImage)
                                                 {
-                                                    Console.WriteLine(answer.AnswerImage);
-
                                                     <img src="@answer.AnswerImage" height="26" />
                                                 }
                                             </td>
@@ -953,8 +954,6 @@
                 isStageActive = game.Questions.FirstOrDefault(q => q.StageID == stage).isActive; ////////////////////////////////////////// IMPORTANT
             }
         }
-        Console.WriteLine(QuestionDescription);
-        Console.WriteLine(QuestionDescriptionCount.ToString());
        
         isLoading = false; // End loading
         StateHasChanged(); // This will trigger a UI update
