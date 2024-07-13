@@ -477,7 +477,7 @@
                                 <label for="formFile" class="form-label">העלאת קובץ</label>
                             </div>
                             <div class="col-5">
-                                <InputFile class="form-control" id="formFile" accept=".doc,.docx,.pdf" required/>
+                                <InputFile class="form-control" id="formFile" accept=".doc,.docx,.pdf" OnChange="HandleFileUpload" required />
                             </div>
                         </div>
                         
@@ -628,6 +628,74 @@
     {
         await RefreshGameDetails();
     }
+
+
+
+
+
+
+    private string FileContent { get; set; }
+    private string ErrorMessage { get; set; }
+
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var file = e.File;
+            if (file != null)
+            {
+                // Check file size (10 MB limit)
+                if (file.Size > 10 * 1024 * 1024)
+                {
+                    ErrorMessage = "File is too large. Maximum size is 10 MB.";
+                    return;
+                }
+
+                // Read the file content
+                using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+                using var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                memoryStream.Position = 0;
+
+                // Create the content to send to the API
+                var content = new MultipartFormDataContent();
+                content.Add(new StreamContent(memoryStream), "file", file.Name);
+
+                // Send the file to the server
+                var response = await Http.PostAsync("api/Document/upload", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<QuestionsFromGPT>();
+                    FileContent = result.information;
+                    ErrorMessage = null; // Clear any previous error message
+                }
+                else
+                {
+                    ErrorMessage = $"File upload failed: {await response.Content.ReadAsStringAsync()}";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"An error occurred: {ex.Message}";
+        }
+    }
+
+    // private class FileUploadResult
+    // {
+    //     public string Content { get; set; }
+    // }
+
+
+
+
+
+
+
+
+
+
 
     private async Task ToggleStage()
     {
