@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace template.Shared.Models.GPT
 {
-    internal class Prompt
+    public class GeneratedQuestions
     {
+        public List<GeneratedQuestion> Questions { get; set; }
+
     }
 }

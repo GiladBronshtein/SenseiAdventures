@@ -41,3 +41,8 @@ window.initTooltips = () => {
         new bootstrap.Tooltip(tooltip);
     });
 };
+
+// Function to clear the file input
+window.clearFileInput = (inputId) => {
+    document.getElementById(inputId).value = null;
+};

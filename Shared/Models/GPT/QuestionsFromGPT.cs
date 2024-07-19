@@ -11,5 +11,10 @@ namespace template.Shared.Models.GPT
         public string information { get; set; }
         public int countQuestions { get; set; }
         public string audienceDescription { get; set; }
+        public string description { get; set; }
+        public string wikipediaLink { get; set; }
+        public string fileBase64 { get; set; }
+        public string fileName { get; set; }
+
     }
 }

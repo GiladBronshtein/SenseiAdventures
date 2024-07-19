@@ -11,5 +11,9 @@ namespace template.Shared.Models.GPT
         public string model { get; set; }
         public List<Message> messages { get; set; } = new List<Message>();
         public int max_tokens { get; set; }
+        public object response_format { get; set; }
+        public double temperature { get; set; }
+
+
     }
 }
