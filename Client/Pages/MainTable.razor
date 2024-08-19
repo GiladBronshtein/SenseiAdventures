@@ -2,8 +2,6 @@
 @inject HttpClient Http
 @inject NavigationManager Nav
 @inject IJSRuntime JSRuntime;
-
-
 @using template.Shared.Models.Games
 @using template.Shared.Models.Users
 @using template.Client.Components
@@ -54,8 +52,11 @@
 
                                             <!-- Ending Message -->
                                             <div class="mb-3">
-                                                <label for="endingMessage" class="form-label">הודעת הסיום</label>
+                                                <label for="endingMessage" class="form-label">הודעת הסיום
+                                                </label>
                                                 <span>(2-30 תווים)</span>
+                                                <Tooltip Text="הודעת הסיום תופיע באיזור הסיום שבתוך המשחק"><i class="fa-solid fa-circle-info endMessage"></i></Tooltip>
+
                                                 <InputText maxlength="30"
                                                            @oninput="@(e => { HandleInputChange(e, nameof(gameToAdd.EndingMessage)); gameToAdd.EndingMessage = e.Value.ToString(); StateHasChanged(); })"
                                                            id="endingMessage"
@@ -119,6 +120,8 @@
                     <div class="row">
                         <!--Main Games Table-->
                         <h5>טבלת המשחקים</h5>
+                        <span class="mb-2" style="color: gray;">המשתמש שמחובר כעת: @UserId</span>
+
                         <div class="mt-3 col-md-9 table-responsive scrollable-table-body">
                             <table class="table shadow-sm border border-1">
                                 <!--Table HEADER-->
@@ -198,7 +201,7 @@
                                         else
                                         {
                                             <tr>
-                                                <td colspan="5" class="text-center" style="font-weight:bold;">
+                                                <td colspan="6" class="text-center" style="font-weight:bold;">
                                                     בטבלה זו יופיעו כלל המשחקים, טרם הוזנו משחקים - לחצו על "משחק חדש"
                                                 </td>
                                             </tr>
@@ -292,6 +295,7 @@
         {
             user = userRes.Content.ReadFromJsonAsync<UserWithGames>().Result;
         }
+
         var gameRes = await Http.GetAsync("api/game/" + UserId + "/all");
         if (gameRes.IsSuccessStatusCode == true)
         {
@@ -500,7 +504,6 @@
 
     private async Task DeleteImages()
     {
-        Console.WriteLine("Yo1");
         Console.WriteLine("Images to delete:" + imagesToDelete.Count.ToString());
         if (imagesToDelete.Count > 0)
         {

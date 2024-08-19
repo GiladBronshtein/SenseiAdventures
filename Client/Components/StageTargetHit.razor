@@ -1,9 +1,11 @@
 ﻿@inject IJSRuntime JS
 @inject HttpClient Http
 @inject NavigationManager Nav
+@using System.Text.Json;
 @using template.Shared.Models.Games;
 @using template.Shared.Models.Users;
-
+@using template.Shared.Models.GPT;
+@using System.Text.RegularExpressions;
 
 <div class="container-fluid">
 
@@ -16,6 +18,11 @@
                         style=" --bs-btn-padding-y: .25rem;  --bs-btn-padding-x: .5rem;  --bs-btn-font-size: .75rem;">
                     הסבר
                     <i class="fa fa-info-circle p-1" style="color:black;"></i>
+                </button>
+                <button type="button" class="btn bg-success-subtle" data-bs-toggle="modal" data-bs-target=@($"#gpt")
+                        style=" --bs-btn-padding-y: .25rem;  --bs-btn-padding-x: .5rem;  --bs-btn-font-size: .75rem;">
+                    מחולל שאלות
+                    <i class="fa-solid fa-robot p-1" style="color:black;"></i>
                 </button>
             </h3>
         </div>
@@ -195,10 +202,10 @@
 
     </div>
 
+    <!-- TOAST -->
     <div class="toast-container position-fixed top-0 end-0 p-3">
         <!--TOAST comes here-->
     </div>
-
 
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -218,7 +225,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- Modal 1 -->
     <div class="modal fade" id=@($"modal1") tabindex="-1" aria-labelledby=@($"modalLabel1") aria-hidden="true">
@@ -252,7 +258,6 @@
         </div>
     </div>
 
-
     <!-- Toggle Confirmation Modal -->
     <div class="modal fade" id="toggleModal" tabindex="-1" aria-labelledby="toggleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -272,14 +277,222 @@
         </div>
     </div>
 
+    <!-- GPT MODAL -->
+    <div class="modal fade modal-lg" id=@($"gpt") tabindex="-1" aria-labelledby=@($"gptLabel") aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id=@($"gptLabel")>מחולל שאלות בעזרת ChatGPT</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="ClearEntireForm"></button>
+
+                </div>
+                <div class="modal-body">
+                    <div class="accordion accordion-flush" id="accordionExample">
+                        <!-- First Accordion Item -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    <i class="fa-regular fa-lightbulb ps-2 pe-3" style="color:darkblue;"></i><b>שאלות נכון / לא נכון</b>
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    שאלות נכון / לא נכון הן כלי נפוץ לבחינה שמאפשר לבדוק הבנה וידע בנושאים שונים. 
+                                    כל שאלה מציעה פתרון עבור הטענה הניתנת בה, שנכונה או לא נכונה. 
+                                    השאלות הן פשוטות לניהול וכוללות בדיקה מהירה של הבנת הנושא, בעלות נגישות גבוהה, ומאפשרות בדיקה מדויקת של ידע בנושאים שונים.
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Second Accordion Item -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    <i class="fa-regular fa-lightbulb ps-2 pe-3" style="color:darkblue;"></i><b>הוראות למחולל GPT</b>
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    <ul>
+                                        <li>
+                                            העלו קובץ או ספקו לינק לויקיפדיה עם מידע עליו תרצו לבסס את השאלות שיווצרו על ידי ChatGPT.
+                                        </li>
+                                        <li>
+                                            תארו בכמה מילים את הנושא, בחרו את קהל היעד וכמות השאלות ליצירה.
+                                        </li>
+                                        <li>
+                                            שימו לב - ניתן לייצר עד 15 שאלות בכל פעם.
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-7 d-flex flex-column mt-3">
+                            <EditForm Model="GenerateQuestions" class="flex-grow-1" OnValidSubmit="HandleGPTSubmit" OnInvalidSubmit="failedSubmit">
+                                <DataAnnotationsValidator />
+                                <!--FILE UPLOAD DOC / DOCX / PDF-->
+                                <div class="row mb-3">
+                                    <div class="col-3">
+                                        <label for="formFile" class="form-label">העלאת קובץ</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <InputFile class="form-control" id="formFile" accept=".doc,.docx,.pdf"
+                                                   OnChange="HandleFileUpload"
+                                                   @attributes="@(new Dictionary<string, object> { { "disabled", !string.IsNullOrEmpty(GenerateQuestions.wikipediaLink) } })" />
+                                    </div>
+                                    <div class="col-1">
+                                        <button type="button" class="btn btn-outline-secondary" @onclick="ClearFileInput">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!--WIKIPEDIA LINK-->
+                                <div class="row mb-3">
+                                    <div class="col-3">
+                                        <label for="wikipedia" class="form-label">דף ויקיפדיה</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <InputText class="form-control" placeholder="https://he.wikipedia.org" id="wikipedia" @bind-Value="GenerateQuestions.wikipediaLink"
+                                                   @attributes="@(new Dictionary<string, object> { { "disabled", !string.IsNullOrEmpty(GenerateQuestions.fileBase64) } })" />
+                                    </div>
+                                    <div class="col-1">
+                                        <button type="button" class="btn btn-outline-secondary" @onclick="ClearWikipediaLink">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!--Description-->
+                                <div class="row mb-3">
+                                    <div class="col-3">
+                                        <label for="description" class="form-label">תיאור</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <InputText @bind-Value="GenerateQuestions.description" class="form-control" id="description" required />
+                                    </div>
+                                    <div class="col-1">
+                                        <button type="button" class="btn btn-outline-secondary" @onclick="ClearDescription">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!--Audience-->
+                                <div class="row mb-3">
+                                    <div class="col-3">
+                                        <label for="audience" class="form-label">  קהל היעד</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <InputSelect @bind-Value="GenerateQuestions.audienceDescription" class="form-select" id="audience" required>
+                                            <option>בחרו</option>
+                                            <option value="kids">ילדים</option>
+                                            <option value="teenagers">נערים</option>
+                                            <option value="grownups">בוגרים</option>
+                                            <option value="adults">מבוגרים</option>
+                                        </InputSelect>
+                                    </div>
+                                </div>
+
+                                <!--Count questions-->
+                                <div class="row mb-3">
+                                    <div class="col-3">
+                                        <label for="countQuestions" class="form-label">כמות שאלות</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <InputNumber @bind-Value="@GenerateQuestions.countQuestions"
+                                                     class="form-control"
+                                                     min="1"
+                                                     max="15"
+                                                     step="1"
+                                                     id="countQuestions" required />
+                                    </div>
+                                </div>
+
+                                <!--submit-->
+                                <div class="row mb-3">
+                                    <div class="col-3">
+                                    </div>
+                                    <div class="col-4">
+                                        @if (!isModalLoading)
+                                        {
+                                            <button type="submit" class="btn btn-primary" style="width:100%;"> חוֹלֵל שאלות  </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-primary" style="width:100%;" disabled>  חוֹלֵל שאלות </button>
+                                        }
+                                    </div>
+                                </div>
+                            </EditForm>
+                            <!--error div-->
+                            @if (!string.IsNullOrEmpty(ErrorMessage))
+                            {
+                                <div class="alert alert-danger" role="alert">
+                                    @ErrorMessage
+                                </div>
+                            }
+                        </div>
+
+                        <div class="col-md-5 d-flex flex-column align-items-start mt-3">
+
+
+                            <div class="position-relative flex-grow-1 w-100">
+                                <textarea class="form-control h-100" placeholder="תוצאות המחולל יופיעו כאן" id="formControlTextarea" readonly>@FormattedContent</textarea>
+                                @if (isModalLoading)
+                                {
+                                    <div class="position-absolute top-50 start-50 translate-middle">
+                                        <div class="spinner-border text-dark" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Warning-->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+                        <symbol id="exclamation-triangle-fill" viewBox="0 0 16 16">
+                            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                        </symbol>
+                    </svg>
+                    <div class="alert alert-warning d-flex align-items-center p-2 mt-4" role="alert" style="display: flex; justify-content: center; align-items: center; white-space: nowrap;">
+                        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Warning:" style="width: 16px; height: 16px;">
+                            <use xlink:href="#exclamation-triangle-fill" />
+                        </svg>
+                        <div>
+                            ChatGPT יכול לעשות טעויות. אנא ודאו מידע חשוב.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+
+                    <!--IF Textarea contains text add button will be available, else disabled -->
+                    @if (!string.IsNullOrEmpty(FormattedContent))
+                    {
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" @onclick="AddQuestionsFromGPT">הוספת השאלות לדוכן</button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" disabled>הוספת השאלות לדוכן</button>
+                    }
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="ClearEntireForm">ביטול</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @if (msg != "")
 {
     <p>@msg</p>
 }
-
-
 
 
 @code {
@@ -302,7 +515,7 @@
 
 
     bool IsCorrect = true; // Default to true for correct answer
-
+    
     int QuestionDescriptionCount => QuestionDescription.Length;
     int CorrectAnswerCount => CorrectAnswer.Length;
 
@@ -336,6 +549,365 @@
     private string toggleButtonClass => isStageActive ? "btn btn-secondary" : "btn btn-primary";
     private string modalTitle => isStageActive ? "כיבוי דוכן" : "הפעלת דוכן";
     private string modalMessage => isStageActive ? "האם אתה בטוח שברצונך לכבות את הדוכן?" : "האם אתה בטוח שברצונך להפעיל את הדוכן?";
+
+
+
+    /*GPT METHODS & VARS*/
+
+    [Parameter] public bool isModalLoading { get; set; }  // State variable to track loading status
+    private QuestionsFromGPT GenerateQuestions = new QuestionsFromGPT();
+    private string FileContent { get; set; } = string.Empty;
+    private string ErrorMessage { get; set; } = string.Empty;
+    private string FormattedContent { get; set; } = string.Empty;
+    private string uploadedFileContent { get; set; } = string.Empty;
+    private string fileInputKey = Guid.NewGuid().ToString();
+
+
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var file = e.File;
+            if (file != null)
+            {
+                // Check file size (10 MB limit)
+                if (file.Size > 10 * 1024 * 1024)
+                {
+                    ErrorMessage = "File is too large. Maximum size is 10 MB.";
+                    return;
+                }
+
+                // Read the file content
+                using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+                using var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                memoryStream.Position = 0;
+
+                // Create the content to send to the API
+                var content = new MultipartFormDataContent();
+                content.Add(new StreamContent(memoryStream), "file", file.Name);
+
+                // Send the file to the server
+                var response = await Http.PostAsync("api/Document/upload", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<JsonDocument>();
+                    if (result != null && result.RootElement.TryGetProperty("content", out JsonElement contentElement))
+                    {
+                        uploadedFileContent = contentElement.GetString(); // Store the uploaded file content
+                        FileContent = uploadedFileContent;
+
+                        // Log to verify the information content
+                        // Console.WriteLine($"File upload successful. Information: {uploadedFileContent}");
+
+                        ErrorMessage = null; // Clear any previous error message
+                    }
+                    else
+                    {
+                        ErrorMessage = "File upload succeeded but no content was returned.";
+                        Console.WriteLine("File upload succeeded but no content was returned.");
+                    }
+                }
+                else
+                {
+                    ErrorMessage = $"File upload failed: {await response.Content.ReadAsStringAsync()}";
+                    Console.WriteLine($"File upload failed: {await response.Content.ReadAsStringAsync()}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"An error occurred: {ex.Message}";
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+    }
+
+    private string _fetchedWikipediaContent; // Field to store fetched Wikipedia content
+
+    private async Task HandleGPTSubmit()
+    {
+        Console.WriteLine("Started Handling GPT Submit");
+        isModalLoading = true;
+        try
+        {
+            string contentToFetch = GenerateQuestions.wikipediaLink;
+
+            // Handle case where no Wikipedia link is provided
+            if (string.IsNullOrEmpty(contentToFetch))
+            {
+                // Use content from uploaded file
+                if (!string.IsNullOrEmpty(uploadedFileContent))
+                {
+                    GenerateQuestions.information = uploadedFileContent;
+                }
+                else
+                {
+                    await ShowToast(false, "הוסיפו תוכן או לינק לויקיפדיה.", "fa-solid fa-circle-exclamation");
+                    isModalLoading = false;
+                    return;
+                }
+            }
+            else
+            {
+                // Wikipedia link is provided, fetch content if not already fetched
+                if (Uri.TryCreate(contentToFetch, UriKind.Absolute, out Uri? uri) &&
+                    (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
+                {
+                    if (_fetchedWikipediaContent == null)
+                    {
+                        var response = await Http.GetAsync($"api/Document/GetWikipediaContent?wikipediaLink={Uri.EscapeUriString(contentToFetch)}");
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            _fetchedWikipediaContent = await response.Content.ReadAsStringAsync();
+                        }
+                        else
+                        {
+                            await ShowToast(false, "אנא ודאו שימוש בקישור תקין לויקיפדיה.", "fa-solid fa-circle-exclamation");
+                            isModalLoading = false;
+                            return; // Exit method if fetch fails
+                        }
+                    }
+
+                    // Use the fetched Wikipedia content for generating questions
+                    GenerateQuestions.information = _fetchedWikipediaContent;
+                }
+                else
+                {
+                    await ShowToast(false, "אנא ודאו שימוש בקישור תקין לויקיפדיה.", "fa-solid fa-circle-exclamation");
+                    isModalLoading = false;
+                    return; // Exit method if link is invalid
+                }
+            }
+
+            // Log to verify information content
+            Console.WriteLine($"Description is:  {GenerateQuestions.description}");
+            Console.WriteLine($"Audience is:  {GenerateQuestions.audienceDescription}");
+            Console.WriteLine($"Count Questions is:  {GenerateQuestions.countQuestions}");
+
+            // Post the request to your API endpoint for generating questions
+            var gptResponse = await Http.PostAsJsonAsync("api/GPT/GPTChatStage2", GenerateQuestions);
+            if (gptResponse.IsSuccessStatusCode)
+            {
+                var result = await gptResponse.Content.ReadAsStringAsync();
+                FileContent = result; // Store the raw JSON response
+                FormattedContent = FormatJsonToPlainText(result); // Format the content for textarea
+                ErrorMessage = null; // Clear any previous error message
+            }
+            else
+            {
+                ErrorMessage = "Error generating questions";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"An error occurred: {ex.Message}";
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+        finally
+        {
+            isModalLoading = false;
+        }
+    }
+
+    private string FormatJsonToPlainText(string jsonContent)
+    {
+        var formattedText = new System.Text.StringBuilder();
+
+        try
+        {
+            var jsonData = JsonDocument.Parse(jsonContent);
+            var questions = jsonData.RootElement.GetProperty("questions");
+
+            foreach (var question in questions.EnumerateArray())
+            {
+                formattedText.AppendLine(question.GetProperty("question").GetString());
+                formattedText.AppendLine();
+
+                var correctAnswer = question.GetProperty("answer").GetBoolean();
+
+                // Add the correct answer as true or false
+                formattedText.AppendLine($"{(correctAnswer ? "True" : "False")}");
+
+                formattedText.AppendLine(); // Add a blank line between questions
+            }
+        }
+        catch (Exception ex)
+        {
+            formattedText.AppendLine("Error parsing JSON content.");
+        }
+
+        return formattedText.ToString();
+    }
+
+    private async Task AddQuestionsFromGPT()
+    {
+        isLoading = true;
+        // Deserialize the JSON content into C# objects
+        //Console.WriteLine(FileContent);
+        var generatedQuestions = JsonSerializer.Deserialize<GeneratedTrueFalseList>(FileContent, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true // Handle case insensitivity if needed
+            });
+
+        if (generatedQuestions != null && generatedQuestions.Questions.Any())
+        {
+
+            foreach (var generatedQuestion in generatedQuestions.Questions)
+            {
+                // Add question
+                var newQuestion = await AddGeneratedQuestion(generatedQuestion);
+
+                // Add answers for the question
+                if (newQuestion != null)
+                {
+                    await AddGeneratedAnswers(newQuestion.ID, generatedQuestion.Answer);
+                    await RefreshGameDetailsForGPT();
+                }
+            }
+
+            await ShowToast(true, "שאלות הוספו בהצלחה!", "fa-solid fa-circle-check");
+            ClearFormFields();
+            ClearEntireForm();
+
+        }
+        else
+        {
+            ErrorMessage = "No questions generated by ChatGPT.";
+        }
+        ClearFormFields();
+        ClearEntireForm();
+        StateHasChanged();
+        isLoading = false;
+
+    } 
+
+    private async Task<GameQuestions> AddGeneratedQuestion(generatedTrueeFalseQuestions generatedQuestion)
+    {
+
+        bool hasImage = !string.IsNullOrEmpty(myFileImage);
+        QuestionToAdd questionToAdd = new QuestionToAdd()
+            {
+                GameID = game.ID,
+                HasImage = hasImage,
+                QuestionDescription = generatedQuestion.Question,
+                QuestionImage = myFileImage,
+                StageID = stage,
+            };
+
+        var response = await Http.PostAsJsonAsync($"api/game/{UserId}/addQuestion/{gameCode}", questionToAdd);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadAsStringAsync();
+            int questionId = int.Parse(result);
+            GameQuestions newQuestion = new GameQuestions
+                {
+                    ID = questionId,
+                    QuestionDescription = generatedQuestion.Question,
+                    QuestionImage = myFileImage,
+                    HasImage = hasImage
+                };
+
+            await OnQuestionAdded.InvokeAsync(newQuestion);
+            return newQuestion;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private async Task<bool> AddGeneratedAnswers(int questionId, bool correctAnswer)
+    {
+        try
+        {
+            // Prepare a list of GameAnswers to send to the API endpoint
+            List<GameAnswers> answers = new List<GameAnswers>
+        {
+            new GameAnswers
+            {
+                AnswerDescription = correctAnswer.ToString(), // Convert bool to string if needed
+                IsCorrect = correctAnswer,
+                HasImage = false, // Adjust as per your logic
+                AnswerImage = "empty", // Adjust as per your logic
+                QuestionID = questionId
+            }
+        };
+
+            // Post the answers list to your API endpoint
+            var response = await Http.PostAsJsonAsync($"api/game/{UserId}/addAnswers/{questionId}", answers);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true; // Return true indicating successful creation
+            }
+            else
+            {
+                Console.WriteLine("Failed to add answers: " + await response.Content.ReadAsStringAsync());
+                return false; // Return false indicating failure to add answers
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception adding answers: " + ex.Message);
+            return false; // Return false on any exception
+        }
+    }
+
+    private async Task ClearFileInput()
+    {
+        GenerateQuestions.fileBase64 = string.Empty;
+        await JS.InvokeVoidAsync("clearFileInput", "formFile");
+
+    }
+
+    private void ClearWikipediaLink()
+    {
+        GenerateQuestions.wikipediaLink = string.Empty;
+    }
+
+    private void ClearDescription()
+    {
+        GenerateQuestions.description = string.Empty;
+    }
+
+    private void ClearEntireForm()
+    {
+        GenerateQuestions = new QuestionsFromGPT();
+        uploadedFileContent = string.Empty;
+        FileContent = string.Empty;
+        FormattedContent = string.Empty;
+        ErrorMessage = string.Empty;
+        _fetchedWikipediaContent = string.Empty;
+        isModalLoading = false;
+    }
+
+    private async Task RefreshGameDetailsForGPT()
+    {
+        Console.WriteLine("Loading Stage ID: " + stage.ToString());
+        var response = await Http.GetFromJsonAsync<GameDetails>($"api/game/{UserId}/getGame/{gameCode}");
+        if (response != null)
+        {
+            // Taking property `StageId` that defines the relevant stage id
+            game = new GameDetails
+                {
+                    ID = response.ID,
+                    GameName = response.GameName,
+                    Questions = response.Questions.Where(q => q.StageID == stage).ToList()
+                    // Copy other properties as needed
+                };
+            //if questions isactive=0 set toggle accordingly
+            if (game.Questions.Count > 0)
+            {
+                isStageActive = game.Questions.FirstOrDefault(q => q.StageID == stage).isActive; ////////////////////////////////////////// IMPORTANT
+            }
+        }
+        StateHasChanged(); // This will trigger a UI update
+    }
+
+
+
 
 
     /*METHODS*/
@@ -679,7 +1251,6 @@
                     ID = response.ID,
                     GameName = response.GameName,
                     Questions = response.Questions.Where(q => q.StageID == stage).ToList()
-                    // Copy other properties as needed
                 };
             //if questions isactive=0 set toggle accordingly
             if (game.Questions.Count > 0)

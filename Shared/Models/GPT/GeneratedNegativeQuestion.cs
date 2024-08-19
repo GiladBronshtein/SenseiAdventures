@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace template.Shared.Models.GPT
 {
-    public class GeneratedQuestion
+    public class GeneratedNegativeQuestion
     {
         public string Question { get; set; }
         public List<string> Options { get; set; }
         public string Answer { get; set; }
-        public bool IsCorrect { get; set; } // Add this property to denote correct answer
-
+        public bool IsCorrect { get; set; }
     }
 }

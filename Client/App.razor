@@ -6,9 +6,9 @@
         @if (UserId > 0 || _nav.Uri + "/" == _nav.ToAbsoluteUri("./").ToString() || _nav.Uri == _nav.ToAbsoluteUri("./").ToString())
         {
             <CascadingValue Value="UserId">
-                 <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-                <FocusOnNavigate RouteData="@routeData" Selector="h1" /> 
-                
+                <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+
             </CascadingValue>
 
         }
@@ -18,27 +18,17 @@
         }
 
     </Found>
-   @*  <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-
-           <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-            </NotFound> *@
     <NotFound>
         @BadRequestFragment
     </NotFound>
-        </Router>
+</Router>
 
 @code {
     int UserId = 0;
     protected override async Task OnInitializedAsync()
     {
-        var res = await _http.GetAsync("api/users");
-        if (res.IsSuccessStatusCode)
-        {
-            UserId = res.Content.ReadFromJsonAsync<int>().Result;
-        }
+        _nav.LocationChanged += OnLocationChanged;
+        await getUser();
     }
 
     public void Dispose()
@@ -48,19 +38,32 @@
 
     async void OnLocationChanged(object sender, LocationChangedEventArgs args)
     {
-        if (_nav.Uri + "/" != _nav.ToAbsoluteUri("./").ToString() && _nav.Uri != _nav.ToAbsoluteUri("./").ToString() && _nav.Uri != _nav.ToAbsoluteUri("../Game").ToString())
-        {
-            var res = await _http.GetAsync("api/users");
-            if (res.IsSuccessStatusCode)
-            {
-                UserId = res.Content.ReadFromJsonAsync<int>().Result;
-            }
-        }
+        await getUser();
         StateHasChanged();
     }
+
+    async Task getUser()
+    {
+
+        var res = await _http.GetAsync("api/users");
+        if (res.IsSuccessStatusCode)
+        {
+            UserId = res.Content.ReadFromJsonAsync<int>().Result;
+        }
+        else if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            if (_nav.Uri + "/" != _nav.ToAbsoluteUri("./").ToString() && _nav.Uri != _nav.ToAbsoluteUri("./").ToString() && _nav.Uri != _nav.ToAbsoluteUri("../Game").ToString())
+            {
+                string url = res.Content.ReadAsStringAsync().Result;
+                _nav.NavigateTo(url, true);
+
+            }
+        }
+    }
+
     private RenderFragment BadRequestFragment => builder =>
        {
-       _nav.NavigateTo("./badrequest");
+           _nav.NavigateTo("./badrequest");
        };
 }
 

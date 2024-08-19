@@ -3,169 +3,155 @@
 @inject NavigationManager Nav
 @inject IJSRuntime JSRuntime;
 
-<h3 class="text-center mb-4">התקנת המשחק על גבי VR</h3>
+<div class="container-fluid">
+    <h3 class="text-center mb-4">התקנת APK על גבי מכשירי Quest</h3>
 
-<div class="container">
     <div class="alert alert-light" role="alert">
         <p class="text-right">
+            <strong>חשוב לדעת:</strong>
             <ul>
-                <li>
-                    המשחק פורסם על גבי SideQuest, פלטפורמה המאפשרת התקנת אפליקציות צד שלישי על משקפי מציאות מדומה.
-                </li>
-                <li>
-                    כאן תוכלו ללמוד כיצד להתקין את SideQuest, לחבר את המשקפיים למחשב ולהתקין את המשחק.
-                </li>
-                <li>
-                    בצעו את השלבים הבאים כדי להתחיל.
-
-                </li>
+                <li>לא נדרש חיבור למחשב או כבלים, רק חיבור לאינטרנט</li>
+                <li>בעת שימוש ראשון ב-Mobile VR Station, האפליקציה עשויה לבקש אישורים נוספים - יש לאשר בחיוב.</li>
             </ul>
+            <a href="https://cdn.sidequestvr.com/file/661288/senseiadv10.apk"> להורדת הAPK בכתובת: https://tinyurl.com/SenseiAdv לחצו כאן</a>
         </p>
     </div>
-   
-    <div class="accordion accordion-flush" id="accordionFlushExample">
 
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                    שלב 1: הכנת המשקפיים למצב מפתחים
-                </button>
-            </h2>
-            <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                <div class="accordion-body">
-                    <ul>
-                        <li>
-                            <p>
-                                פתיחת חשבון מפתחים: היכנסו לאתר של
-                                <a href="https://dashboard.oculus.com/organizations/creat" target="_blank">Oculus</a> ופתחו חשבון מפתחים.
-                            </p>
-                            <img src="path_to_image" class="img-fluid" alt="פתיחת חשבון מפתחים">
-                        </li>
-                        <li>
-                            <p>חיבור לחשבון שלך: היכנסו לאפליקציית Meta Quest בטלפון שלך, התחבר לחשבון שלך, ובחר באפשרות 'הגדרות'.</p>
-                            <img src="path_to_image" class="img-fluid" alt="חיבור לחשבון שלך">
-                        </li>
-                        <li>
-                            <p>הפעלת מצב מפתחים: מצא את המשקפיים שלך ברשימה, ובתוך ההגדרות שלה, הפעילו את מצב המפתחים.</p>
-                            <img src="path_to_image" class="img-fluid" alt="הפעלת מצב מפתחים">
-                        </li>
-                    </ul>
+    <div class="row">
+        <div class="col-md-4 order-md-3 d-flex align-items-center mb-2">
+            <div class="video-container">
+                <div class="embed-responsive  embed-responsive-16by9">
+@*                     <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/wLBgioJ4OmA" allowfullscreen></iframe> *@
+                    <iframe src="https://player.vimeo.com/video/991417946?h=864182144b&amp;app_id=122963"  frameborder="0" 
+                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write" title="איך מתקינים"></iframe>
                 </div>
             </div>
         </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
-                    שלב 2: התקנת SideQuest במחשב
-                </button>
-            </h2>
-            <div id="flush-collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                <div class="accordion-body">
-                    <ul>
-                        <li>
-                            <p>
-                                הורדת SideQuest: גשו לאתר
-                                <a href="https://sidequestvr.com/setup-howto" target="_blank">SideQuest</a> והורידו את התוכנה למחשב.
-                            </p>
-                            <img src="path_to_image" class="img-fluid" alt="הורדת SideQuest">
-                        </li>
-                        <li>
-                            <p>התקנת SideQuest: פתחו את קובץ ההתקנה והתקינו את SideQuest כמו כל תוכנה אחרת.</p>
-                            <img src="path_to_image" class="img-fluid" alt="התקנת SideQuest">
-                        </li>
-                    </ul>
+        <div class="col-md-8 order-md-1">
+            <div class="accordion accordion-flush" id="accordionFlushExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                            שלב 1: הגדרות ראשוניות
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <ul>
+                                <li>פתחו את האפליקציות ונווטו ל-Settings</li>
+                                <li>בתוך Settings,  לחצו על System</li>
+                                <li>לאחר מכן לחצו על Developer</li>
+                                <li>ודאו שהאופציה הראשונה מופעלת</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
-                    שלב 3: חיבור המשקפיים למחשב
-                </button>
-            </h2>
-            <div id="flush-collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                <div class="accordion-body">
-                    <ul>
-                        <li>
-                            <p>חיבור באמצעות כבל USB: חבר את המשקפיים למחשב שלך באמצעות כבל USB.</p>
-                            <img src="path_to_image" class="img-fluid" alt="חיבור באמצעות כבל USB">
-                        </li>
-                        <li>
-                            <p>אישור חיבור: הרכב את המשקפיים ואשר את החיבור למחשב בתצוגת המשקפיים.</p>
-                            <img src="path_to_image" class="img-fluid" alt="אישור חיבור">
-                        </li>
-                    </ul>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                            שלב 2: הורדת קובץ ה-APK
+                        </button>
+                    </h2>
+                    <div id="flush-collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <ul>
+                                <li>מתוך הVR, פתחו את הדפדפן</li>
+                                <li>הכניסו את הלינק ל-APK של המשחק</li>
+                                <li>הורידו את הקובץ (הוא יישמר בתיקיית Downloads של המכשיר)</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseFour" aria-expanded="false" aria-controls="flush-collapseFour">
-                    שלב 4: שימוש ב-SideQuest
-                </button>
-            </h2>
-            <div id="flush-collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                <div class="accordion-body">
-                    <ul>
-                        <li>
-                            <p>פתיחת SideQuest: פתח את התוכנה במחשב שלך.</p>
-                            <img src="path_to_image" class="img-fluid" alt="פתיחת SideQuest">
-                        </li>
-                        <li>
-                            <p>התקנת אפליקציות: בתוכנה תוכל למצוא אפליקציות שונות ולהתקין אותן על המשקפיים בלחיצה פשוטה על כפתור ה-Install.</p>
-                            <img src="path_to_image" class="img-fluid" alt="התקנת אפליקציות">
-                        </li>
-                    </ul>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
+                            שלב 3: התקנת Mobile VR Station
+                        </button>
+                    </h2>
+                    <div id="flush-collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <ul>
+                                <li>הורידו והתקינו את האפליקציה Mobile VR Station</li>
+                                <li>פתחו את האפליקציה</li>
+                                <li>אשרו את כל ההרשאות הנדרשות</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseFive" aria-expanded="false" aria-controls="flush-collapseFive">
-                    שלב 5: הפעלת האפליקציות במשקפיים
-                </button>
-            </h2>
-            <div id="flush-collapseFive" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                <div class="accordion-body">
-                    <ul>
-                        <li>
-                            <p>מציאת האפליקציות: בתפריט הראשי של המשקפיים, לך ל-'Apps' ואז בחר באפשרות 'Unknown Sources'.</p>
-                            <img src="path_to_image" class="img-fluid" alt="מציאת האפליקציות">
-                        </li>
-                        <li>
-                            <p>הפעלת האפליקציות: כאן תמצא את כל האפליקציות שהתקנת דרך SideQuest ותוכל להפעיל אותן.</p>
-                            <img src="path_to_image" class="img-fluid" alt="הפעלת האפליקציות">
-                        </li>
-                    </ul>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseFour" aria-expanded="false" aria-controls="flush-collapseFour">
+                            שלב 4: הגדרת Mobile VR Station
+                        </button>
+                    </h2>
+                    <div id="flush-collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <ul>
+                                <li>לכו ל-Android fixes</li>
+                                <li>בחרו ב-Configuration wizard</li>
+                                <li>סמנו שאתם רוצים לעשות מוד</li>
+                                <li>לחצו על האופציה Configure Scoped Storage</li>
+                                <li>לחצו על Request Access</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseSix" aria-expanded="false" aria-controls="flush-collapseSix">
-                    <i class="fa-regular fa-lightbulb me-2" style="color:darkblue ;"></i>
-
-                    טוב לדעת - לשם מה צריכים חשבון מפתחים?
-                </button>
-            </h2>
-            <div id="flush-collapseSix" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                <div class="accordion-body">
-                    <p>
-                        בכדי להשתמש ב-SideQuest ולהתקין אפליקציות צד שלישי על משקפי ה-Oculus, חייבים לפתוח חשבון מפתחים.
-                        זה מאפשר להפעיל את מצב המפתחים במשקפיים, דבר שהוא הכרחי כדי לחבר אותם למחשב ולהתקין אפליקציות שאינן קיימות בחנות הרשמית של Oculus.
-                        תהליך זה הוא חובה כדי להבטיח שתוכלו להשתמש ב-SideQuest בצורה חלקה.
-                    </p>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseFive" aria-expanded="false" aria-controls="flush-collapseFive">
+                            שלב 5: גישה לקובץ ה-APK
+                        </button>
+                    </h2>
+                    <div id="flush-collapseFive" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <ul>
+                                <li>במסך שנפתח, לחצו על Quest 3</li>
+                                <li>נווטו לתיקיית Download</li>
+                                <li>מצאו את קובץ ה-APK שהורדתם</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseSix" aria-expanded="false" aria-controls="flush-collapseSix">
+                            שלב 6: התקנת ה-APK
+                        </button>
+                    </h2>
+                    <div id="flush-collapseSix" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <ul>
+                                <li>לחצו על אייקון ההגדלה ליד הקובץ</li>
+                                <li>לחצו על Continue</li>
+                                <li>לחצו על Install (או Update אם כבר מותקן)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseSeven" aria-expanded="false" aria-controls="flush-collapseSeven">
+                            שלב 7: הפעלת האפליקציה החדשה
+                        </button>
+                    </h2>
+                    <div id="flush-collapseSeven" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <ul>
+                                <li>גשו למסך האפליקציות שלכם</li>
+                                <li>לחצו על Unknown Sources</li>
+                                <li>מצאו את המשחק , Sensei Adventures והפעילו אותו</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+             </div>
         </div>
-
     </div>
 </div>
+
+<style>
+
+</style>
 
 @code {
 }

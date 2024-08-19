@@ -16,8 +16,9 @@
         background-size: cover;
         margin: 0;
         padding: 0;
-/*         height: 100%;
- */    }
+        /*         height: 100%;
+     */
+    }
 
     .full-height-container {
         flex-grow: 1;
@@ -45,7 +46,7 @@
     }
 
     .iframe-container {
-        width:100%; /* Responsive width */
+        width: 100%; /* Responsive width */
         max-width: 400px; /* Prevent over-expansion */
     }
 
@@ -60,33 +61,30 @@
 
 
     /* CHERRY BLOSSOMS ORIGINAL */
-body:after {
-    filter: hue-rotate(0deg);
-    pointer-events: none !important;
-    position: fixed;
-    left: 0;
-    top: 0;
-    content: '';
-    width: 100%;
-    height: 100%;
-    background-image: url(https://i.imgur.com/w6otSXf.png), url(https://i.imgur.com/Uz2WWFg.png), url(https://i.imgur.com/D1fpagO.png);
-    animation: SAKURA 25s linear infinite;
-    z-index: -5;
-    opacity: 0.3; /* Adjust the value to set the desired transparency */
-}
-
-@@keyframes SAKURA {
-    0% {
-        background-position: 0 0, 0 0, 0 0;
+    body:after {
+        filter: hue-rotate(0deg);
+        pointer-events: none !important;
+        position: fixed;
+        left: 0;
+        top: 0;
+        content: '';
+        width: 100%;
+        height: 100%;
+        background-image: url(https://i.imgur.com/w6otSXf.png), url(https://i.imgur.com/Uz2WWFg.png), url(https://i.imgur.com/D1fpagO.png);
+        animation: SAKURA 25s linear infinite;
+        z-index: -5;
+        opacity: 0.3; /* Adjust the value to set the desired transparency */
     }
 
-    100% {
-        background-position: 500px 1000px, 400px 400px, 300px 300px;
+    @@keyframes SAKURA {
+        0% {
+            background-position: 0 0, 0 0, 0 0;
+        }
+
+        100% {
+            background-position: 500px 1000px, 400px 400px, 300px 300px;
+        }
     }
-}
-
-
-
 
 </style>
 
@@ -103,13 +101,17 @@ body:after {
                         <iframe class="iframe-video" src="https://player.vimeo.com/video/533879616" frameborder="0"
                                 allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
                     </div>
-                    <h6 class="mb-2" style="color: #1c1c1e;">המשתמש שמחובר כעת: @UserId</h6>
                     <button @onclick="NavigateToEditor" class="btn btn-primary mt-4 mb-3" style="transition: transform 0.2s;">כניסה לעורך</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
+
+
+
 
 @code {
     [CascadingParameter]
@@ -120,5 +122,4 @@ body:after {
         Nav.NavigateTo("./maintable");
     }
 }
-
 

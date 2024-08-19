@@ -37,19 +37,19 @@ namespace template.Server.Helpers
 
                     case "no service found":
                         //context.Result = new BadRequestObjectResult("no service found");
-                        context.Result = new RedirectResult(res.Value);
+                        context.Result = new UnauthorizedObjectResult(res.Value);
                         return;
                     case "no token found":
                         //context.Result = new BadRequestObjectResult("no token found");
-                        context.Result = new RedirectResult(res.Value);
+                        context.Result = new UnauthorizedObjectResult(res.Value);
                         return;
                     case "expired token":
                         //context.Result = new BadRequestObjectResult("expired token");
-                        context.Result = new RedirectResult(res.Value);
+                        context.Result = new UnauthorizedObjectResult(res.Value);
                         return;
                     case "unauthorize user":
                         //context.Result = new BadRequestObjectResult("unauthorize user");
-                        context.Result = new RedirectResult(res.Value);
+                        context.Result = new UnauthorizedObjectResult(res.Value);
                         return;
                     case "new user insert fail":
                         context.Result = new BadRequestObjectResult("new user insert fail");

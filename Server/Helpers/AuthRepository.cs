@@ -184,7 +184,5 @@ namespace template.Server.Helpers
             return Convert.FromBase64String(base64);
         }
     }
-
-
 }
 

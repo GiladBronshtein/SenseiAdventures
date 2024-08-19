@@ -1,0 +1,45 @@
+﻿
+.mymodaltitle {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: #333;
+}
+
+
+.mymodalbody {
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+}
+
+.text-right {
+    font-size: 1.1em;
+}
+
+.logo-container img {
+    width: 80%;
+    max-width: 80%;
+    height: auto;
+}
+
+.modaldflex.align-items-center img {
+    margin-left: 10px; /* Adjusted to margin-left for RTL alignment */
+}
+
+.modaldflex span {
+    font-size: 1.5em;
+    font-weight: 600;
+    color: #333;
+}
+
+p a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+    p a:hover {
+        text-decoration: none;
+    }
+.modal-header {
+    border-bottom: none; /* Remove the underline */
+}

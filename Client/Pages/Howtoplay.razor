@@ -1,0 +1,84 @@
+﻿@page "/howtoplay"
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<div class="modal fade" id="howToPlayModal" tabindex="-1" aria-labelledby="howToPlayModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header custom-header">
+                <h5 class="modal-title" id="howToPlayModalLabel">איך משחקים</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row justify-content-center">
+                    <div class="col-md-12">
+                        <div class="iframe-container mb-4">
+                            <iframe id="videoIframe" class="iframe-video" src="https://player.vimeo.com/video/991417040?h=24f4f37f5a&amp;app_id=122963"
+                                    frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <div class="video-details">
+                            <h5 class="video-title">Sensei Adventures</h5>
+                            <p class="video-description">למדו כיצד לשחק ב-Sensei Adventures עם מדריך וידאו זה.</p>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button @onclick="NavigateToEditor" class="btn btn-primary mt-3">כניסה לעורך</button>
+                            <div class="video-stats">
+                                <span>1.2M views</span> • <span>21 days ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("stopVideoOnModalClose", "howToPlayModal", "videoIframe");
+        }
+    }
+
+    private async void NavigateToEditor()
+    {
+        await JS.InvokeVoidAsync("hideModal", "howToPlayModal");
+        await Task.Delay(300); // Allow some time for the modal to hide
+
+        Nav.NavigateTo("/maintable");
+    }
+}
+
+@* JavaScript section to handle the modal closing event and stop the video *@
+<script>
+    function stopVideoOnModalClose(modalId, iframeId) {
+        var myModal = document.getElementById(modalId);
+        var iframe = document.getElementById(iframeId);
+
+        if (myModal && iframe) {
+            myModal.addEventListener('hidden.bs.modal', function () {
+                var src = iframe.src;
+                iframe.src = '';
+                iframe.src = src;
+            });
+        }
+    }
+
+    function hideModal(modalId) {
+        var myModalElement = document.getElementById(modalId);
+        if (myModalElement) {
+            var myModal = bootstrap.Modal.getInstance(myModalElement);
+            if (!myModal) {
+                myModal = new bootstrap.Modal(myModalElement);
+            }
+            myModal.hide();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        stopVideoOnModalClose('howToPlayModal', 'videoIframe');
+    });
+</script>
+

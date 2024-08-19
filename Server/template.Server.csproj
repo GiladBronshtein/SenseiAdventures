@@ -14,6 +14,7 @@
     <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.26" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.26" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NPOI" Version="2.7.1" />
     <PackageReference Include="PdfPig" Version="0.1.8" />
     <PackageReference Include="popper.js" Version="1.16.1" />
